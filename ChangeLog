@@ -1,0 +1,30 @@
+
+2017-05-12  Ian Bolton  <ian.bolton@embecosm.com>
+
+	* AUTHORS: Created.
+	* configure.ac: Created.
+	* Makefile.am: Created.
+	* NEWS: Created.
+	* README: Created as symbolic link to README.md.
+	* README.md: Updated with a note about lack of doc directory.
+	* server/Cpu.cpp: Created.
+	* server/Cpu.h: Created.
+	* server/GdbServer.cpp: Created.
+	* server/GdbServer.h: Created.
+	* server/main.cpp: Created.
+	* server/Makefile.am: Created.
+	* server/MpHash.cpp: Created.
+	* server/MpHash.h: Created.
+	* server/RspConnection.cpp: Created.
+	* server/RspConnection.h: Created.
+	* server/RspPacket.cpp: Created.
+	* server/RspPacket.h: Created.
+	* server/TraceFlags.cpp: Created.
+	* server/TraceFlags.h: Created.
+	* server/Utils.cpp: Created.
+	* server/Utils.h: Created.
+
+2017-05-12  Ian Bolton  <ian.bolton@embecosm.com>
+
+	* ChangeLog: Created.
+	* README.md: Created.
