@@ -1,4 +1,8 @@
 
+2017-05-13  Ian Bolton  <ian.bolton@embecosm.com>
+
+	* README.md: Added commands required to build.
+
 2017-05-12  Ian Bolton  <ian.bolton@embecosm.com>
 
 	* AUTHORS: Created.
