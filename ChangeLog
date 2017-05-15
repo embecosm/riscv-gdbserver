@@ -1,5 +1,15 @@
 2017-05-15  Ian Bolton  <ian.bolton@embecosm.com>
 
+	* server/Cpu.cpp: Detect inReset and trap situations and return bool from step.
+	* server/Cpu.h: Add inReset and haveTrap, and return bool from step.
+	* server/GdbServer.cpp: Handle 32-bit breakpoint instructions correctly.
+	* server/GdbServer.h: Correct BREAK_INSTR to EBREAK instruction pattern.
+	* server/MpHash.cpp: Correct instructions to be 32-bits.
+	* server/MpHash.h: Likewise.
+	* server/main.cpp: Cycle until CPU no longer in reset. Remove redundant command line arguments.
+
+2017-05-15  Ian Bolton  <ian.bolton@embecosm.com>
+
 	* server/Cpu.cpp: Fix spelling mistake in comment.
 	* server/Cpu.h: Likewise.
 	* server/GdbServer.cpp: Likewise.

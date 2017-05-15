@@ -45,9 +45,9 @@ int
 main (int   argc,
       char *argv[] )
 {
-  // Argument handling. There is an optional trace flag, followed by three
-  // positional arguments, the library, the device within the library and the
-  // RSP port. All three positional arguments must be specified.
+  // Argument handling. There is an optional trace flag, followed by one
+  // argument: the RSP port. More positional arguments could be added once
+  // we can connect to different things.
   unsigned int  flags;
 
   while (true) {
@@ -72,7 +72,7 @@ main (int   argc,
     case '?':
     case ':':
       cerr << "Usage: riscv-gdbserver [ -trace | -t <traceflags> ]" << endl
-           << "                     <library> <devicename> <rsp-port>" << endl;
+           << "                       <rsp-port>" << endl;
       return 255;
 
     default:
@@ -81,25 +81,29 @@ main (int   argc,
   }
 
   // 3 positional args
-  if ((argc - optind) != 3) {
+  if ((argc - optind) != 1) {
       cerr << "Usage: riscv-gdbserver [ -trace | -t <traceflags> ]" << endl
-           << "                     <library> <devicename> <rsp-port>" << endl;
+           << "                       <rsp-port>" << endl;
       cerr << "argc = " << argc << ", optind = " << optind << endl;
       return 255;
     }
 
-  char *lib  = argv[optind];
-  char *dev  = argv[optind + 1];
-  int   port = atoi (argv[optind + 2]);
+  int   port = atoi (argv[optind]);
   TraceFlags *traceFlags = new TraceFlags (flags);
 
   // The RISC-V model
   Cpu    *cpu = new Cpu ();
 
+  // Cycle while CPU is resetting
+  while (cpu->inReset())
+  {
+    cpu->step();
+  }
+
   // The RSP server
   GdbServer *gdbServer = new GdbServer (port, cpu, traceFlags);
 
-  // Run the GDB server. If we return we hit some sort of problem.
+  // Run the GDB server. If we return, then we have hit some sort of problem.
   gdbServer->rspServer ();
 
   // Free memory

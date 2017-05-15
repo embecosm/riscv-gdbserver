@@ -179,13 +179,11 @@ GdbServer::rspClientRequest ()
 
       for (int i = 0; true; i++)
 	{
-	  cpu->step ();
-          /* TODO step used to return bool */
-	  /* {
+	  if (cpu->step ())
+	    {
 	      rspReportException ();
 	      return;
 	    }
-          */
 	  if ((clock_timeout != 0)
 	      && (0 == (i % RUN_SAMPLE_PERIOD))
 	      && ((clock() - timeout_start) > clock_timeout))
@@ -945,7 +943,7 @@ GdbServer::rspRemoveMatchpoint ()
 {
   MpType    type;			// What sort of matchpoint
   uint32_t  addr;			// Address specified
-  uint16_t  instr;			// Instruction value found
+  uint32_t  instr;			// Instruction value found
   int       len;			// Matchpoint length
   uint8_t  *instrVec;			// Instruction as byte vector
 
@@ -1115,7 +1113,7 @@ GdbServer::rspInsertMatchpoint ()
 {
   MpType    type;			// What sort of matchpoint
   uint32_t  addr;			// Address specified
-  uint16_t  instr;			// Instruction value found
+  uint32_t  instr;			// Instruction value found
   int       len;			// Matchpoint length
   uint8_t  *instrVec;			// Instruction as byte vector
 
@@ -1155,9 +1153,11 @@ GdbServer::rspInsertMatchpoint ()
       // place.
       mpHash->add (type, addr, instr);
 
-      // Little-endian, so MS byte is at "little" address.
-      cpu->writeMem (addr,     BREAK_INSTR >> 8);
-      cpu->writeMem (addr + 1, BREAK_INSTR & 0xff);
+      // Little-endian, so least significant byte is at "little" address.
+      cpu->writeMem (addr, BREAK_INSTR & 0xff);
+      cpu->writeMem (addr + 1, (BREAK_INSTR >> 8) & 0xff);
+      cpu->writeMem (addr + 2, (BREAK_INSTR >> 16) & 0xff);
+      cpu->writeMem (addr + 3, (BREAK_INSTR >> 24) & 0xff);
 
       if (traceFlags->traceRsp())
 	{

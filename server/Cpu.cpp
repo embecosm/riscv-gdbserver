@@ -45,14 +45,36 @@ Cpu::~Cpu ()
 
 //! Step one clock edge
 
-void
+bool
 Cpu::step ()
 {
   mCpu->clk = mClk;
   mCpu->eval ();
   mClk++;
-
+  return haveTrap() == 1;
 }	// Cpu::step ()
+
+
+//! Are we in reset?
+
+bool
+Cpu::inReset (void) const
+{
+  int  res = mCpu->testbench->inReset ();
+  return  res == 1;
+
+}	// inReset ()
+
+
+//! Have we hit a trap?
+
+bool
+Cpu::haveTrap (void) const
+{
+  int  res = mCpu->testbench->haveTrap ();
+  return  res == 1;
+
+}	// haveTrap ()
 
 
 //! Read from memory
@@ -77,11 +99,16 @@ Cpu::writeMem (uint32_t addr,
 }	// Cpu::writeMem ()
 
 
+//! Read a register
+
 uint32_t
 Cpu::readReg (unsigned int regno) const
 {
   return mCpu->testbench->uut->readReg(regno);
 }
+
+
+//! Write a register
 
 void
 Cpu::writeReg (unsigned int regno,
@@ -90,11 +117,17 @@ Cpu::writeReg (unsigned int regno,
   mCpu->testbench->uut->writeReg(regno, val);
 }
 
+
+//! Read the PC
+
 uint32_t
 Cpu::readProgramAddr () const
 {
   return  mCpu->testbench->uut->readPc();
 }
+
+
+//! Write the PC
 
 void
 Cpu::writeProgramAddr (uint32_t     val)

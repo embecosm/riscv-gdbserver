@@ -3,6 +3,7 @@
 // Copyright (C) 2009, 2013  Embecosm Limited <info@embecosm.com>
 
 // Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+// Contributor Ian Bolton <ian.bolton@embecosm.com>
 
 // This file is part of the RISC-V GDB server
 
@@ -54,7 +55,7 @@ public:
 
   MpType    type;		//!< Type of matchpoint
   uint32_t  addr;		//!< Address with the matchpoint
-  uint16_t  instr;		//!< Substituted instruction
+  uint32_t  instr;		//!< Substituted instruction
 
 
 private:
@@ -79,12 +80,12 @@ public:
   // Accessor methods
   void  add (MpType    type,
 	     uint32_t  addr,
-	     uint16_t  instr);
+	     uint32_t  instr);
   MpEntry *lookup (MpType    type,
 		   uint32_t  addr);
   bool  remove (MpType    type,
 		uint32_t  addr,
-		uint16_t *instr = NULL);
+		uint32_t *instr = NULL);
 
 private:
 

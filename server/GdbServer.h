@@ -72,8 +72,8 @@ private:
   //! Constant for a thread id
   static const int  DUMMY_TID = 1;
 
-  //! Constant for a breapoint (BREAK). Remember we are little-endian.
-  static const uint16_t  BREAK_INSTR = 0x9895;
+  //! Constant for a breakpoint (EBREAK). Remember we are little-endian.
+  static const uint32_t  BREAK_INSTR = 0x100073;
 
   //! Constant which is the sample period (in instruction steps) during
   //! "continue" etc.

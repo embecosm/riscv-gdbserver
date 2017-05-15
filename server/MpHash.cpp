@@ -69,7 +69,7 @@ MpHash::~MpHash ()
 void
 MpHash::add (MpType    type,
 	     uint32_t  addr,
-	     uint16_t  instr)
+	     uint32_t  instr)
 {
   int      hv    = addr % size;
   MpEntry *curr;
@@ -142,7 +142,7 @@ MpHash::lookup (MpType    type,
 bool
 MpHash::remove (MpType    type,
 		uint32_t  addr,
-		uint16_t *instr)
+		uint32_t *instr)
 {
   int      hv   = addr % size;
   MpEntry *prev = NULL;
