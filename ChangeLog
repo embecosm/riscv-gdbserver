@@ -1,5 +1,10 @@
 2017-05-15  Ian Bolton  <ian.bolton@embecosm.com>
 
+	* server/Cpu.cpp: Call into readReg, writeReg within CPU correctly.
+	* server/GdbServer.cpp: Continue should step without reporting exception.
+
+2017-05-15  Ian Bolton  <ian.bolton@embecosm.com>
+
 	* server/GdbServer.cpp: Corrected RISCV_PC_REGNUM to be 32.
 
 2017-05-15  Ian Bolton  <ian.bolton@embecosm.com>

@@ -24,7 +24,7 @@
 
 #include "Cpu.h"
 #include "Vtestbench_testbench.h"
-
+#include "Vtestbench_picorv32__C1_EF1_EH1.h"
 
 //! Constructor. Instantiate the Verilator model and initialize the clock.
 
@@ -80,24 +80,26 @@ Cpu::writeMem (uint32_t addr,
 uint32_t
 Cpu::readReg (unsigned int regno) const
 {
-  return  0;
+  return mCpu->testbench->uut->readReg(regno);
 }
 
 void
 Cpu::writeReg (unsigned int regno,
 	       uint32_t     val)
 {
+  mCpu->testbench->uut->writeReg(regno, val);
 }
 
 uint32_t
 Cpu::readProgramAddr () const
 {
-  return  0;
+  return  mCpu->testbench->uut->readPc();
 }
 
 void
 Cpu::writeProgramAddr (uint32_t     val)
 {
+  mCpu->testbench->uut->writePc(val);
 }
 
 

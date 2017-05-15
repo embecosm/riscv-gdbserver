@@ -181,10 +181,11 @@ GdbServer::rspClientRequest ()
 	{
 	  cpu->step ();
           /* TODO step used to return bool */
-	    {
+	  /* {
 	      rspReportException ();
 	      return;
 	    }
+          */
 	  if ((clock_timeout != 0)
 	      && (0 == (i % RUN_SAMPLE_PERIOD))
 	      && ((clock() - timeout_start) > clock_timeout))
