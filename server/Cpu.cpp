@@ -3,7 +3,7 @@
 // Copyright (C) 2017  Embecosm Limited <info@embecosm.com>
 
 // Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
-// Contibutor Ian Bolton <ian.bolton@embecosm.com>
+// Contributor Ian Bolton <ian.bolton@embecosm.com>
 
 // This file is part of the RISC-V GDB server
 

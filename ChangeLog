@@ -1,5 +1,13 @@
 2017-05-15  Ian Bolton  <ian.bolton@embecosm.com>
 
+	* server/Cpu.cpp: Fix spelling mistake in comment.
+	* server/Cpu.h: Likewise.
+	* server/GdbServer.cpp: Likewise.
+	* server/GdbServer.h: Likewise.
+	* server/main.cpp: Likewise.
+
+2017-05-15  Ian Bolton  <ian.bolton@embecosm.com>
+
 	* server/Cpu.cpp: Call into readReg, writeReg within CPU correctly.
 	* server/GdbServer.cpp: Continue should step without reporting exception.
 
