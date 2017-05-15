@@ -94,7 +94,7 @@ main (int   argc,
   TraceFlags *traceFlags = new TraceFlags (flags);
 
   // The RISC-V model
-  Cpu    *cpu;
+  Cpu    *cpu = new Cpu ();
 
   // The RSP server
   GdbServer *gdbServer = new GdbServer (port, cpu, traceFlags);

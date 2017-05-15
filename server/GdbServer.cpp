@@ -863,6 +863,12 @@ GdbServer::rspVpkt ()
       sprintf (pkt->data, "S%02d", TARGET_SIGNAL_TRAP);
       rsp->putPkt (pkt);
     }
+  else if (0 == strncmp ("vMustReplyEmpty", pkt->data, strlen ("vMustReplyEmpty")))
+    {
+      pkt->packStr ("");
+      rsp->putPkt (pkt);
+      return;
+    }
   else
     {
       cerr << "Warning: Unknown RSP 'v' packet type " << pkt->data

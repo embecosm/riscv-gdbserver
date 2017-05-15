@@ -22,7 +22,9 @@ git clone ssh://git@github.com/embecosm/picorv32
 cd picorv32/scripts/gdbserver
 make
 cd ../../..
-./configure --with-model-headers=../picorv32/scripts/gdbserver/obj_dir --with-verilator-headers=/usr/local/share/verilator/include CXXFLAGS=-std=gnu++11
+./configure --with-model-headers=../picorv32/scripts/gdbserver/obj_dir \
+            --with-verilator-headers=/usr/local/share/verilator/include \
+            CXXFLAGS="-std=gnu++11 -g"
 make
 ```
 
