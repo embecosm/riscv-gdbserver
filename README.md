@@ -39,7 +39,7 @@ server/riscv-gdbserver 51000
 In a separate terminal, invoke gdb with the binary you wish to run:
 
 ```
-riscv32-unknown-elf-gdb helloworld
+riscv32-unknown-elf-gdb dhry.elf
 ```
 
 At the gdb prompt, enter the following:
@@ -47,12 +47,13 @@ At the gdb prompt, enter the following:
 ```
 target remote :51000
 load
-step
+display /i $pc
+stepi
 ```
 
-This connects to the gdbserver, loads the helloworld binary and executes the first instruction.
+This connects to the gdbserver, loads the dhry.elf binary and executes the first instruction.
 
-You can now continue stepping through with the 'step' command.
+You can now continue stepping through with the 'stepi' command, or use 'continue' to run until the end of the program.
 
 To see the RSP packets being sent and received, type the following at the gdb prompt:
 
@@ -60,8 +61,7 @@ To see the RSP packets being sent and received, type the following at the gdb pr
 set debug remote 1
 ```
 
-Please note that the gdbserver does not behave correctly once we reach the end of the program.
-This is being worked on at the moment, so we can just type 'continue' to run the whole thing.
+Please note that continuing (or stepping) after a breakpoint is currently not working.
 
 ## Notes on documentation
 Since this is being developed from the ground-up, it does not yet have a doc directory.

@@ -43,15 +43,28 @@ Cpu::~Cpu ()
 }
 
 
-//! Step one clock edge
+// ! Step one single clock of the processor
 
-bool
-Cpu::step ()
+void
+Cpu::clock_step ()
 {
   mCpu->clk = mClk;
   mCpu->eval ();
   mClk++;
-  return haveTrap() == 1;
+}	// Cpu::clock_step ()
+
+//! Step one instruction execution
+
+bool
+Cpu::step ()
+{
+  uint32_t prev_pc = readProgramAddr ();
+  do
+  {
+    clock_step ();
+  }
+  while (prev_pc == readProgramAddr () && haveTrap () == 0);
+  return haveTrap () == 1;
 }	// Cpu::step ()
 
 
@@ -60,8 +73,8 @@ Cpu::step ()
 bool
 Cpu::inReset (void) const
 {
-  int  res = mCpu->testbench->inReset ();
-  return  res == 1;
+  int res = mCpu->testbench->inReset ();
+  return res == 1;
 
 }	// inReset ()
 
@@ -72,7 +85,7 @@ bool
 Cpu::haveTrap (void) const
 {
   int  res = mCpu->testbench->haveTrap ();
-  return  res == 1;
+  return res == 1;
 
 }	// haveTrap ()
 
@@ -94,7 +107,7 @@ void
 Cpu::writeMem (uint32_t addr,
 	       uint8_t  val)
 {
-  mCpu->testbench->writeMem(addr, val);
+  mCpu->testbench->writeMem (addr, val);
 
 }	// Cpu::writeMem ()
 
@@ -104,8 +117,9 @@ Cpu::writeMem (uint32_t addr,
 uint32_t
 Cpu::readReg (unsigned int regno) const
 {
-  return mCpu->testbench->uut->readReg(regno);
-}
+  return mCpu->testbench->uut->readReg (regno);
+
+}	// Cpu::readReg ()
 
 
 //! Write a register
@@ -114,8 +128,9 @@ void
 Cpu::writeReg (unsigned int regno,
 	       uint32_t     val)
 {
-  mCpu->testbench->uut->writeReg(regno, val);
-}
+  mCpu->testbench->uut->writeReg (regno, val);
+
+}	// Cpu::writeReg ()
 
 
 //! Read the PC
@@ -123,23 +138,24 @@ Cpu::writeReg (unsigned int regno,
 uint32_t
 Cpu::readProgramAddr () const
 {
-  return  mCpu->testbench->uut->readPc();
-}
+  return  mCpu->testbench->uut->readPc ();
+}	// Cpu::readProgramAddr ()
 
 
 //! Write the PC
 
 void
-Cpu::writeProgramAddr (uint32_t     val)
+Cpu::writeProgramAddr (uint32_t val)
 {
-  mCpu->testbench->uut->writePc(val);
-  while (inReset()) {
-    // keep stepping and writing PC while in reset, so that we are
+  mCpu->testbench->uut->writePc (val);
+  while (inReset ()) {
+    // keep stepping the clock and writing PC while in reset, so that we are
     // at the desired start address once out of reset.
-    step();
-    mCpu->testbench->uut->writePc(val);
+    clock_step ();
+    mCpu->testbench->uut->writePc (val);
   }
-}
+
+}	// Cpu::writeProgramAddr ()
 
 
 // Local Variables:

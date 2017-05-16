@@ -39,7 +39,7 @@ class Cpu final
 
   // Accessors
 
-  bool step ();
+  bool step (void);
   bool inReset (void) const;
   bool haveTrap (void) const;
   uint8_t readMem (uint32_t addr) const;
@@ -48,8 +48,8 @@ class Cpu final
   uint32_t readReg (unsigned int regno) const;
   void writeReg (unsigned int regno,
 		 uint32_t     val);
-  void writeProgramAddr (uint32_t addr);
   uint32_t readProgramAddr () const;
+  void writeProgramAddr (uint32_t addr);
 
  private:
 
@@ -60,6 +60,10 @@ class Cpu final
   //! Clock
 
   unsigned int  mClk = 0;
+
+  //! For advancing the clock
+
+  void clock_step (void);
 };
 
 #endif

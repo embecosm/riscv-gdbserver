@@ -1,5 +1,12 @@
 2017-05-16  Ian Bolton  <ian.bolton@embecosm.com>
 
+	* README.md: Updated the GDB example session section.
+	* server/Cpu.cpp: Bring step function in line with what GDB expects, to
+	execute a single instruction rather than just one clock step.
+	* server/Cpu.h: Add clock_step function.
+
+2017-05-16  Ian Bolton  <ian.bolton@embecosm.com>
+
 	* README.md: Added example GDB session instructions.
 
 2017-05-16  Ian Bolton  <ian.bolton@embecosm.com>
