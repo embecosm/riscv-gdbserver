@@ -1,5 +1,9 @@
 2017-05-16  Ian Bolton  <ian.bolton@embecosm.com>
 
+	* server/GdbServer.cpp: Debug only shown when GDBSERVER_DEBUG defined.
+
+2017-05-16  Ian Bolton  <ian.bolton@embecosm.com>
+
 	* README.md: Updated the GDB example session section.
 	* server/Cpu.cpp: Bring step function in line with what GDB expects, to
 	execute a single instruction rather than just one clock step.

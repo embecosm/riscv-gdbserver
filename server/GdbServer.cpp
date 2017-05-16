@@ -177,6 +177,10 @@ GdbServer::rspClientRequest ()
       // need to be clearer about the exception we report back.
       timeout_start = std::clock ();
 
+#ifdef GDBSERVER_DEBUG
+      fprintf (stderr, "Continuing...\n");
+#endif
+
       for (int i = 0; true; i++)
 	{
 	  if (cpu->step ())
@@ -294,13 +298,19 @@ GdbServer::rspClientRequest ()
       // Single step one machine instruction. For now we ignore the address.
       // TODO. We need to be clearer about the exception, if any, that we
       // hit.
-      cpu->step();
+#ifdef GDBSERVER_DEBUG
+      fprintf (stderr, "Single stepping ...\n");
+#endif
+      cpu->step ();
       rspReportException ();
       return;
 
     case 'S':
       // Single step one machine instruction with signal. For now just the
       // same as 's'. TODO. Need to implement properly.
+#ifdef GDBSERVER_DEBUG
+      fprintf (stderr, "Single stepping with signal ...\n");
+#endif
       cpu->step ();
       rspReportException ();
       return;
@@ -615,10 +625,14 @@ GdbServer::rspWriteReg ()
     {
     case RISCV_PC_REGNUM:
       /* This will only work at the very start of the program before executing anything */
-      printf ("Writing PC to model as 0x%x\n", val);
-      cpu->writeProgramAddr(val);
-      printf ("Reading PC back from model as 0x%x\n", cpu->readProgramAddr());
-     break;
+#ifdef GDBSERVER_DEBUG
+      fprintf (stderr, "Writing PC to model as 0x%x\n", val);
+#endif
+      cpu->writeProgramAddr (val);
+#ifdef GDBSERVER_DEBUG
+      fprintf (stderr, "Reading PC back from model as 0x%x\n", cpu->readProgramAddr ());
+#endif
+      break;
     default:              cpu->writeReg(regNum, val); break;
     }
 
@@ -991,6 +1005,10 @@ GdbServer::rspRemoveMatchpoint ()
 	  rsp->putPkt (pkt);
 	}
 
+#ifdef GDBSERVER_DEBUG
+      fprintf (stderr, "Putting back the instruction (%x) at 0x%x.\n", instr, addr);
+#endif
+
       // Remove the breakpoint from memory. The endianness of the instruction
       // matches that of the memory.
       instrVec = (uint8_t *)(&instr);
@@ -1153,6 +1171,10 @@ GdbServer::rspInsertMatchpoint ()
       // Record the breakpoint and write a breakpoint instruction in its
       // place.
       mpHash->add (type, addr, instr);
+
+#ifdef GDBSERVER_DEBUG
+      fprintf (stderr, "Inserting a breakpoint over the instruction (%d) at 0x%x:\n", instr, addr);
+#endif
 
       // Little-endian, so least significant byte is at "little" address.
       cpu->writeMem (addr, BREAK_INSTR & 0xff);
