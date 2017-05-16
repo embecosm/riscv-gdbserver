@@ -94,11 +94,11 @@ main (int   argc,
   // The RISC-V model
   Cpu    *cpu = new Cpu ();
 
-  // Cycle while CPU is resetting
-  while (cpu->inReset())
-  {
-    cpu->step();
-  }
+  // The cpu will still be in reset at this point, but we need to set its
+  // start address before it is out of reset. We can do this within the
+  // writeProgramAddr function, which GDB calls with the start address of
+  // the loaded binary, and then step through until reset after successful
+  // updating of PC.
 
   // The RSP server
   GdbServer *gdbServer = new GdbServer (port, cpu, traceFlags);

@@ -133,6 +133,12 @@ void
 Cpu::writeProgramAddr (uint32_t     val)
 {
   mCpu->testbench->uut->writePc(val);
+  while (inReset()) {
+    // keep stepping and writing PC while in reset, so that we are
+    // at the desired start address once out of reset.
+    step();
+    mCpu->testbench->uut->writePc(val);
+  }
 }
 
 

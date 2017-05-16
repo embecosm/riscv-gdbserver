@@ -1,3 +1,12 @@
+2017-05-16  Ian Bolton  <ian.bolton@embecosm.com>
+
+	* server/Cpu.cpp: Write PC for each step while in reset, so that it is set
+	in the model once out of reset.
+	* server/GdbServer.cpp: Print out when we are writing PC and then read the
+	value back to confirm it was written.
+	* server/main.cpp: Cycling during reset has been deferred until we attempt
+	to write PC. 
+
 2017-05-15  Ian Bolton  <ian.bolton@embecosm.com>
 
 	* server/Cpu.cpp: Detect inReset and trap situations and return bool from step.

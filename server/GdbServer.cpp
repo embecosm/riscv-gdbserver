@@ -426,7 +426,6 @@ GdbServer::rspWriteAllRegs ()
 	{
 	case RISCV_PC_REGNUM:
 	  cpu->writeProgramAddr(val);
-	  cpu->step ();			// Bug 12740
 	  break;
 	default:              cpu->writeReg(regNum, val); break;
 	}
@@ -615,9 +614,11 @@ GdbServer::rspWriteReg ()
   switch (regNum)
     {
     case RISCV_PC_REGNUM:
+      /* This will only work at the very start of the program before executing anything */
+      printf ("Writing PC to model as 0x%x\n", val);
       cpu->writeProgramAddr(val);
-      cpu->step ();			// Bug 12740
-      break;
+      printf ("Reading PC back from model as 0x%x\n", cpu->readProgramAddr());
+     break;
     default:              cpu->writeReg(regNum, val); break;
     }
 
