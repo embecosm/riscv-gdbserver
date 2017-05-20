@@ -1,5 +1,10 @@
 2017-05-20  Ian Bolton  <ian.bolton@embecosm.com>
 
+	* README.md: Mention building outside source tree and also
+	expand example GDB session to cover breakpoints.
+
+2017-05-20  Ian Bolton  <ian.bolton@embecosm.com>
+
 	* README.md: Update status to mention breakpoints working.
 	* server/Cpu.cpp: Add clearTrapAndRestartInstruction to properly
 	continue after a breakpoint has caused a trap.

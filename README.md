@@ -27,6 +27,9 @@ autoreconf --install
 make
 ```
 
+If you wish to build outside the source tree, that also works, but be sure
+to amend VTESTBENCH in the configure command.
+
 ## Example GDB session interacting with riscv-gdbserver
 
 Start the riscv-gdbserver, supplying a port as the only parameter:
@@ -52,7 +55,7 @@ stepi
 
 This connects to the gdbserver, loads the dhry.elf binary and executes the first instruction.
 
-You can now continue stepping through with the 'stepi' command, or use 'continue' to run until the end of the program.
+You can now continue stepping through with the 'stepi' command.
 
 To see the RSP packets being sent and received, type the following at the gdb prompt:
 
@@ -60,7 +63,15 @@ To see the RSP packets being sent and received, type the following at the gdb pr
 set debug remote 1
 ```
 
-Please note that continuing (or stepping) after a breakpoint is currently not working.
+If you wish to set a breakpoint at main and continue until you hit it:
+
+```
+break main
+continue
+```
+
+After the breakpoint has been hit, you can 'continue' running until the end of the
+program or just do further 'stepi' commands first.
 
 ## Notes on documentation
 Since this is being developed from the ground-up, it does not yet have a doc directory.
