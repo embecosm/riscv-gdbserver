@@ -38,5 +38,5 @@ riscv_gdbserver_SOURCES = Cpu.cpp           \
                           Utils.cpp         \
                           Utils.h
 
-
-riscv_gdbserver_LDADD = ../picorv32/scripts/gdbserver/obj_dir/Vtestbench__ALL.a ../picorv32/scripts/gdbserver/obj_dir/verilated.o ../picorv32/scripts/gdbserver/obj_dir/verilated_dpi.o
+# Link in the objects we built when we verilated our model
+riscv_gdbserver_LDADD = $(VTESTBENCH)/Vtestbench__ALL.a $(VTESTBENCH)/verilated.o $(VTESTBENCH)/verilated_dpi.o

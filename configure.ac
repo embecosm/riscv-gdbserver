@@ -41,22 +41,20 @@ AC_PROG_INSTALL
 # Add -Werror to the CXXFLAGS. For now this is not configurable.
 CXXFLAGS="$CXXFLAGS -Werror"
 
+# Add the supplied VTESTBENCH dir to CPPFLAGS
+CPPFLAGS="$CPPFLAGS -I$VTESTBENCH"
+
 # Provide an option to build a 32-bit version on a 64-bit machine
 AC_ARG_ENABLE(
 	[32-bit],
 	AC_HELP_STRING([--enable-32-bit],[build a 32-bit version on a 64-bit machine]),
 	[CXXFLAGS="$CXXFLAGS -m32"])
 
-# We need to know where the models and libraries are
-AC_ARG_WITH(
-	[model-headers],
-	AC_HELP_STRING([--with-model-headers],[location of model headers]),
-	[CPPFLAGS="$CPPFLAGS -I$withval"])
+# We need to know where the verilator headers are
 AC_ARG_WITH(
 	[verilator-headers],
 	AC_HELP_STRING([--with-verilator-headers],[location of verilator headers]),
 	[CPPFLAGS="$CPPFLAGS -I$withval -I$withval/vltstd"])
-
 
 # This is GNU compliant source and uses GNU libraries
 AC_DEFINE(_GNU_SOURCE, 1, "The source code uses the GNU libraries)
@@ -83,6 +81,7 @@ AC_CHECK_TYPES([uint8_t, uint32_t, uint64_t], , \
 AC_SUBST(CPPFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(LDFLAGS)
+AC_SUBST(VTESTBENCH)
 
 # We want to create a Makefile
 AC_CONFIG_FILES([Makefile server/Makefile])

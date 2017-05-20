@@ -1,3 +1,9 @@
+2017-05-20  Ian Bolton  <ian.bolton@embecosm.com>
+
+	* configure.ac: Define and use VTESTBENCH variable.
+	* README.md: Updated build instructions.
+	* server/Makefile.am: No longer hardcode object locations.
+
 2017-05-16  Ian Bolton  <ian.bolton@embecosm.com>
 
 	* server/GdbServer.cpp: Debug only shown when GDBSERVER_DEBUG defined.
