@@ -7,6 +7,8 @@ our modified picorv32 repo to be in the root of this repo. Since no
 Makefiles have been generated yet, you will need to run autoreconf
 during building.
 
+As of 20th May, it is now possible to breakpoint and continue.
+
 ## How to build
 Ensure you have verilator installed before you begin, since that is
 required to build our RISCV model.

@@ -1,5 +1,14 @@
 2017-05-20  Ian Bolton  <ian.bolton@embecosm.com>
 
+	* README.md: Update status to mention breakpoints working.
+	* server/Cpu.cpp: Add clearTrapAndRestartInstruction to properly
+	continue after a breakpoint has caused a trap.
+	* server/Cpu.h: New clearTrapAndRestartInstruction function.
+	* server/GdbServer.cpp: Make single instruction stepping call
+	clearTrapAndRestartInstruction before doing the step.
+
+2017-05-20  Ian Bolton  <ian.bolton@embecosm.com>
+
 	* configure.ac: Define and use VTESTBENCH variable.
 	* README.md: Updated build instructions.
 	* server/Makefile.am: No longer hardcode object locations.

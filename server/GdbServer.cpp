@@ -301,6 +301,7 @@ GdbServer::rspClientRequest ()
 #ifdef GDBSERVER_DEBUG
       fprintf (stderr, "Single stepping ...\n");
 #endif
+      cpu->clearTrapAndRestartInstruction (); // does nothing if no trap
       cpu->step ();
       rspReportException ();
       return;

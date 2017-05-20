@@ -39,6 +39,7 @@ class Cpu final
 
   // Accessors
 
+  void clearTrapAndRestartInstruction (void);
   bool step (void);
   bool inReset (void) const;
   bool haveTrap (void) const;
@@ -63,7 +64,7 @@ class Cpu final
 
   //! For advancing the clock
 
-  void clock_step (void);
+  void clockStep (void);
 };
 
 #endif
