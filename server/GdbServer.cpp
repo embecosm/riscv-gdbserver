@@ -831,6 +831,11 @@ GdbServer::rspVpkt ()
       cerr << "Warning: RSP vCont not supported: ignored" << endl;
       return;
     }
+  else if (0 == strncmp ("vKill", pkt->data, strlen ("vKill")))
+   {
+     // gdb wants us to exit, so let's do that
+     exit (0);
+   }
   else if (0 == strncmp ("vFile:", pkt->data, strlen ("vFile:")))
     {
       // For now we don't support this.
