@@ -750,13 +750,9 @@ GdbServer::rspCommand ()
 
   if (0 == strcmp (cmd, "reset"))
     {
-      // Also resets timer, which does not happen by default with cpu->reset ()
-      cout << "Model reset NOT IMPLEMENTED" << endl;
-      /*
-      cpu->reset();
-      cpu->setCycleCounter (0);
-      cpu->setLifetimeCounter (0);
-      */
+      // Throw away CPU and make another, giving completely clean slate
+      delete cpu;
+      cpu = new Cpu ();
     }
   else if (1 == sscanf (cmd, "timeout %d", &timeout))
     {
@@ -833,8 +829,11 @@ GdbServer::rspVpkt ()
     }
   else if (0 == strncmp ("vKill", pkt->data, strlen ("vKill")))
    {
-     // gdb wants us to exit, so let's do that
-     exit (0);
+     // gdb wants to kill the process (program) that was running,
+     // so delete the cpu and make another so that another gdb session
+     // can still connect to us (this happens during DEJAGNU testing)
+     delete cpu;
+     cpu = new Cpu ();
    }
   else if (0 == strncmp ("vFile:", pkt->data, strlen ("vFile:")))
     {

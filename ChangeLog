@@ -1,3 +1,8 @@
+2017-05-25  Ian Bolton  <ian.bolton@embecosm.com>
+
+	* server/GdbServer.cpp: Handle monitor reset, and make vKill
+	behave in the same way (delete cpu and construct another).
+
 2017-05-21  Ian Bolton  <ian.bolton@embecosm.com>
 
 	* server/GdbServer.cpp: Handle vKill packet, so that server
