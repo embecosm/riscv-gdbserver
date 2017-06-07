@@ -1,5 +1,49 @@
 2017-06-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	Infrastructure for an abstracted target interface class, ITarget.
+	All targets should implement the interface class ITarget, declared
+	in the "targets" subdirectory.  Each target should be in its own
+	subdirectory of the "targets" directory.  There is also a "common"
+	subdirectory for code common to all targets.
+
+	The result is the libtargets library, which can be linked into the
+	server code, which can instantiate the target of choice.  The
+	current framework has placeholders for the PicoRV32 and RI5CY
+	verilator models.
+
+	* Makefile.am: Add new subdirectories and have automake include
+	the m4 directory.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated for libtool.
+	* compile: Generated.
+	* config.guess: Generated.
+	* config.h.in: Regenerated.
+	* config.sub: Generated.
+	* configure: Regenerated.
+	* configure.ac: Now use libtool and for now comment out the
+	verilator directory.
+	* ltmain.sh: Generated.
+	* m4/libtool.m4: Generated.
+	* m4/ltoptions.m4: Generated.
+	* m4/ltsugar.m4: Generated.
+	* m4/ltversion.m4: Generated.
+	* m4/lt~obsolete.m4: Generated.
+	* server/Makefile.in: Regenerated.
+	* targets/ITarget.cpp: Created
+	* targets/ITarget.h: Created
+	* targets/Makefile.am: Created
+	* targets/Makefile.in: Generated.
+	* targets/common/Makefile.am: Created
+	* targets/common/Makefile.in: Generated.
+	* targets/common/SyscallInfo.cpp: Created
+	* targets/common/SyscallInfo.h: Created
+	* targets/picorv32/Makefile.am: Created
+	* targets/picorv32/Makefile.in: Generated.
+	* targets/ri5cy/Makefile.am: Created
+	* targets/ri5cy/Makefile.in: Generated.
+
+2017-06-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	Add in the autotools generated files.  I know that there is a
 	debate about whether to do this.  But we'll follow the GNU tool
 	chain practice of doing so.  It means you can clone and build out
