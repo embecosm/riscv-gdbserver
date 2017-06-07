@@ -22,11 +22,13 @@
 
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([riscv-gdbserver], [0.0.1], [support@embecosm.com])
+AC_INIT([riscv-gdbserver], [0.0.2], [support@embecosm.com])
 AM_INIT_AUTOMAKE
+LT_INIT
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIRS([m4])
 
-AC_COPYRIGHT([Copyright (C) 2009, 2013 Embecosm Limited])
+AC_COPYRIGHT([Copyright (C) 2017 Embecosm Limited])
 
 # Make sure we are using a reasonably recent autoconf version
 AC_PREREQ(2.69)
@@ -39,10 +41,10 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 
 # Add -Werror to the CXXFLAGS. For now this is not configurable.
-CXXFLAGS="$CXXFLAGS -Werror"
+CXXFLAGS="$CXXFLAGS -Werror -std=gnu++11"
 
 # Add the supplied VTESTBENCH dir to CPPFLAGS
-CPPFLAGS="$CPPFLAGS -I$VTESTBENCH"
+#CPPFLAGS="$CPPFLAGS -I$VTESTBENCH"
 
 # Provide an option to build a 32-bit version on a 64-bit machine
 AC_ARG_ENABLE(
@@ -84,7 +86,12 @@ AC_SUBST(LDFLAGS)
 AC_SUBST(VTESTBENCH)
 
 # We want to create a Makefile
-AC_CONFIG_FILES([Makefile server/Makefile])
+AC_CONFIG_FILES([Makefile                  \
+                 server/Makefile           \
+		 targets/Makefile          \
+		 targets/common/Makefile   \
+		 targets/picorv32/Makefile \
+		 targets/ri5cy/Makefile])
 
 # Put it all out.
 AC_OUTPUT
