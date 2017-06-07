@@ -1,3 +1,23 @@
+2017-06-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Add in the autotools generated files.  I know that there is a
+	debate about whether to do this.  But we'll follow the GNU tool
+	chain practice of doing so.  It means you can clone and build out
+	of the box.
+
+	* .gitignore: Created.
+	* COPYING: Generated.
+	* INSTALL: Generated.
+	* Makefile.in: Generated.
+	* aclocal.m4: Generated.
+	* config.h.in: Generated.
+	* configure: Generated.
+	* depcomp: Generated.
+	* install-sh: Generated.
+	* missing: Generated.
+	* server/Makefile.in: Generated.
+
+
 2017-05-25  Ian Bolton  <ian.bolton@embecosm.com>
 
 	* server/GdbServer.cpp: Handle monitor reset, and make vKill

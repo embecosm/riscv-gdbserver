@@ -1,0 +1,6 @@
+# Editor backup files
+*~
+# Cache
+autom4te.cache/
+# Build directory
+bd/
