@@ -638,6 +638,10 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 VTESTBENCH
+MODNAME_RI5CY
+MDIR_RI5CY
+MODNAME_PICORV32
+MDIR_PICORV32
 CXXCPP
 am__fastdepCXX_FALSE
 am__fastdepCXX_TRUE
@@ -771,8 +775,11 @@ enable_dependency_tracking
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
-enable_32_bit
 with_verilator_headers
+with_picorv32_modeldir
+with_picorv32_topmodule
+with_ri5cy_modeldir
+with_ri5cy_topmodule
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1417,7 +1424,6 @@ Optional Features:
   --disable-dependency-tracking
                           speeds up one-time build
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --enable-32-bit         build a 32-bit version on a 64-bit machine
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1431,7 +1437,13 @@ Optional Packages:
   --with-sysroot[=DIR]    Search for dependent libraries within DIR (or the
                           compiler's sysroot if not specified).
   --with-verilator-headers
-                          location of verilator headers
+                          location of standard verilator headers
+  --with-picorv32-modeldir
+                          directory containing the PicoRV32 model & headers
+  --with-picorv32-topmodule
+                          Name of the top module in the PicoRV32 Verilog
+  --with-ri5cy-modeldir   directory containing the RI5CY model & headers
+  --with-ri5cy-topmodule  Name of the top module in the RI5CY Verilog
 
 Some influential environment variables:
   CC          C compiler command
@@ -15856,19 +15868,71 @@ CXXFLAGS="$CXXFLAGS -Werror -std=gnu++11"
 # Add the supplied VTESTBENCH dir to CPPFLAGS
 #CPPFLAGS="$CPPFLAGS -I$VTESTBENCH"
 
-# Provide an option to build a 32-bit version on a 64-bit machine
-# Check whether --enable-32-bit was given.
-if test "${enable_32_bit+set}" = set; then :
-  enableval=$enable_32_bit; CXXFLAGS="$CXXFLAGS -m32"
-fi
-
-
-# We need to know where the verilator headers are
+# We need to know where the generic verilator headers are
 
 # Check whether --with-verilator-headers was given.
 if test "${with_verilator_headers+set}" = set; then :
-  withval=$with_verilator_headers; CPPFLAGS="$CPPFLAGS -I$withval -I$withval/vltstd"
+  withval=$with_verilator_headers; VINCDIR="$withval"
+else
+  VINCDIR="usr/share/verilator/include"
 fi
+
+
+CPPFLAGS="$CPPFLAGS -I$VINCDIR -I$VINCDIR/vltstd"
+
+# We need to know where the target library and headers are for each target,
+# and the name of the top module (from which we derive the module name)
+
+# PicoRV32
+
+# Check whether --with-picorv32-modeldir was given.
+if test "${with_picorv32_modeldir+set}" = set; then :
+  withval=$with_picorv32_modeldir; MDIR_PICORV32="$withval"
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "PicoRV32 model directory not specified
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+# Check whether --with-picorv32-topmodule was given.
+if test "${with_picorv32_topmodule+set}" = set; then :
+  withval=$with_picorv32_topmodule; MODNAME_PICORV32="$withval"
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "PicoRV32 top module not specified
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+
+
+# RI5CY
+
+# Check whether --with-ri5cy-modeldir was given.
+if test "${with_ri5cy_modeldir+set}" = set; then :
+  withval=$with_ri5cy_modeldir; MDIR_RI5CY="$withval"
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "RI5CY model directory not specified
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+# Check whether --with-ri5cy-topmodule was given.
+if test "${with_ri5cy_topmodule+set}" = set; then :
+  withval=$with_ri5cy_topmodule; MODNAME_RI5CY="$withval"
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "RI5CY top module not specified
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
 
 
 # This is GNU compliant source and uses GNU libraries
@@ -15928,6 +15992,26 @@ else
 		 { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "C headers missing
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+done
+
+# Headers for Verilator
+for ac_header in verilated.h verilated_dpi.h verilated_vcd_c.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+else
+  \
+		 { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Verilator headers missing
 See \`config.log' for more details" "$LINENO" 5; }
 fi
 

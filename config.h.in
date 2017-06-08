@@ -78,6 +78,15 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to 1 if you have the <verilated_dpi.h> header file. */
+#undef HAVE_VERILATED_DPI_H
+
+/* Define to 1 if you have the <verilated.h> header file. */
+#undef HAVE_VERILATED_H
+
+/* Define to 1 if you have the <verilated_vcd_c.h> header file. */
+#undef HAVE_VERILATED_VCD_C_H
+
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 

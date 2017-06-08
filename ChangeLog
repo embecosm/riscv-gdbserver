@@ -1,3 +1,28 @@
+2017-06-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Restructure configure.ac to add a set of target specific options
+	to locate verilator models and headers. We now have
+	--with-verilator-headers
+	--with-picorv32-modeldir
+	--with-picorv32-topmodule
+	--with-ri5cy-modeldir
+	--with-ri5cy-topmodule
+
+	For each new model, we add a new set of options.
+
+	* Makefile.in: Regenerated.
+	* config.h.in: Regenerated.
+	* configure: Regenerated.
+	* configure.ac: Remove --enable-32-bit, add --with-verilator-headers
+	--with-picorv32-modeldir, --with-picorv32-topmodule,
+	--with-ri5cy-modeldir, --with-ri5cy-topmodule, test for Verilator
+	headers.
+	* server/Makefile.in: Regenerated.
+	* targets/Makefile.in: Regenerated.
+	* targets/common/Makefile.in: Regenerated.
+	* targets/picorv32/Makefile.in: Regenerated.
+	* targets/ri5cy/Makefile.in: Regenerated.
+
 2017-06-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	Infrastructure for an abstracted target interface class, ITarget.

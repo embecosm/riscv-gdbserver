@@ -46,17 +46,49 @@ CXXFLAGS="$CXXFLAGS -Werror -std=gnu++11"
 # Add the supplied VTESTBENCH dir to CPPFLAGS
 #CPPFLAGS="$CPPFLAGS -I$VTESTBENCH"
 
-# Provide an option to build a 32-bit version on a 64-bit machine
-AC_ARG_ENABLE(
-	[32-bit],
-	AC_HELP_STRING([--enable-32-bit],[build a 32-bit version on a 64-bit machine]),
-	[CXXFLAGS="$CXXFLAGS -m32"])
-
-# We need to know where the verilator headers are
+# We need to know where the generic verilator headers are
 AC_ARG_WITH(
 	[verilator-headers],
-	AC_HELP_STRING([--with-verilator-headers],[location of verilator headers]),
-	[CPPFLAGS="$CPPFLAGS -I$withval -I$withval/vltstd"])
+	AC_HELP_STRING([--with-verilator-headers],
+	               [location of standard verilator headers]),
+	[VINCDIR="$withval"],[VINCDIR="usr/share/verilator/include"])
+
+CPPFLAGS="$CPPFLAGS -I$VINCDIR -I$VINCDIR/vltstd"
+
+# We need to know where the target library and headers are for each target,
+# and the name of the top module (from which we derive the module name)
+
+# PicoRV32
+AC_ARG_WITH(
+	[picorv32-modeldir],
+	AC_HELP_STRING([--with-picorv32-modeldir],
+	               [directory containing the PicoRV32 model & headers]),
+	[MDIR_PICORV32="$withval"],
+	[AC_MSG_FAILURE(PicoRV32 model directory not specified)])
+AC_ARG_WITH(
+	[picorv32-topmodule],
+	AC_HELP_STRING([--with-picorv32-topmodule],
+	               [Name of the top module in the PicoRV32 Verilog]),
+	[MODNAME_PICORV32="$withval"],
+	[AC_MSG_FAILURE(PicoRV32 top module not specified)])
+AC_SUBST(MDIR_PICORV32)
+AC_SUBST(MODNAME_PICORV32)
+
+# RI5CY
+AC_ARG_WITH(
+	[ri5cy-modeldir],
+	AC_HELP_STRING([--with-ri5cy-modeldir],
+	               [directory containing the RI5CY model & headers]),
+	[MDIR_RI5CY="$withval"],
+	[AC_MSG_FAILURE(RI5CY model directory not specified)])
+AC_ARG_WITH(
+	[ri5cy-topmodule],
+	AC_HELP_STRING([--with-ri5cy-topmodule],
+	               [Name of the top module in the RI5CY Verilog]),
+	[MODNAME_RI5CY="$withval"],
+	[AC_MSG_FAILURE(RI5CY top module not specified)])
+AC_SUBST(MDIR_RI5CY)
+AC_SUBST(MODNAME_RI5CY)
 
 # This is GNU compliant source and uses GNU libraries
 AC_DEFINE(_GNU_SOURCE, 1, "The source code uses the GNU libraries)
@@ -73,6 +105,9 @@ AC_LANG_POP([C++])
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h netinet/tcp.h poll.h \
                  inttypes.h sys/socket.h], , \
 		 [AC_MSG_FAILURE(C headers missing)])
+# Headers for Verilator
+AC_CHECK_HEADERS([verilated.h verilated_dpi.h verilated_vcd_c.h], , \
+		 [AC_MSG_FAILURE(Verilator headers missing)])
 
 # check for uint{8,32,64}_t in stdint.h.
 AC_CHECK_TYPES([uint8_t, uint32_t, uint64_t], , \
