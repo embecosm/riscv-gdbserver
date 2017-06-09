@@ -1,3 +1,34 @@
+2017-06-09  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	WIP progress to integrated existing model into the GDB server
+	target abstraction.
+
+	* server/Cpu.cpp: Moved to targets/ri5cy/Ri5cy.cpp.
+	* server/Cpu.h: Moved to targets/ri5cy/Ri5cy.h.
+	* server/GdbServer.cpp: Use ITarget.h, not Cpu.h, add using
+	statements from chrono components. Use timeout, not clock_timeout
+	throughout and make signals of scoped enumeration type TargetSignal.
+	(GdbServer::GdbServer): Change type of cpu to ITarget, and
+	initialize timeout as a duration.
+	(GdbServer::rspClientRequest): Replace code for 'c'.
+	(operator<<): Created.
+	* server/GdbServer.h: Relace ctime by chrono header
+	(class GdbServer): Make cpu of class ITarget, make signals a
+	scoped enumeration, make timeout a duration.
+	* server/Makefile.am: Remove Cpu.c and Cpu.h from SOURCES, add
+	libtargets as a library and all the target include directories.
+	* server/Makefile.in: Regnerated.
+	* server/RspConnection.cpp:
+	(RspConnection::putRspChar, RspConnection::getRspChar): Rewrite to
+	use raw versions of functions and test for break.
+	(RspConnection::haveBreak, RspConnection::putRspCharRaw)
+	(RspConnectionLinux::getRspCharRaw): Created.
+	* server/RspConnection.h (class RspConnection): Add new methods
+	and member variable sot support them.
+	* server/main.cpp: Replace Cpu.h by all the target headers.
+	* targets/ri5cy/Ri5cy.cpp: Moved to server/Cpu.cpp.
+	* targets/ri5cy/Ri5cy.h: Moved to server/Cpu.h.
+
 2017-06-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	Restructure configure.ac to add a set of target specific options

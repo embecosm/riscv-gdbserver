@@ -22,9 +22,7 @@
 
 bin_PROGRAMS = riscv-gdbserver
 
-riscv_gdbserver_SOURCES = Cpu.cpp           \
-                          Cpu.h             \
-                          GdbServer.cpp     \
+riscv_gdbserver_SOURCES = GdbServer.cpp     \
                           GdbServer.h       \
 		          main.cpp          \
                           MpHash.cpp        \
@@ -39,4 +37,11 @@ riscv_gdbserver_SOURCES = Cpu.cpp           \
                           Utils.h
 
 # Link in the objects we built when we verilated our model
-riscv_gdbserver_LDADD = $(VTESTBENCH)/Vtestbench__ALL.a $(VTESTBENCH)/verilated.o $(VTESTBENCH)/verilated_dpi.o
+##riscv_gdbserver_LDADD = $(VTESTBENCH)/Vtestbench__ALL.a $(VTESTBENCH)/verilated.o $(VTESTBENCH)/verilated_dpi.o
+
+riscv_gdbserver_LDADD = ../targets/libtargets.la
+
+riscv_gdbserver_CPPFLAGS = -I$(top_srcdir)/targets          \
+                           -I$(top_srcdir)/targets/common   \
+                           -I$(top_srcdir)/targets/picorv32 \
+                           -I$(top_srcdir)/targets/ri5cy

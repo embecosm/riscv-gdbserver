@@ -1,4 +1,4 @@
-// GDB RSP server: implementation
+// GDB RSP server: definition
 
 // Copyright (C) 2009, 2013, 2017  Embecosm Limited <info@embecosm.com>
 
@@ -19,7 +19,7 @@
 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// ----------------------------------------------------------------------------
+
 
 #include <iostream>
 #include <iomanip>
@@ -29,9 +29,11 @@
 #include <cstdlib>
 
 #include "GdbServer.h"
-#include "Cpu.h"
 #include "Utils.h"
 
+using std::chrono::duration;
+using std::chrono::system_clock;
+using std::chrono::time_point;
 using std::cout;
 using std::cerr;
 using std::dec;
@@ -40,22 +42,25 @@ using std::hex;
 using std::string;
 
 
-//-----------------------------------------------------------------------------
 // For now these are hard-coded constants, but they need to be made
 // configurable.
-//-----------------------------------------------------------------------------
 
 //! Total number of regs. 32 general regs + PC
+
 static const int RISCV_NUM_REGS = 33;
+
 //! Total bytes taken by regs. 4 bytes for each
+
 static const int RISCV_NUM_REG_BYTES = RISCV_NUM_REGS * 4;
 
 // Special registers
-static const int RISCV_PC_REGNUM   = 32; 
+
+static const int RISCV_PC_REGNUM   = 32;	//!< RISCV program counter
 
 //! Minimum packet size for RSP. Must be large enough for any initial
 //! dialogue. Should at least allow all the registers ASCII encloded + end of
 //! string marker.
+
 static const int RSP_PKT_SIZE =
   (RISCV_NUM_REG_BYTES * 2 + 1) < 256 ? 256 : RISCV_NUM_REG_BYTES * 2 + 1;
 
@@ -68,12 +73,13 @@ static const int RSP_PKT_SIZE =
 //! @param[in] rspPort      RSP port to use.
 //! @param[in] _cpu         The simulated CPU
 //! @param[in] _traceFlags  Flags controlling tracing
-GdbServer::GdbServer (int         rspPort,
-		      Cpu      *_cpu,
-		      TraceFlags *_traceFlags) :
+
+GdbServer::GdbServer (int rspPort,
+		      ITarget * _cpu,
+		      TraceFlags * _traceFlags) :
   cpu (_cpu),
   traceFlags (_traceFlags),
-  clock_timeout (0)
+  timeout (duration <double>::zero ())
 {
   pkt       = new RspPacket (RSP_PKT_SIZE);
   rsp       = new RspConnection (rspPort, traceFlags);
@@ -173,35 +179,93 @@ GdbServer::rspClientRequest ()
       return;
 
     case 'c':
-      // Continue. For now without taking any notice of the address. TODO we
-      // need to be clearer about the exception we report back.
-      timeout_start = std::clock ();
-
-#ifdef GDBSERVER_DEBUG
-      fprintf (stderr, "Continuing...\n");
-#endif
-
-      for (int i = 0; true; i++)
-	{
-	  if (cpu->step ())
-	    {
-	      rspReportException ();
-	      return;
-	    }
-	  if ((clock_timeout != 0)
-	      && (0 == (i % RUN_SAMPLE_PERIOD))
-	      && ((clock() - timeout_start) > clock_timeout))
-	    {
-	      rspReportException (TARGET_SIGNAL_XCPU);	// Timeout
-	      return;
-	    }
-	}
-
     case 'C':
-      // Continue with signal (in the packet). For now it is just the same as
-      // 'c'. TODO for now we report we have hit an exception.
-      rspReportException ();
-      return;
+
+      // Continue.  We have two timeouts to worry about.  The first is any
+      // timeout set by the user (through "monitor timeout", the second is a
+      // timeout for checking for crtl-C.
+
+      // @todo For now we use indentical code for 'C' (continue with signal)
+      //       and just ignore the signal.
+      // @todo We do not yet use the SyscallInfo arcgument when resuming.
+
+      {
+	// @todo We ought to have a constant for this.
+
+	duration <double>  interruptTimeout (0.1);
+	time_point <system_clock, duration <double> >  timeout_end =
+	  std::chrono::system_clock::now () + timeout;
+
+	// Check for break before resuming the machine.
+
+	if (rsp->haveBreak ())
+	  {
+	    (void) cpu->resume (ITarget::ResumeType::STOP);
+	    rspReportException (TargetSignal::INT);
+	    return;
+	  }
+
+	for (;;)
+	  {
+	    ITarget::ResumeRes resType =
+	      cpu->resume (ITarget::ResumeType::CONTINUE,
+				interruptTimeout, nullptr);
+
+	    switch (resType)
+	      {
+	      case ITarget::ResumeRes::SYSCALL:
+
+		// @todo Waiting for syscall. Should not occur, if it does, we
+		// treat it as a trap.
+
+		cerr << "Warning: Unexpected SYSCALL return in 'c' packet: "
+		     << "treating as TRAP." << endl;
+
+		rspReportException (TargetSignal::INT);
+		return;
+
+	      case ITarget::ResumeRes::INTERRUPTED:
+
+		// At breakpoint
+
+		rspReportException (TargetSignal::TRAP);
+		return;
+
+	      case ITarget::ResumeRes::TIMEOUT:
+
+		// Check for timeout, unless the timeout was zero
+		if ((duration <double>::zero () != timeout)
+		    && (timeout_end < std::chrono::system_clock::now ()))
+		  {
+		    // Force the target to stop. Ignore return value.
+
+		    (void) cpu->resume (ITarget::ResumeType::STOP);
+		    rspReportException (TargetSignal::XCPU);	// Timeout
+		    return;
+		  }
+
+		// Check for break
+		if (rsp->haveBreak ())
+		  {
+		    // Force the target to stop. Ignore return value.
+
+		    (void) cpu->resume (ITarget::ResumeType::STOP);
+		    rspReportException (TargetSignal::INT);	// Interrupt
+		    return;
+		  }
+
+		break;
+
+	      default:
+
+		// Should never occur.  We exit the gdbserver if this happens.
+
+		cerr << "*** ABORT: Unrecognized continue return from resume: "
+		     << "terminating" << resType << endl;
+		exit (EXIT_FAILURE);
+	      }
+	  }
+      }
 
     case 'd':
       // Disable debug using a general query
@@ -359,7 +423,7 @@ GdbServer::rspClientRequest ()
 
 //! Send a packet acknowledging an exception has occurred
 
-//! @param[in] sig  The signal to send (defaults to TARGET_SIGNAL_TRAP).
+//! @param[in] sig  The signal to send (defaults to TargetSignal::TRAP).
 void
 GdbServer::rspReportException (TargetSignal  sig)
 {
@@ -756,7 +820,7 @@ GdbServer::rspCommand ()
     }
   else if (1 == sscanf (cmd, "timeout %d", &timeout))
     {
-      clock_timeout = timeout * CLOCKS_PER_SEC;
+      timeout = timeout * CLOCKS_PER_SEC;
     }
   else if (0 == strcmp (cmd, "timestamp"))
     {
@@ -807,9 +871,9 @@ GdbServer::rspVpkt ()
   if (0 == strncmp ("vAttach;", pkt->data, strlen ("vAttach;")))
     {
       // Attaching is a null action, since we have no other process. We just
-      // return a stop packet (using TARGET_SIGNAL_TRAP) to indicate we are
+      // return a stop packet (using TargetSignal::TRAP) to indicate we are
       // stopped.
-      sprintf (pkt->data, "S%02d", TARGET_SIGNAL_TRAP);
+      sprintf (pkt->data, "S%02d", TargetSignal::TRAP);
       rsp->putPkt (pkt);
       return;
     }
@@ -879,7 +943,7 @@ GdbServer::rspVpkt ()
       // Restart the current program. However unlike a "R" packet, "vRun"
       // should behave as though it has just stopped. TODO For now we use the
       // SIGNAL_TRAP signal and do nothing.
-      sprintf (pkt->data, "S%02d", TARGET_SIGNAL_TRAP);
+      sprintf (pkt->data, "S%02d", TargetSignal::TRAP);
       rsp->putPkt (pkt);
     }
   else if (0 == strncmp ("vMustReplyEmpty", pkt->data, strlen ("vMustReplyEmpty")))
@@ -1267,6 +1331,33 @@ GdbServer::rspInsertMatchpoint ()
       return;
     }
 }	// rspInsertMatchpoint ()
+
+
+//! Output operator for TargetSignal enumeration
+
+//! @param[in] s  The stream to output to.
+//! @param[in] p  The TargetSignal value to output.
+//! @return  The stream with the item appended.
+
+std::ostream &
+operator<< (std::ostream & s,
+	    GdbServer::TargetSignal  p)
+{
+  const char * name;
+
+  switch (p)
+    {
+    case GdbServer::TargetSignal::NONE:    name = "SIGNONE";    break;
+    case GdbServer::TargetSignal::INT:     name = "SIGINT";     break;
+    case GdbServer::TargetSignal::TRAP:    name = "SIGTRAP";    break;
+    case GdbServer::TargetSignal::XCPU:    name = "SIGXCPU";    break;
+    case GdbServer::TargetSignal::UNKNOWN: name = "SIGUNKNOWN"; break;
+    default:                               name = "unknown";    break;
+    }
+
+  return  s << name;
+
+}	// operator<< ()
 
 
 // Local Variables:
