@@ -24,15 +24,17 @@
 #ifndef GDB_SERVER__H
 #define GDB_SERVER__H
 
+#include <chrono>
 #include <cstdio>
-#include <ctime>
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
+//#define __STDC_FORMAT_MACROS
+//#include <inttypes.h>
 
-// New file for RISCV CPU
-#include "Cpu.h"
+// General interface to targets
+
+#include "ITarget.h"
 
 // Class headers
+
 #include "MpHash.h"
 #include "RspConnection.h"
 #include "RspPacket.h"
@@ -50,9 +52,9 @@ class GdbServer
 public:
 
   // Constructor and destructor
-  GdbServer (int         rspPort,
-	     Cpu      *_cpu,
-	     TraceFlags *_traceFlags);
+  GdbServer (int  rspPort,
+	     ITarget * _cpu,
+	     TraceFlags * _traceFlags);
   ~GdbServer ();
 
   // Main loop to listen for and service RSP requests.
@@ -62,25 +64,35 @@ public:
 private:
 
   //! Definition of GDB target signals.
-  enum TargetSignal {
-    TARGET_SIGNAL_NONE    =   0,
-    TARGET_SIGNAL_TRAP    =   5,
-    TARGET_SIGNAL_XCPU    =  24,
-    TARGET_SIGNAL_UNKNOWN = 143
+
+  enum class TargetSignal : int {
+    NONE    =   0,
+    INT     =   2,
+    TRAP    =   5,
+    XCPU    =  24,
+    UNKNOWN = 143
   };
 
+  // stream operator has to be a friend to access private members
+
+  friend std::ostream & operator<< (std::ostream & s,
+				    GdbServer::TargetSignal  p);
+
   //! Constant for a thread id
+
   static const int  DUMMY_TID = 1;
 
   //! Constant for a breakpoint (EBREAK). Remember we are little-endian.
+
   static const uint32_t  BREAK_INSTR = 0x100073;
 
   //! Constant which is the sample period (in instruction steps) during
   //! "continue" etc.
+
   static const int RUN_SAMPLE_PERIOD = 10000;
 
   //! Our associated simulated CPU
-  Cpu *cpu;
+  ITarget * cpu;
 
   //! Our trace flags
   TraceFlags *traceFlags;
@@ -96,13 +108,13 @@ private:
   MpHash *mpHash;
 
   //! Timeout for continue.
-  clock_t clock_timeout;
+  std::chrono::duration<double>  timeout;
 
   // Main RSP request handler
   void  rspClientRequest ();
 
   // Handle the various RSP requests
-  void  rspReportException (TargetSignal  sig = TARGET_SIGNAL_TRAP);
+  void  rspReportException (TargetSignal  sig = TargetSignal::TRAP);
   void  rspReadAllRegs ();
   void  rspWriteAllRegs ();
   void  rspReadMem ();

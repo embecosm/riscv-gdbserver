@@ -26,8 +26,10 @@
 #include <cstring>
 #include <getopt.h>
 
-// RISC-V headers
-#include "Cpu.h"
+// RISC-V headers in general and for each target
+#include "ITarget.h"
+#include "Picorv32.h"
+// #include "Ri5cy.h"
 
 // Class headers
 #include "GdbServer.h"

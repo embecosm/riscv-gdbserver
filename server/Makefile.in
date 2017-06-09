@@ -125,12 +125,15 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_riscv_gdbserver_OBJECTS = Cpu.$(OBJEXT) GdbServer.$(OBJEXT) \
-	main.$(OBJEXT) MpHash.$(OBJEXT) RspConnection.$(OBJEXT) \
-	RspPacket.$(OBJEXT) TraceFlags.$(OBJEXT) Utils.$(OBJEXT)
+am_riscv_gdbserver_OBJECTS = riscv_gdbserver-GdbServer.$(OBJEXT) \
+	riscv_gdbserver-main.$(OBJEXT) \
+	riscv_gdbserver-MpHash.$(OBJEXT) \
+	riscv_gdbserver-RspConnection.$(OBJEXT) \
+	riscv_gdbserver-RspPacket.$(OBJEXT) \
+	riscv_gdbserver-TraceFlags.$(OBJEXT) \
+	riscv_gdbserver-Utils.$(OBJEXT)
 riscv_gdbserver_OBJECTS = $(am_riscv_gdbserver_OBJECTS)
-riscv_gdbserver_DEPENDENCIES = $(VTESTBENCH)/Vtestbench__ALL.a \
-	$(VTESTBENCH)/verilated.o $(VTESTBENCH)/verilated_dpi.o
+riscv_gdbserver_DEPENDENCIES = ../targets/libtargets.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -340,9 +343,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-riscv_gdbserver_SOURCES = Cpu.cpp           \
-                          Cpu.h             \
-                          GdbServer.cpp     \
+riscv_gdbserver_SOURCES = GdbServer.cpp     \
                           GdbServer.h       \
 		          main.cpp          \
                           MpHash.cpp        \
@@ -358,7 +359,12 @@ riscv_gdbserver_SOURCES = Cpu.cpp           \
 
 
 # Link in the objects we built when we verilated our model
-riscv_gdbserver_LDADD = $(VTESTBENCH)/Vtestbench__ALL.a $(VTESTBENCH)/verilated.o $(VTESTBENCH)/verilated_dpi.o
+riscv_gdbserver_LDADD = ../targets/libtargets.la
+riscv_gdbserver_CPPFLAGS = -I$(top_srcdir)/targets          \
+                           -I$(top_srcdir)/targets/common   \
+                           -I$(top_srcdir)/targets/picorv32 \
+                           -I$(top_srcdir)/targets/ri5cy
+
 all: all-am
 
 .SUFFIXES:
@@ -452,14 +458,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cpu.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GdbServer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MpHash.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RspConnection.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RspPacket.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TraceFlags.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Utils.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-GdbServer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-MpHash.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-RspConnection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-RspPacket.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-TraceFlags.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-Utils.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-main.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -481,6 +486,104 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+riscv_gdbserver-GdbServer.o: GdbServer.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-GdbServer.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-GdbServer.Tpo -c -o riscv_gdbserver-GdbServer.o `test -f 'GdbServer.cpp' || echo '$(srcdir)/'`GdbServer.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-GdbServer.Tpo $(DEPDIR)/riscv_gdbserver-GdbServer.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='GdbServer.cpp' object='riscv_gdbserver-GdbServer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-GdbServer.o `test -f 'GdbServer.cpp' || echo '$(srcdir)/'`GdbServer.cpp
+
+riscv_gdbserver-GdbServer.obj: GdbServer.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-GdbServer.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-GdbServer.Tpo -c -o riscv_gdbserver-GdbServer.obj `if test -f 'GdbServer.cpp'; then $(CYGPATH_W) 'GdbServer.cpp'; else $(CYGPATH_W) '$(srcdir)/GdbServer.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-GdbServer.Tpo $(DEPDIR)/riscv_gdbserver-GdbServer.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='GdbServer.cpp' object='riscv_gdbserver-GdbServer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-GdbServer.obj `if test -f 'GdbServer.cpp'; then $(CYGPATH_W) 'GdbServer.cpp'; else $(CYGPATH_W) '$(srcdir)/GdbServer.cpp'; fi`
+
+riscv_gdbserver-main.o: main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-main.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-main.Tpo -c -o riscv_gdbserver-main.o `test -f 'main.cpp' || echo '$(srcdir)/'`main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-main.Tpo $(DEPDIR)/riscv_gdbserver-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cpp' object='riscv_gdbserver-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-main.o `test -f 'main.cpp' || echo '$(srcdir)/'`main.cpp
+
+riscv_gdbserver-main.obj: main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-main.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-main.Tpo -c -o riscv_gdbserver-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-main.Tpo $(DEPDIR)/riscv_gdbserver-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cpp' object='riscv_gdbserver-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
+
+riscv_gdbserver-MpHash.o: MpHash.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-MpHash.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-MpHash.Tpo -c -o riscv_gdbserver-MpHash.o `test -f 'MpHash.cpp' || echo '$(srcdir)/'`MpHash.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-MpHash.Tpo $(DEPDIR)/riscv_gdbserver-MpHash.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='MpHash.cpp' object='riscv_gdbserver-MpHash.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-MpHash.o `test -f 'MpHash.cpp' || echo '$(srcdir)/'`MpHash.cpp
+
+riscv_gdbserver-MpHash.obj: MpHash.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-MpHash.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-MpHash.Tpo -c -o riscv_gdbserver-MpHash.obj `if test -f 'MpHash.cpp'; then $(CYGPATH_W) 'MpHash.cpp'; else $(CYGPATH_W) '$(srcdir)/MpHash.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-MpHash.Tpo $(DEPDIR)/riscv_gdbserver-MpHash.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='MpHash.cpp' object='riscv_gdbserver-MpHash.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-MpHash.obj `if test -f 'MpHash.cpp'; then $(CYGPATH_W) 'MpHash.cpp'; else $(CYGPATH_W) '$(srcdir)/MpHash.cpp'; fi`
+
+riscv_gdbserver-RspConnection.o: RspConnection.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-RspConnection.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-RspConnection.Tpo -c -o riscv_gdbserver-RspConnection.o `test -f 'RspConnection.cpp' || echo '$(srcdir)/'`RspConnection.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-RspConnection.Tpo $(DEPDIR)/riscv_gdbserver-RspConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='RspConnection.cpp' object='riscv_gdbserver-RspConnection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-RspConnection.o `test -f 'RspConnection.cpp' || echo '$(srcdir)/'`RspConnection.cpp
+
+riscv_gdbserver-RspConnection.obj: RspConnection.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-RspConnection.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-RspConnection.Tpo -c -o riscv_gdbserver-RspConnection.obj `if test -f 'RspConnection.cpp'; then $(CYGPATH_W) 'RspConnection.cpp'; else $(CYGPATH_W) '$(srcdir)/RspConnection.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-RspConnection.Tpo $(DEPDIR)/riscv_gdbserver-RspConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='RspConnection.cpp' object='riscv_gdbserver-RspConnection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-RspConnection.obj `if test -f 'RspConnection.cpp'; then $(CYGPATH_W) 'RspConnection.cpp'; else $(CYGPATH_W) '$(srcdir)/RspConnection.cpp'; fi`
+
+riscv_gdbserver-RspPacket.o: RspPacket.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-RspPacket.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-RspPacket.Tpo -c -o riscv_gdbserver-RspPacket.o `test -f 'RspPacket.cpp' || echo '$(srcdir)/'`RspPacket.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-RspPacket.Tpo $(DEPDIR)/riscv_gdbserver-RspPacket.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='RspPacket.cpp' object='riscv_gdbserver-RspPacket.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-RspPacket.o `test -f 'RspPacket.cpp' || echo '$(srcdir)/'`RspPacket.cpp
+
+riscv_gdbserver-RspPacket.obj: RspPacket.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-RspPacket.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-RspPacket.Tpo -c -o riscv_gdbserver-RspPacket.obj `if test -f 'RspPacket.cpp'; then $(CYGPATH_W) 'RspPacket.cpp'; else $(CYGPATH_W) '$(srcdir)/RspPacket.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-RspPacket.Tpo $(DEPDIR)/riscv_gdbserver-RspPacket.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='RspPacket.cpp' object='riscv_gdbserver-RspPacket.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-RspPacket.obj `if test -f 'RspPacket.cpp'; then $(CYGPATH_W) 'RspPacket.cpp'; else $(CYGPATH_W) '$(srcdir)/RspPacket.cpp'; fi`
+
+riscv_gdbserver-TraceFlags.o: TraceFlags.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-TraceFlags.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-TraceFlags.Tpo -c -o riscv_gdbserver-TraceFlags.o `test -f 'TraceFlags.cpp' || echo '$(srcdir)/'`TraceFlags.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-TraceFlags.Tpo $(DEPDIR)/riscv_gdbserver-TraceFlags.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='TraceFlags.cpp' object='riscv_gdbserver-TraceFlags.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-TraceFlags.o `test -f 'TraceFlags.cpp' || echo '$(srcdir)/'`TraceFlags.cpp
+
+riscv_gdbserver-TraceFlags.obj: TraceFlags.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-TraceFlags.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-TraceFlags.Tpo -c -o riscv_gdbserver-TraceFlags.obj `if test -f 'TraceFlags.cpp'; then $(CYGPATH_W) 'TraceFlags.cpp'; else $(CYGPATH_W) '$(srcdir)/TraceFlags.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-TraceFlags.Tpo $(DEPDIR)/riscv_gdbserver-TraceFlags.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='TraceFlags.cpp' object='riscv_gdbserver-TraceFlags.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-TraceFlags.obj `if test -f 'TraceFlags.cpp'; then $(CYGPATH_W) 'TraceFlags.cpp'; else $(CYGPATH_W) '$(srcdir)/TraceFlags.cpp'; fi`
+
+riscv_gdbserver-Utils.o: Utils.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-Utils.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-Utils.Tpo -c -o riscv_gdbserver-Utils.o `test -f 'Utils.cpp' || echo '$(srcdir)/'`Utils.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-Utils.Tpo $(DEPDIR)/riscv_gdbserver-Utils.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Utils.cpp' object='riscv_gdbserver-Utils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-Utils.o `test -f 'Utils.cpp' || echo '$(srcdir)/'`Utils.cpp
+
+riscv_gdbserver-Utils.obj: Utils.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-Utils.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-Utils.Tpo -c -o riscv_gdbserver-Utils.obj `if test -f 'Utils.cpp'; then $(CYGPATH_W) 'Utils.cpp'; else $(CYGPATH_W) '$(srcdir)/Utils.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-Utils.Tpo $(DEPDIR)/riscv_gdbserver-Utils.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Utils.cpp' object='riscv_gdbserver-Utils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-Utils.obj `if test -f 'Utils.cpp'; then $(CYGPATH_W) 'Utils.cpp'; else $(CYGPATH_W) '$(srcdir)/Utils.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -425,14 +425,107 @@ RspConnection::putPkt (RspPacket *pkt)
 
 //! Put a single character out on the RSP connection
 
+//! Potentially we can have an OS specific implemenation of the underlying
+//! routine.
+
+//! @param[in] c  The character to put out
+//! @return  TRUE if char sent OK, FALSE if not (communications failure)
+
+bool
+RspConnection::putRspChar (char  c)
+{
+  return  putRspCharRaw (c);
+
+}	// putRspChar ()
+
+
+
+//! Get a single character from the RSP connection with buffering
+
+//! Utility routine for use by other functions.  This is built on the raw
+//! read function.
+
+//! This function will first return the possibly buffered character (buffering
+//! caused by calling 'haveBreak'.  If the character read is the break
+//! character then we record this fact, and fetch the next character.
+
+//! @return  The character received or -1 on failure
+
+int
+RspConnection::getRspChar ()
+{
+  int ch;
+
+  if (mNumGetBufChars > 1)
+    cerr << "Warning: Too many cached characters ("
+	 << dec << mNumGetBufChars << ")" << endl;
+
+  if (mNumGetBufChars > 0)
+    {
+      ch = mGetCharBuf;
+      mNumGetBufChars = 0;
+    }
+  else
+    ch = getRspCharRaw (true);
+
+  return  ch;
+
+}	// getRspChar ()
+
+
+//! Have we received a break character.
+
+//! Since we only check fo this between packets, we don't have to worry about
+//! being in the middle of a packet.
+
+//! @Note  We only peek, so no character is actually consumed from the input.
+
+//! @return  TRUE if we have received a break character, FALSE otherwise.
+
+bool
+RspConnection::haveBreak ()
+{
+  if (!mHavePendingBreak
+      && mNumGetBufChars == 0)
+    {
+      // Non-blocking read to possibly get a character.
+
+      int nextChar = getRspCharRaw (false);
+
+      if (nextChar != -1)
+	{
+	  if (nextChar == BREAK_CHAR)
+	    mHavePendingBreak = true;
+	  else
+	    {
+	      mGetCharBuf = nextChar;
+	      mNumGetBufChars = 1;
+	    }
+	}
+    }
+
+  if (mHavePendingBreak)
+    {
+      mHavePendingBreak = false;
+      return true;
+    }
+  else
+    return false;
+
+}	// haveBreak ()
+
+
+//! Put a single character out on the RSP connection
+
 //! Utility routine. This should only be called if the client is open, but we
 //! check for safety.
 
 //! @param[in] c         The character to put out
 
 //! @return  TRUE if char sent OK, FALSE if not (communications failure)
+
 bool
-RspConnection::putRspChar (char  c)
+RspConnection::putRspCharRaw (char  c)
 {
   if (-1 == clientFd)
     {
@@ -466,7 +559,7 @@ RspConnection::putRspChar (char  c)
 	  return  true;		// Success, we can return
 	}
     }
-}	// putRspChar ()
+}	// putRspCharRaw ()
 
 
 //! Get a single character from the RSP connection
@@ -474,45 +567,53 @@ RspConnection::putRspChar (char  c)
 //! Utility routine. This should only be called if the client is open, but we
 //! check for safety.
 
-//! @return  The character received or -1 on failure
+//! @param[in] blocking  True if the read should block.
+//! @return  The character received or -1 on failure, or if the read would
+//!          block, and blocking is true.
+
 int
-RspConnection::getRspChar ()
+RspConnectionLinux::getRspCharRaw (bool blocking)
 {
   if (-1 == clientFd)
     {
       cerr << "Warning: Attempt to read from "
-	   << "unopened RSP client: Ignored" << endl;
+  	   << "unopened RSP client: Ignored" << endl;
       return  -1;
     }
 
   // Blocking read until successful (we retry after interrupts) or
   // catastrophic failure.
-  while (true)
+
+  for (;;)
     {
       unsigned char  c;
 
-      switch (read (clientFd, &c, sizeof (c)))
-	{
-	case -1:
-	  // Error: only allow interrupts
-	  if (EINTR != errno)
-	    {
-	      cerr << "Warning: Failed to read from RSP client: "
-		   << "Closing client connection: "
-		   <<  strerror (errno) << endl;
-	      return  -1;
-	    }
-	  break;
+      switch (recv (clientFd, &c, sizeof (c), (blocking ? 0 : MSG_DONTWAIT)))
+  	{
+  	case -1:
+	  if (!blocking
+	      && (errno == EAGAIN || errno == EWOULDBLOCK))
+	    return -1;
 
-	case 0:
-	  return  -1;
+  	  // Error: only allow interrupts
 
-	default:
-	  return  c & 0xff;	// Success, we can return (no sign extend!)
-	}
+  	  if (EINTR != errno)
+  	    {
+  	      cerr << "Warning: Failed to read from RSP client: "
+  		   << "Closing client connection: "
+  		   <<  strerror (errno) << endl;
+  	      return  -1;
+  	    }
+  	  break;
+
+  	case 0:
+  	  return  -1;
+
+  	default:
+  	  return  c & 0xff;	// Success, we can return (no sign extend!)
+  	}
     }
-
-}	// getRspChar ()
+}	// getRspCharRaw ()
 
 
 // Local Variables:

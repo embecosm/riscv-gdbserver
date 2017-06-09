@@ -1,4 +1,4 @@
-// Remote Serial Protocol connection: definition
+// Remote Serial Protocol connection: declaration
 
 // Copyright (C) 2009, 2013  Embecosm Limited <info@embecosm.com>
 
@@ -18,7 +18,6 @@
 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// ----------------------------------------------------------------------------
 
 #ifndef RSP_CONNECTION__H
 #define RSP_CONNECTION__H
@@ -27,47 +26,75 @@
 #include "TraceFlags.h"
 
 
-//! The default service to use if port number = 0 and no service specified
-#define DEFAULT_RSP_SERVICE  "or1ksim-rsp"
-
-
 //! Class implementing the RSP connection listener
 
 //! This class is entirely passive. It is up to the caller to determine that a
 //! packet will become available before calling ::getPkt ().
+
 class RspConnection
 {
 public:
 
   // Constructors and destructor
+
   RspConnection (int         _portNum,
 		 TraceFlags *_traceFlags);
   ~RspConnection ();
 
   // Public interface: manage client connections
+
   bool  rspConnect ();
   void  rspClose ();
   bool  isConnected ();
 
   // Public interface: get packets from the stream and put them out
+
   bool  getPkt (RspPacket *pkt);
   bool  putPkt (RspPacket *pkt);
+
+  // Check for a break (ctrl-C)
+
+  bool  haveBreak ();
 
 
 private:
 
+  //! The BREAK character
+
+  static const int BREAK_CHAR = 3;
+
   //! The port number to listen on
+
   int  portNum;
 
   //! Trace flags
+
   TraceFlags *traceFlags;
 
   //! The client file descriptor
+
   int  clientFd;
 
+  //! Has a BREAK arrived?
+
+  bool mHavePendingBreak;
+
+  //! The buffered char for get RspChar
+  int  mGetCharBuf;
+
+  //! Count of how many buffered chars we have
+  int  mNumGetBufChars;
+
   // Internal routines to handle individual chars
+
   bool  putRspChar (char  c);
   int   getRspChar ();
+
+  // Internal OS specific routines to handle individual chars.
+
+  bool  putRspCharRaw (char  c);
+  int   getRspCharRaw (bool blocking);
+
 
 };	// RspConnection ()
 
