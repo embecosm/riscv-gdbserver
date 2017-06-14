@@ -1,3 +1,37 @@
+2017-06-14  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	WIP in progress on target abstraction.
+
+	* Makefile.in: Regenerated.
+	* server/GdbServer.cpp (GdbServer::rspClientRequest): Rewrite
+	handling of 's' and 'S' packets.
+	(GdbServer::rspReportException): Use static_cast instead of C
+	style cast.
+	(GdbServer::rspReadAllRegs, GdbServer::rspWriteAllRegs): Do not
+	treat program counter as special case and use ITarget methods to
+	access registers.
+	(GdbServer::rspReadMem): Rewrite to use ITarget read method.
+	(GdbServer::rspWriteMem): Rewrite to use ITarget write method.
+	(GdbServer::rspReadReg, GdbServer::rspWriteReg): Do not treat
+	program counter as special case and use ITarget methods to access
+	registers.
+	(GdbServer::rspCommand): Use ITarget reset method for "monitor
+	reset".
+	(GdbServer::rspVpkt): Do not handle 'v' packets for now.
+	(GdbServer::rspWriteMemBin): Rewrite to use ITarget write method.
+	(GdbServer::rspRemoveMatchpoint, GdbServer::rspInsertMatchpoint):
+	Use reinterpret_cast instead of C style cast and use ITarget
+	methods to read/write memory.
+	* server/GdbServer.h: Include <inttypes.h> with STDC_FORMAT_MACROS.
+	* targets/ITarget.h (class ITarget): Pass first argument to read
+	and write methods by value, not reference.
+	* targets/picorv32/Picorv32.cpp: Created.
+	* targets/picorv32/Picorv32.h: Created.
+	* targets/picorv32/Picorv32Impl.cpp: Renamed from ri5cy/Ri5cy.cpp.
+	* targets/picorv32/Picorv32Impl.h: Renamed from ri5cy/Ri5cy.h.
+	* targets/ri5cy/Ri5cy.cpp: Renamed as picorv32/Picorv32Impl.cpp.
+	* targets/ri5cy/Ri5cy.h: Renamed as picorv32/Picorv32Impl.h.
+
 2017-06-09  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	WIP progress to integrated existing model into the GDB server

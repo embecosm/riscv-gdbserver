@@ -26,8 +26,8 @@
 
 #include <chrono>
 #include <cstdio>
-//#define __STDC_FORMAT_MACROS
-//#include <inttypes.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 // General interface to targets
 
