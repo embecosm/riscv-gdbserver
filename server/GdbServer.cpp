@@ -209,7 +209,7 @@ GdbServer::rspClientRequest ()
 	  {
 	    ITarget::ResumeRes resType =
 	      cpu->resume (ITarget::ResumeType::CONTINUE,
-				interruptTimeout, nullptr);
+			   interruptTimeout, nullptr);
 
 	    switch (resType)
 	      {
@@ -359,26 +359,49 @@ GdbServer::rspClientRequest ()
       return;
 
     case 's':
-      // Single step one machine instruction. For now we ignore the address.
-      // TODO. We need to be clearer about the exception, if any, that we
-      // hit.
-#ifdef GDBSERVER_DEBUG
-      fprintf (stderr, "Single stepping ...\n");
-#endif
-      cpu->clearTrapAndRestartInstruction (); // does nothing if no trap
-      cpu->step ();
-      rspReportException ();
-      return;
-
     case 'S':
-      // Single step one machine instruction with signal. For now just the
-      // same as 's'. TODO. Need to implement properly.
-#ifdef GDBSERVER_DEBUG
-      fprintf (stderr, "Single stepping with signal ...\n");
-#endif
-      cpu->step ();
-      rspReportException ();
-      return;
+      {
+	// Single step one machine instruction.
+	// @todo For 'S' we currently only handle Syscall requests
+
+	// Check for break before resuming the machine.
+
+	if (rsp->haveBreak ())
+	  {
+	    (void) cpu->resume (ITarget::ResumeType::STOP, nullptr);
+	    rspReportException (TargetSignal::INT);
+	    return;
+	  }
+
+	// @todo No syscall for now.
+
+	ITarget::ResumeRes resType = cpu->resume (ITarget::ResumeType::STEP,
+						  nullptr);
+
+	if (resType == ITarget::ResumeRes::SYSCALL)
+	  {
+	    // @todo Waiting for syscall. Should not occur, if it does, we
+	    // treat it as a trap.
+
+	    cerr << "Warning: Unexpected SYSCALL return in 's' packet: "
+		 << "treating as TRAP." << endl;
+
+	    rspReportException (TargetSignal::INT);
+	    return;
+	  }
+
+	// Check for break now we've stopped. No Syscall for now
+
+	if (rsp->haveBreak ())
+	  {
+	    (void) cpu->resume (ITarget::ResumeType::STOP, nullptr);
+	    rspReportException (TargetSignal::INT);
+	    return;
+	  }
+
+	rspReportException (TargetSignal::TRAP);
+	return;
+      }
 
     case 't':
       // Search. This is not well defined in the manual and for now we don't
@@ -429,8 +452,8 @@ GdbServer::rspReportException (TargetSignal  sig)
 {
   // Construct a signal received packet
   pkt->data[0] = 'S';
-  pkt->data[1] = Utils::hex2Char (sig >> 4);
-  pkt->data[2] = Utils::hex2Char (sig % 16);
+  pkt->data[1] = Utils::hex2Char (static_cast<int> (sig) >> 4);
+  pkt->data[2] = Utils::hex2Char (static_cast<int> (sig) % 16);
   pkt->data[3] = '\0';
   pkt->setLen (strlen (pkt->data));
 
@@ -457,12 +480,7 @@ GdbServer::rspReadAllRegs ()
       uint32_t  val;		// Enough for even the PC
       int       byteSize;	// Size of reg in bytes
 
-      switch (regNum)
-	{
-	case RISCV_PC_REGNUM:   val = cpu->readProgramAddr(); byteSize = 4; break;
-	default:              val = cpu->readReg(regNum);  byteSize = 4; break;
-	}
-
+      byteSize = cpu->readRegister (regNum, val);
       Utils::val2Hex (val, &(pkt->data[pktSize]), byteSize,
 		      true /* Little Endian */);
       pktSize += byteSize * 2;	// 2 chars per hex digit
@@ -487,23 +505,15 @@ GdbServer::rspWriteAllRegs ()
   // The registers
   for (int  regNum = 0; regNum < RISCV_NUM_REGS; regNum++)
     {
-      int       byteSize;	// Size of reg in bytes
+      int       byteSize = 4;	// @todo automate this. Size of reg in bytes
 
-      // Find the register size
-      byteSize = 4;
-	
       uint32_t val = Utils::hex2Val (&(pkt->data[pktSize]), byteSize,
 				     true /* little endian */);
       pktSize += byteSize * 2;	// 2 chars per hex digit
 
-      // Write the register
-      switch (regNum)
-	{
-	case RISCV_PC_REGNUM:
-	  cpu->writeProgramAddr(val);
-	  break;
-	default:              cpu->writeReg(regNum, val); break;
-	}
+      if (byteSize != cpu->writeRegister (regNum, val))
+	cerr << "Warning: Size != " << byteSize << " when writing reg "
+	     << regNum << "." << endl;
     }
 
   pkt->packStr ("OK");
@@ -544,14 +554,18 @@ GdbServer::rspReadMem ()
 	   << " too large for RSP packet: truncated" << endl;
       len = (pkt->getBufSize() - 1) / 2;
     }
-  
+
   // Refill the buffer with the reply
   for (off = 0; off < len; off++)
     {
       uint8_t  ch;
-      ch= cpu->readMem (addr + off);
-      pkt->data[off * 2]     = Utils::hex2Char(ch >>   4);
-      pkt->data[off * 2 + 1] = Utils::hex2Char(ch &  0xf);
+      if (1 == cpu->read (addr + off, &ch, 1))
+	{
+	  pkt->data[off * 2]     = Utils::hex2Char(ch >>   4);
+	  pkt->data[off * 2 + 1] = Utils::hex2Char(ch &  0xf);
+	}
+      else
+	cerr << "Warning: failed to read char" << endl;
     }
 
   pkt->data[off * 2] = '\0';			// End of string
@@ -599,14 +613,16 @@ GdbServer::rspWriteMem ()
       rsp->putPkt (pkt);
       return;
     }
-  
+
   // Write the bytes to memory (no check the address is OK here)
   for (int  off = 0; off < len; off++)
     {
       uint8_t  nyb1 = Utils::char2Hex (symDat[off * 2]);
       uint8_t  nyb2 = Utils::char2Hex (symDat[off * 2 + 1]);
+      uint8_t  val = static_cast<unsigned int> ((nyb1 << 4) | nyb2);
 
-      cpu->writeMem (addr + off, (unsigned)((nyb1 << 4) | nyb2));
+      if (1 != cpu->write (addr + off, &val, 1))
+	cerr << "Warning: Failed to write character" << endl;
     }
 
   pkt->packStr ("OK");
@@ -641,12 +657,7 @@ GdbServer::rspReadReg ()
   uint32_t  val;
   int       byteSize;
 
-  switch (regNum)
-    {
-    case RISCV_PC_REGNUM:   val = cpu->readProgramAddr(); byteSize = 4; break;
-    default:              val = cpu->readReg(regNum);  byteSize = 4; break;
-    }
-
+  byteSize = cpu->readRegister (regNum, val);
   Utils::val2Hex (val, pkt->data, byteSize, true /* little endian */);
 
   pkt->setLen (strlen (pkt->data));
@@ -678,28 +689,12 @@ GdbServer::rspWriteReg ()
       return;
     }
 
-  int       byteSize;	// Size of reg in bytes
-
-  // Find the register size
-  byteSize = 4;
-  
+  int      byteSize = 4;	// @todo automate this. Size of reg in bytes
   uint32_t val = Utils::hex2Val (valstr, byteSize, true /* little endian */);
 
-  // Write the register
-  switch (regNum)
-    {
-    case RISCV_PC_REGNUM:
-      /* This will only work at the very start of the program before executing anything */
-#ifdef GDBSERVER_DEBUG
-      fprintf (stderr, "Writing PC to model as 0x%x\n", val);
-#endif
-      cpu->writeProgramAddr (val);
-#ifdef GDBSERVER_DEBUG
-      fprintf (stderr, "Reading PC back from model as 0x%x\n", cpu->readProgramAddr ());
-#endif
-      break;
-    default:              cpu->writeReg(regNum, val); break;
-    }
+  if (byteSize != cpu->writeRegister (regNum, val))
+    cerr << "Warning: Size != " << byteSize << " when writing reg " << regNum
+	 << "." << endl;
 
   pkt->packStr ("OK");
   rsp->putPkt (pkt);
@@ -814,9 +809,13 @@ GdbServer::rspCommand ()
 
   if (0 == strcmp (cmd, "reset"))
     {
-      // Throw away CPU and make another, giving completely clean slate
-      delete cpu;
-      cpu = new Cpu ();
+      // Reset the CPU.  Failure to reset causes us to blow up.
+
+      if (ITarget::ResumeRes::SUCCESS != cpu->reset ())
+	{
+	  cerr << "*** ABORT *** Failed to reset: Terminating." << endl;
+	  exit (EXIT_FAILURE);
+	}
     }
   else if (1 == sscanf (cmd, "timeout %d", &timeout))
     {
@@ -864,102 +863,14 @@ GdbServer::rspSet ()
 
 //! Handle a RSP 'v' packet
 
-//! These are commands associated with executing the code on the target
+//! @todo for now we don't handle V packets.
+
 void
 GdbServer::rspVpkt ()
 {
-  if (0 == strncmp ("vAttach;", pkt->data, strlen ("vAttach;")))
-    {
-      // Attaching is a null action, since we have no other process. We just
-      // return a stop packet (using TargetSignal::TRAP) to indicate we are
-      // stopped.
-      sprintf (pkt->data, "S%02d", TargetSignal::TRAP);
-      rsp->putPkt (pkt);
-      return;
-    }
-  else if (0 == strcmp ("vCont?", pkt->data))
-    {
-      // For now we don't support this.
-      pkt->packStr ("");
-      rsp->putPkt (pkt);
-      return;
-    }
-  else if (0 == strncmp ("vCont", pkt->data, strlen ("vCont")))
-    {
-      // This shouldn't happen, because we've reported non-support via vCont?
-      // above
-      cerr << "Warning: RSP vCont not supported: ignored" << endl;
-      return;
-    }
-  else if (0 == strncmp ("vKill", pkt->data, strlen ("vKill")))
-   {
-     // gdb wants to kill the process (program) that was running,
-     // so delete the cpu and make another so that another gdb session
-     // can still connect to us (this happens during DEJAGNU testing)
-     delete cpu;
-     cpu = new Cpu ();
-   }
-  else if (0 == strncmp ("vFile:", pkt->data, strlen ("vFile:")))
-    {
-      // For now we don't support this.
-      cerr << "Warning: RSP vFile not supported: ignored" << endl;
-      pkt->packStr ("");
-      rsp->putPkt (pkt);
-      return;
-    }
-  else if (0 == strncmp ("vFlashErase:", pkt->data, strlen ("vFlashErase:")))
-    {
-      // For now we don't support this.
-      cerr << "Warning: RSP vFlashErase not supported: ignored" << endl;
-      pkt->packStr ("E01");
-      rsp->putPkt (pkt);
-      return;
-    }
-  else if (0 == strncmp ("vFlashWrite:", pkt->data, strlen ("vFlashWrite:")))
-    {
-      // For now we don't support this.
-      cerr << "Warning: RSP vFlashWrite not supported: ignored" << endl;
-      pkt->packStr ("E01");
-      rsp->putPkt (pkt);
-      return;
-    }
-  else if (0 == strcmp ("vFlashDone", pkt->data))
-    {
-      // For now we don't support this.
-      cerr << "Warning: RSP vFlashDone not supported: ignored" << endl;;
-      pkt->packStr ("E01");
-      rsp->putPkt (pkt);
-      return;
-    }
-  else if (0 == strncmp ("vRun;", pkt->data, strlen ("vRun;")))
-    {
-      // We shouldn't be given any args, but check for this
-      if (pkt->getLen () > strlen ("vRun;"))
-	{
-	  cerr << "Warning: Unexpected arguments to RSP vRun "
-	    "command: ignored" << endl;
-	}
+  pkt->packStr ("");
+  rsp->putPkt (pkt);
 
-      // Restart the current program. However unlike a "R" packet, "vRun"
-      // should behave as though it has just stopped. TODO For now we use the
-      // SIGNAL_TRAP signal and do nothing.
-      sprintf (pkt->data, "S%02d", TargetSignal::TRAP);
-      rsp->putPkt (pkt);
-    }
-  else if (0 == strncmp ("vMustReplyEmpty", pkt->data, strlen ("vMustReplyEmpty")))
-    {
-      pkt->packStr ("");
-      rsp->putPkt (pkt);
-      return;
-    }
-  else
-    {
-      cerr << "Warning: Unknown RSP 'v' packet type " << pkt->data
-	   << ": ignored" << endl;
-      pkt->packStr ("E01");
-      rsp->putPkt (pkt);
-      return;
-    }
 }	// rspVpkt ()
 
 
@@ -1005,10 +916,11 @@ GdbServer::rspWriteMemBin ()
 	   << endl;
       len = minLen;
     }
-  
+
   // Write the bytes to memory.
-  for (int i = 0; i < len; i++)
-    cpu->writeMem (addr + i, (unsigned) bindat[i]);
+  if (len != cpu->write (addr, bindat, len))
+    cerr << "Warning: Failed to write " << len << " bytes to 0x" << hex
+	 << addr << dec << endl;
 
   pkt->packStr ("OK");
   rsp->putPkt (pkt);
@@ -1080,10 +992,10 @@ GdbServer::rspRemoveMatchpoint ()
 
       // Remove the breakpoint from memory. The endianness of the instruction
       // matches that of the memory.
-      instrVec = (uint8_t *)(&instr);
+      instrVec = reinterpret_cast<uint8_t *> (&instr);
 
-      for (int  i = 0 ; i < len; i++)
-	    cpu->writeMem (addr + i, (unsigned) instrVec[i]);
+      if (len != cpu->write (addr, instrVec, len))
+	cerr << "Warning: Failed to write memory removing breakpoint" << endl;
 
       pkt->packStr ("OK");
       rsp->putPkt (pkt);
@@ -1232,10 +1144,11 @@ GdbServer::rspInsertMatchpoint ()
     {
     case BP_MEMORY:
       // Software (memory) breakpoint. Extract the instruction.
-      instrVec = (uint8_t *)(&instr);
+      instrVec = reinterpret_cast<uint8_t *> (&instr);
 
-      for (int  i = 0 ; i < len; i++)
-	instrVec[i] = cpu->readMem (addr + i);
+      if (len != cpu->read (addr, instrVec, len))
+	cerr << "Warning: Failed to read memory when inserting breakpoint"
+	     << endl;
 
       // Record the breakpoint and write a breakpoint instruction in its
       // place.
@@ -1246,10 +1159,12 @@ GdbServer::rspInsertMatchpoint ()
 #endif
 
       // Little-endian, so least significant byte is at "little" address.
-      cpu->writeMem (addr, BREAK_INSTR & 0xff);
-      cpu->writeMem (addr + 1, (BREAK_INSTR >> 8) & 0xff);
-      cpu->writeMem (addr + 2, (BREAK_INSTR >> 16) & 0xff);
-      cpu->writeMem (addr + 3, (BREAK_INSTR >> 24) & 0xff);
+
+      instr = BREAK_INSTR;
+      instrVec = reinterpret_cast<uint8_t *> (&instr);
+
+      if (4 != cpu->write (addr, instrVec, 4))
+	cerr << "Warning: Failed to write BREAK instruction" << endl;
 
       if (traceFlags->traceRsp())
 	{
@@ -1364,4 +1279,3 @@ operator<< (std::ostream & s,
 // mode: C++
 // c-file-style: "gnu"
 // End:
-
