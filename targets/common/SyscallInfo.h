@@ -20,7 +20,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef SYSCALL_INFO__H
-#define SYSCALL_INFO_H
+#define SYSCALL_INFO__H
 
 
 #include <cstddef>
@@ -114,7 +114,7 @@ operator<< (std::ostream & s,
 	    SyscallInfo::Syscall  p);
 
 
-#endif //SYSCALL_INFO_H
+#endif //SYSCALL_INFO__H
 
 
 // Local Variables:

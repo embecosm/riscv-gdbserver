@@ -40,79 +40,123 @@ using std::atoi;
 using std::cerr;
 using std::cout;
 using std::endl;
+using std::ostream;
 using std::strcmp;
 
+
+//! Convenience function to output the usage to a specified stream.
+
+//! @param[in] s  Output stream to use.
+
+static void
+usage (ostream & s)
+{
+  s << "Usage: riscv-gdbserver --core | -c <corename>" << endl
+    << "                       [ --trace | -t <traceflags> ]" << endl
+    << "                       <rsp-port>" << endl;
+
+}	// usage ()
+
+
+//! Main function
+
+//! @see usage () for information on the parameters.  Instantiates the core
+//! and GDB server.
+
+//! @param[in] argc  Number of arguments.
+//! @param[in] argv  Vector or arguments.
+//! @return  The return code for the program.
 
 int
 main (int   argc,
       char *argv[] )
 {
-  // Argument handling. There is an optional trace flag, followed by one
-  // argument: the RSP port. More positional arguments could be added once
-  // we can connect to different things.
-  unsigned int  flags;
+  // Argument handling.
+
+  unsigned int  flags = 0;
+  char         *coreName = nullptr;
 
   while (true) {
     int c;
     int longOptind = 0;
     static struct option longOptions[] = {
-      {"trace", required_argument, 0,  0 },
+      {"core",  required_argument, nullptr,  'c' },
+      {"help",  no_argument,       nullptr,  'h' },
+      {"trace", required_argument, nullptr,  't' },
       {0,       0,                 0,  0 }
     };
 
-    if ((c = getopt_long (argc, argv, "t:", longOptions, &longOptind)) == -1)
+    if ((c = getopt_long (argc, argv, "c:t:", longOptions, &longOptind)) == -1)
       break;
 
     switch (c) {
-    case 0:
+    case 'c':
+      coreName = strdup (optarg);
+      break;
+
+    case 'h':
+      usage (cout);
+      return  EXIT_SUCCESS;
+
     case 't':
-      // We only have the one long option for now (--trace), so no checking.
       // @todo We should allow more than just decimal values.
+
       flags = atoi (optarg);
       break;
 
     case '?':
     case ':':
-      cerr << "Usage: riscv-gdbserver [ -trace | -t <traceflags> ]" << endl
-           << "                       <rsp-port>" << endl;
-      return 255;
+      usage (cerr);
+      return  EXIT_FAILURE;
 
     default:
       cerr << "ERROR: getopt_long returned character code " << c << endl;
     }
   }
 
-  // 3 positional args
-  if ((argc - optind) != 1) {
-      cerr << "Usage: riscv-gdbserver [ -trace | -t <traceflags> ]" << endl
-           << "                       <rsp-port>" << endl;
-      cerr << "argc = " << argc << ", optind = " << optind << endl;
-      return 255;
+  // 1 positional arg
+
+  if ((argc - optind) != 1)
+    {
+      usage (cerr);
+      return  EXIT_FAILURE;
     }
 
   int   port = atoi (argv[optind]);
-  TraceFlags *traceFlags = new TraceFlags (flags);
+
+  // Trace flags for the server
+
+  TraceFlags * traceFlags = new TraceFlags (flags);
 
   // The RISC-V model
-  Cpu    *cpu = new Cpu ();
 
-  // The cpu will still be in reset at this point, but we need to set its
-  // start address before it is out of reset. We can do this within the
-  // writeProgramAddr function, which GDB calls with the start address of
-  // the loaded binary, and then step through until reset after successful
-  // updating of PC.
+  ITarget * cpu;
+
+  if (0 == strcasecmp ("PicoRV32", coreName))
+    cpu = new Picorv32 ();
+  // else if (0 == strcasecmp ("RI5CY", coreName))
+  //   cpu = new Ri5cy ();
+  else
+    {
+      cerr << "ERROR: Unrecognized core: " << coreName << ": exiting" << endl;
+      return  EXIT_FAILURE;
+    }
 
   // The RSP server
+
   GdbServer *gdbServer = new GdbServer (port, cpu, traceFlags);
 
   // Run the GDB server. If we return, then we have hit some sort of problem.
+
   gdbServer->rspServer ();
 
   // Free memory
+
   delete  gdbServer;
   delete  traceFlags;
+  free (coreName);
 
-  return 255;			// If we return it's a failure!
+  return EXIT_FAILURE;			// If we return it's a failure!
 
 }	/* sc_main() */
 
