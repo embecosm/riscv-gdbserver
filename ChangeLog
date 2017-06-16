@@ -1,3 +1,14 @@
+2017-06-16  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* server/RspConnection.cpp (RspConnection::getRspCharRaw): Correct
+	class name.
+	* server/main.cpp (usage): Created.
+	(main): Extend argument handling.
+	* targets/ITarget.h: Correct single use #define.
+	* targets/common/SyscallInfo.h: Likewise.
+	* targets/picorv32/Picorv32.h (class Picorv32): Make class members
+	non-virtual.
+
 2017-06-14  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	WIP in progress on target abstraction.

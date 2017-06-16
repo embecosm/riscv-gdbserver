@@ -20,7 +20,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef ITARGET__H
-#define ITARGET_H
+#define ITARGET__H
 
 #include <chrono>
 #include <cstddef>

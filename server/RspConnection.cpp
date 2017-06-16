@@ -572,7 +572,7 @@ RspConnection::putRspCharRaw (char  c)
 //!          block, and blocking is true.
 
 int
-RspConnectionLinux::getRspCharRaw (bool blocking)
+RspConnection::getRspCharRaw (bool blocking)
 {
   if (-1 == clientFd)
     {

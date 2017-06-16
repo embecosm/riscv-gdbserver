@@ -34,7 +34,7 @@ class Picorv32Impl;
 //! We hide the details away in a separate implementation class, so that this
 //! header has minimal other dependencies.
 
-class Picorv32 : public ITarget final
+class Picorv32 final : public ITarget
 {
  public:
 
@@ -44,51 +44,51 @@ class Picorv32 : public ITarget final
   ~Picorv32 ();
 
   virtual ResumeRes  resume (ResumeType step,
-			     SyscallInfo *syscall_info = nullptr) = 0;
+			     SyscallInfo *syscall_info = nullptr);
   virtual ResumeRes  resume (ResumeType step,
                              std::chrono::duration <double>  timeout,
-                             SyscallInfo *syscall_info = nullptr) = 0;
+                             SyscallInfo *syscall_info = nullptr);
 
-  virtual ResumeRes  terminate (void) = 0;
-  virtual ResumeRes  reset (void) = 0;
+  virtual ResumeRes  terminate (void);
+  virtual ResumeRes  reset (void);
 
-  virtual uint64_t  getCycleCount (void) const = 0;
-  virtual uint64_t  getInstrCount (void) const = 0;
+  virtual uint64_t  getCycleCount (void) const;
+  virtual uint64_t  getInstrCount (void) const;
 
   // Read contents of a target register.
 
   virtual std::size_t  readRegister (const int  reg,
-				     uint32_t & value) const = 0;
+				     uint32_t & value) const;
 
   // Write data to a target register.
 
   virtual std::size_t  writeRegister (const int  reg,
-				      const uint32_t  value) = 0;
+				      const uint32_t  value);
 
   // Read data from memory.
 
   virtual std::size_t  read (const uint32_t  addr,
 			     uint8_t * buffer,
-			     const std::size_t  size) const = 0;
+			     const std::size_t  size) const;
 
   // Write data to memory.
 
   virtual std::size_t  write (const uint32_t  addr,
 			      const uint8_t * buffer,
-			      const std::size_t  size) = 0;
+			      const std::size_t  size);
 
   // Insert and remove a matchpoint (breakpoint or watchpoint) at the given
   // address.  Return value indicates whether the operation was successful.
 
   virtual bool  insertMatchpoint (const uint32_t & addr,
-				  const MatchType  matchType) = 0;
+				  const MatchType  matchType);
   virtual bool  removeMatchpoint (const uint32_t & addr,
-				  const MatchType  matchType) = 0;
+				  const MatchType  matchType);
 
   // Generic pass through of command
 
   virtual bool command (const std::string  cmd,
-			std::ostream & stream) = 0;
+			std::ostream & stream);
 
 private:
 
