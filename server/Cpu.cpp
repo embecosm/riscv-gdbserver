@@ -193,6 +193,13 @@ Cpu::writeProgramAddr (uint32_t val)
 
 }	// Cpu::writeProgramAddr ()
 
+//! Read the lifetime counter
+
+uint32_t
+Cpu::getLifetimeCounter ()
+{
+  return mClk;
+}
 
 // Local Variables:
 // mode: C++
