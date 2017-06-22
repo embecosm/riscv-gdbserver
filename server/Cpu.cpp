@@ -125,6 +125,15 @@ Cpu::haveTrap (void) const
 
 }	// haveTrap ()
 
+//! Have we exited?
+
+bool
+Cpu::haveExited (void) const
+{
+  int res = mCpu->testbench->haveExited ();
+  return res == 1;
+
+}      // haveExited ()
 
 //! Read from memory
 

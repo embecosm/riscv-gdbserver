@@ -195,6 +195,11 @@ GdbServer::rspClientRequest ()
 	      rspReportException (TARGET_SIGNAL_XCPU);	// Timeout
 	      return;
 	    }
+          if (cpu->haveExited ())
+            {
+              rsp->rspClose ();
+              exit(0);
+            }
 	}
 
     case 'C':
