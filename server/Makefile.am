@@ -36,10 +36,8 @@ riscv_gdbserver_SOURCES = GdbServer.cpp     \
                           Utils.cpp         \
                           Utils.h
 
-# Link in the objects we built when we verilated our model
-##riscv_gdbserver_LDADD = $(VTESTBENCH)/Vtestbench__ALL.a $(VTESTBENCH)/verilated.o $(VTESTBENCH)/verilated_dpi.o
-
-riscv_gdbserver_LDADD = ../targets/libtargets.la
+# For now, link in the Verilated PicoRV32. This may clash when we add RI5CY.
+riscv_gdbserver_LDADD = ../targets/libtargets.la @MDIR_PICORV32@/Vtestbench__ALL.a @MDIR_PICORV32@/verilated.o @MDIR_PICORV32@/verilated_dpi.o
 
 riscv_gdbserver_CPPFLAGS = -I$(top_srcdir)/targets          \
                            -I$(top_srcdir)/targets/common   \

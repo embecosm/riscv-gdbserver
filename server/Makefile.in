@@ -133,7 +133,9 @@ am_riscv_gdbserver_OBJECTS = riscv_gdbserver-GdbServer.$(OBJEXT) \
 	riscv_gdbserver-TraceFlags.$(OBJEXT) \
 	riscv_gdbserver-Utils.$(OBJEXT)
 riscv_gdbserver_OBJECTS = $(am_riscv_gdbserver_OBJECTS)
-riscv_gdbserver_DEPENDENCIES = ../targets/libtargets.la
+riscv_gdbserver_DEPENDENCIES = ../targets/libtargets.la \
+	@MDIR_PICORV32@/Vtestbench__ALL.a @MDIR_PICORV32@/verilated.o \
+	@MDIR_PICORV32@/verilated_dpi.o
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -358,8 +360,8 @@ riscv_gdbserver_SOURCES = GdbServer.cpp     \
                           Utils.h
 
 
-# Link in the objects we built when we verilated our model
-riscv_gdbserver_LDADD = ../targets/libtargets.la
+# For now, link in the Verilated PicoRV32. This may clash when we add RI5CY.
+riscv_gdbserver_LDADD = ../targets/libtargets.la @MDIR_PICORV32@/Vtestbench__ALL.a @MDIR_PICORV32@/verilated.o @MDIR_PICORV32@/verilated_dpi.o
 riscv_gdbserver_CPPFLAGS = -I$(top_srcdir)/targets          \
                            -I$(top_srcdir)/targets/common   \
                            -I$(top_srcdir)/targets/picorv32 \

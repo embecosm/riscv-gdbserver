@@ -28,14 +28,14 @@
 #include "Vtestbench.h"
 #include "verilated.h"
 
-class Cpu final
+class Picorv32Impl final
 {
  public:
 
   // Constructor and destructor
 
-  Cpu ();
-  ~Cpu ();
+  Picorv32Impl ();
+  ~Picorv32Impl ();
 
   // Accessors
 
