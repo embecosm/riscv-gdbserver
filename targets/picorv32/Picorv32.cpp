@@ -85,15 +85,15 @@ Picorv32::getInstrCount (void) const
 std::size_t
 Picorv32::readRegister (const int reg, uint32_t & value) const
 {
-  std::cerr << "readRegister NOT IMPLEMENTED" << std::endl;
-  return 0;
+  value = mPicorv32Impl->readReg(reg);
+  return 4;
 }
 
 std::size_t
 Picorv32::writeRegister (const int reg, const uint32_t  value)
 {
-  std::cerr << "writeRegister NOT IMPLEMENTED" << std::endl;
-  return 0;
+  mPicorv32Impl->writeReg(reg, value);
+  return 4;
 }
 
 std::size_t
@@ -101,8 +101,10 @@ Picorv32::read (const uint32_t addr,
                 uint8_t * buffer,
                 const std::size_t  size) const
 {
-  std::cerr << "read NOT IMPLEMENTED" << std::endl;
-  return 0;
+  size_t i;
+  for (i = 0; i < size; i++)
+    buffer[i] = mPicorv32Impl->readMem (addr + i);
+  return i;
 }
 
 std::size_t
@@ -110,8 +112,10 @@ Picorv32::write (const uint32_t addr,
                  const uint8_t * buffer,
                  const std::size_t size)
 {
-  std::cerr << "write NOT IMPLEMENTED" << std::endl;
-  return 0;
+  size_t i;
+  for (i = 0; i < size; i++)
+    mPicorv32Impl->writeMem (addr + i, buffer[i]);
+  return i;
 }
 
 bool
