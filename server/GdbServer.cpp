@@ -53,10 +53,6 @@ static const int RISCV_NUM_REGS = 33;
 
 static const int RISCV_NUM_REG_BYTES = RISCV_NUM_REGS * 4;
 
-// Special registers
-
-static const int RISCV_PC_REGNUM   = 32;	//!< RISCV program counter
-
 //! Minimum packet size for RSP. Must be large enough for any initial
 //! dialogue. Should at least allow all the registers ASCII encloded + end of
 //! string marker.
