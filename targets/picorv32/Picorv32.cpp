@@ -20,6 +20,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <chrono>
 #include <cstdint>
 #include <iostream>
 
@@ -28,9 +29,18 @@
 #include "Vtestbench_testbench.h"
 #include "Vtestbench_picorv32__C1_EF1_EH1.h"
 
+
+using std::chrono::duration;
+using std::chrono::system_clock;
+using std::chrono::time_point;
+
 // The program counter is handled a little differently to the rest of the
 // register file on Picorv32.
 static const int RISCV_PC_REGNUM   = 32;
+
+// Run for 10000 cycles at a time during continued execution.
+static const size_t RUN_SAMPLE_PERIOD = 10000;
+
 
 Picorv32::Picorv32()
 {
@@ -46,10 +56,20 @@ Picorv32::~Picorv32()
 ITarget::ResumeRes
 Picorv32::resume (ResumeType step, SyscallInfo *syscall_info)
 {
+  return resume(step, duration <double>::zero (), syscall_info);
+}
+
+ITarget::ResumeRes
+Picorv32::resume (ResumeType step,
+        std::chrono::duration <double> timeout,
+        SyscallInfo *syscall_info)
+{
+  time_point <system_clock, duration <double> > timeout_end =
+    system_clock::now () + timeout;
+
   switch (step)
   {
   case ResumeType::STEP:
-  case ResumeType::CONTINUE:
     if (mPicorv32Impl->step ())
     {
       return ResumeRes::TIMEOUT;
@@ -57,20 +77,28 @@ Picorv32::resume (ResumeType step, SyscallInfo *syscall_info)
       return ResumeRes::INTERRUPTED;
     }
     break;
+  case ResumeType::CONTINUE:
+    for (;;)
+    {
+      for (size_t i = 0; i < RUN_SAMPLE_PERIOD; i++)
+      {
+        if (mPicorv32Impl->step ())
+        {
+          return ResumeRes::INTERRUPTED;
+        }
+      }
+
+      if (timeout_end < system_clock::now ())
+      {
+        return ResumeRes::TIMEOUT;
+      }
+    }
+    break;
   case ResumeType::STOP:
     // Do nothing. We are already "stopped"?
     break;
   }
   return ResumeRes::NONE;
-}
-
-ITarget::ResumeRes
-Picorv32::resume (ResumeType step,
-        std::chrono::duration <double> __attribute__((unused)) timeout,
-        SyscallInfo *syscall_info)
-{
-  // FIXME: Timeout is ignored, only single-steps for now.
-  return resume(step, syscall_info);
 }
 
 ITarget::ResumeRes
