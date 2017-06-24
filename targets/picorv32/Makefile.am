@@ -21,6 +21,11 @@
 
 noinst_LTLIBRARIES = libpicorv32.la
 
-libpicorv32_la_SOURCES =
+libpicorv32_la_SOURCES = Picorv32.cpp Picorv32Impl.cpp
 
-libpicorv32_la_CXXFLAGS = -Werror -Wall -Wextra
+# FIXME: Remove -Wno-unused-paramted once the Picorv32 class is implemented
+# properly.
+libpicorv32_la_CXXFLAGS = -Werror -Wall -Wextra -Wno-unused-parameter \
+                          -I$(srcdir)/..        \
+                          -I$(srcdir)/../common \
+			  -I@MDIR_PICORV32@

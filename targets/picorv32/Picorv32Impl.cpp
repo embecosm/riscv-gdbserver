@@ -22,13 +22,13 @@
 
 #include <cstdint>
 
-#include "Cpu.h"
+#include "Picorv32Impl.h"
 #include "Vtestbench_testbench.h"
 #include "Vtestbench_picorv32__C1_EF1_EH1.h"
 
 //! Constructor. Instantiate the Verilator model and initialize the clock.
 
-Cpu::Cpu ()
+Picorv32Impl::Picorv32Impl ()
 {
   mCpu = new Vtestbench;
   mClk = 0;
@@ -37,7 +37,7 @@ Cpu::Cpu ()
 
 //! Destructor. Delete the Verilator model.
 
-Cpu::~Cpu ()
+Picorv32Impl::~Picorv32Impl ()
 {
   delete mCpu;
 }
@@ -46,19 +46,19 @@ Cpu::~Cpu ()
 // ! Step one single clock of the processor
 
 void
-Cpu::clockStep ()
+Picorv32Impl::clockStep ()
 {
   mCpu->clk = mClk;
   mCpu->eval ();
   mClk++;
-}	// Cpu::clockStep ()
+}	// Picorv32Impl::clockStep ()
 
 
 // ! If trap is set, then get the processor in the right state to
 // ! redo that instruction properly
 
 void
-Cpu::clearTrapAndRestartInstruction ()
+Picorv32Impl::clearTrapAndRestartInstruction ()
 {
   // do nothing if trap is not set
   if (haveTrap ())
@@ -86,13 +86,13 @@ Cpu::clearTrapAndRestartInstruction ()
 
   }
 
-}	// Cpu::clearTrapAndRestartInstruction ()
+}	// Picorv32Impl::clearTrapAndRestartInstruction ()
 
 
 //! Step one instruction execution
 
 bool
-Cpu::step ()
+Picorv32Impl::step ()
 {
   uint32_t prev_pc = readProgramAddr ();
   do
@@ -101,13 +101,13 @@ Cpu::step ()
   }
   while (prev_pc == readProgramAddr () && haveTrap () == 0);
   return haveTrap () == 1;
-}	// Cpu::step ()
+}	// Picorv32Impl::step ()
 
 
 //! Are we in reset?
 
 bool
-Cpu::inReset (void) const
+Picorv32Impl::inReset (void) const
 {
   int res = mCpu->testbench->inReset ();
   return res == 1;
@@ -118,7 +118,7 @@ Cpu::inReset (void) const
 //! Have we hit a trap?
 
 bool
-Cpu::haveTrap (void) const
+Picorv32Impl::haveTrap (void) const
 {
   int  res = mCpu->testbench->haveTrap ();
   return res == 1;
@@ -129,59 +129,59 @@ Cpu::haveTrap (void) const
 //! Read from memory
 
 uint8_t
-Cpu::readMem (uint32_t addr) const
+Picorv32Impl::readMem (uint32_t addr) const
 {
   uint8_t res = mCpu->testbench->readMem (addr);
   return res;
 
-}	// Cpu::readMem ()
+}	// Picorv32Impl::readMem ()
 
 
 //! Write to memory
 
 void
-Cpu::writeMem (uint32_t addr,
+Picorv32Impl::writeMem (uint32_t addr,
 	       uint8_t  val)
 {
   mCpu->testbench->writeMem (addr, val);
 
-}	// Cpu::writeMem ()
+}	// Picorv32Impl::writeMem ()
 
 
 //! Read a register
 
 uint32_t
-Cpu::readReg (unsigned int regno) const
+Picorv32Impl::readReg (unsigned int regno) const
 {
   return mCpu->testbench->uut->readReg (regno);
 
-}	// Cpu::readReg ()
+}	// Picorv32Impl::readReg ()
 
 
 //! Write a register
 
 void
-Cpu::writeReg (unsigned int regno,
+Picorv32Impl::writeReg (unsigned int regno,
 	       uint32_t     val)
 {
   mCpu->testbench->uut->writeReg (regno, val);
 
-}	// Cpu::writeReg ()
+}	// Picorv32Impl::writeReg ()
 
 
 //! Read the PC
 
 uint32_t
-Cpu::readProgramAddr () const
+Picorv32Impl::readProgramAddr () const
 {
   return  mCpu->testbench->uut->readPc ();
-}	// Cpu::readProgramAddr ()
+}	// Picorv32Impl::readProgramAddr ()
 
 
 //! Write the PC
 
 void
-Cpu::writeProgramAddr (uint32_t val)
+Picorv32Impl::writeProgramAddr (uint32_t val)
 {
   mCpu->testbench->uut->writePc (val);
   while (inReset ()) {
@@ -191,7 +191,7 @@ Cpu::writeProgramAddr (uint32_t val)
     mCpu->testbench->uut->writePc (val);
   }
 
-}	// Cpu::writeProgramAddr ()
+}	// Picorv32Impl::writeProgramAddr ()
 
 
 // Local Variables:

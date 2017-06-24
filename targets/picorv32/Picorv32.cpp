@@ -21,178 +21,119 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstdint>
+#include <iostream>
 
-#include "Cpu.h"
+#include "Picorv32.h"
+#include "Picorv32Impl.h"
 #include "Vtestbench_testbench.h"
 #include "Vtestbench_picorv32__C1_EF1_EH1.h"
 
-//! Constructor. Instantiate the Verilator model and initialize the clock.
-
-Cpu::Cpu ()
+Picorv32::Picorv32()
 {
-  mCpu = new Vtestbench;
-  mClk = 0;
+  mPicorv32Impl = new Picorv32Impl();
 }
 
 
-//! Destructor. Delete the Verilator model.
-
-Cpu::~Cpu ()
+Picorv32::~Picorv32()
 {
-  delete mCpu;
+  delete mPicorv32Impl;
 }
 
-
-// ! Step one single clock of the processor
-
-void
-Cpu::clockStep ()
+ITarget::ResumeRes
+Picorv32::resume (ResumeType step, SyscallInfo *syscall_info)
 {
-  mCpu->clk = mClk;
-  mCpu->eval ();
-  mClk++;
-}	// Cpu::clockStep ()
+  std::cerr << "resume NOT IMPLEMENTED" << std::endl;
+  return ResumeRes::NONE;
+}
 
-
-// ! If trap is set, then get the processor in the right state to
-// ! redo that instruction properly
-
-void
-Cpu::clearTrapAndRestartInstruction ()
+ITarget::ResumeRes
+Picorv32::resume (ResumeType step,
+        std::chrono::duration <double> timeout,
+        SyscallInfo *syscall_info)
 {
-  // do nothing if trap is not set
-  if (haveTrap ())
-  {
-    // the trap happened on the instruction we want to continue from
-    uint32_t prev_pc = mCpu->testbench->uut->readPc();
-    // unfortunately, when we come out of trap, the instruction at the current
-    // pc effectively becomes a NOP, so we actually need to set pc to the
-    // previous instruction and then execute it. We then end up at the
-    // desired pc that will execute properly.
-    mCpu->testbench->uut->writePc (prev_pc-4);
-    mCpu->testbench->uut->clearTrapAndContinue ();
-    // loop until the processor has come out of the trap and changed pc to
-    // the value we wrote above
-    do
-    {
-      clockStep ();
-    }
-    while (prev_pc == readProgramAddr ());
-    // pc now is at the prev instruction, which will effectively work as a NOP
-    // and get us to the instruction we actually want to continue from, so
-    // let's step it
-    step ();
-    // we are now ready to properly execute the instruction that trapped
+  std::cerr << "resume NOT IMPLEMENTED" << std::endl;
+  return ResumeRes::NONE;
+}
 
-  }
+ITarget::ResumeRes
+Picorv32::terminate (void)
+{
+  std::cerr << "terminate NOT IMPLEMENTED" << std::endl;
+  return ResumeRes::NONE;
+}
 
-}	// Cpu::clearTrapAndRestartInstruction ()
+ITarget::ResumeRes
+Picorv32::reset (void)
+{
+  std::cerr << "reset NOT IMPLEMENTED" << std::endl;
+  return ResumeRes::NONE;
+}
 
+uint64_t
+Picorv32::getCycleCount (void) const
+{
+  std::cerr << "getCycleCount NOT IMPLEMENTED" << std::endl;
+  return 0;
+}
+uint64_t
+Picorv32::getInstrCount (void) const
+{
+  std::cerr << "getInstrCount NOT IMPLEMENTED" << std::endl;
+  return 0;
+}
 
-//! Step one instruction execution
+std::size_t
+Picorv32::readRegister (const int reg, uint32_t & value) const
+{
+  std::cerr << "readRegister NOT IMPLEMENTED" << std::endl;
+  return 0;
+}
+
+std::size_t
+Picorv32::writeRegister (const int reg, const uint32_t  value)
+{
+  std::cerr << "writeRegister NOT IMPLEMENTED" << std::endl;
+  return 0;
+}
+
+std::size_t
+Picorv32::read (const uint32_t addr,
+                uint8_t * buffer,
+                const std::size_t  size) const
+{
+  std::cerr << "read NOT IMPLEMENTED" << std::endl;
+  return 0;
+}
+
+std::size_t
+Picorv32::write (const uint32_t addr,
+                 const uint8_t * buffer,
+                 const std::size_t size)
+{
+  std::cerr << "write NOT IMPLEMENTED" << std::endl;
+  return 0;
+}
 
 bool
-Cpu::step ()
+Picorv32::insertMatchpoint (const uint32_t & addr, const MatchType matchType)
 {
-  uint32_t prev_pc = readProgramAddr ();
-  do
-  {
-    clockStep ();
-  }
-  while (prev_pc == readProgramAddr () && haveTrap () == 0);
-  return haveTrap () == 1;
-}	// Cpu::step ()
-
-
-//! Are we in reset?
+  std::cerr << "insertMatchpoint NOT IMPLEMENTED" << std::endl;
+  return false;
+}
 
 bool
-Cpu::inReset (void) const
+Picorv32::removeMatchpoint (const uint32_t & addr, const MatchType matchType)
 {
-  int res = mCpu->testbench->inReset ();
-  return res == 1;
-
-}	// inReset ()
-
-
-//! Have we hit a trap?
+  std::cerr << "removeMatchpoint NOT IMPLEMENTED" << std::endl;
+  return false;
+}
 
 bool
-Cpu::haveTrap (void) const
+Picorv32::command (const std::string cmd, std::ostream & stream)
 {
-  int  res = mCpu->testbench->haveTrap ();
-  return res == 1;
-
-}	// haveTrap ()
-
-
-//! Read from memory
-
-uint8_t
-Cpu::readMem (uint32_t addr) const
-{
-  uint8_t res = mCpu->testbench->readMem (addr);
-  return res;
-
-}	// Cpu::readMem ()
-
-
-//! Write to memory
-
-void
-Cpu::writeMem (uint32_t addr,
-	       uint8_t  val)
-{
-  mCpu->testbench->writeMem (addr, val);
-
-}	// Cpu::writeMem ()
-
-
-//! Read a register
-
-uint32_t
-Cpu::readReg (unsigned int regno) const
-{
-  return mCpu->testbench->uut->readReg (regno);
-
-}	// Cpu::readReg ()
-
-
-//! Write a register
-
-void
-Cpu::writeReg (unsigned int regno,
-	       uint32_t     val)
-{
-  mCpu->testbench->uut->writeReg (regno, val);
-
-}	// Cpu::writeReg ()
-
-
-//! Read the PC
-
-uint32_t
-Cpu::readProgramAddr () const
-{
-  return  mCpu->testbench->uut->readPc ();
-}	// Cpu::readProgramAddr ()
-
-
-//! Write the PC
-
-void
-Cpu::writeProgramAddr (uint32_t val)
-{
-  mCpu->testbench->uut->writePc (val);
-  while (inReset ()) {
-    // keep stepping the clock and writing PC while in reset, so that we are
-    // at the desired start address once out of reset.
-    clockStep ();
-    mCpu->testbench->uut->writePc (val);
-  }
-
-}	// Cpu::writeProgramAddr ()
-
+  std::cerr << "command NOT IMPLEMENTED" << std::endl;
+  return false;
+}
 
 // Local Variables:
 // mode: C++
