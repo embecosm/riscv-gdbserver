@@ -28,6 +28,10 @@
 #include "Vtestbench_testbench.h"
 #include "Vtestbench_picorv32__C1_EF1_EH1.h"
 
+// The program counter is handled a little differently to the rest of the
+// register file on Picorv32.
+static const int RISCV_PC_REGNUM   = 32;
+
 Picorv32::Picorv32()
 {
   mPicorv32Impl = new Picorv32Impl();
@@ -42,31 +46,52 @@ Picorv32::~Picorv32()
 ITarget::ResumeRes
 Picorv32::resume (ResumeType step, SyscallInfo *syscall_info)
 {
-  std::cerr << "resume NOT IMPLEMENTED" << std::endl;
+  switch (step)
+  {
+  case ResumeType::STEP:
+  case ResumeType::CONTINUE:
+    if (mPicorv32Impl->step ())
+    {
+      return ResumeRes::TIMEOUT;
+    } else {
+      return ResumeRes::INTERRUPTED;
+    }
+    break;
+  case ResumeType::STOP:
+    // Do nothing. We are already "stopped"?
+    break;
+  }
   return ResumeRes::NONE;
 }
 
 ITarget::ResumeRes
 Picorv32::resume (ResumeType step,
-        std::chrono::duration <double> timeout,
+        std::chrono::duration <double> __attribute__((unused)) timeout,
         SyscallInfo *syscall_info)
 {
-  std::cerr << "resume NOT IMPLEMENTED" << std::endl;
-  return ResumeRes::NONE;
+  // FIXME: Timeout is ignored, only single-steps for now.
+  return resume(step, syscall_info);
 }
 
 ITarget::ResumeRes
 Picorv32::terminate (void)
 {
-  std::cerr << "terminate NOT IMPLEMENTED" << std::endl;
+  // FIXME: Any action required here? I don't think so..
   return ResumeRes::NONE;
 }
 
 ITarget::ResumeRes
 Picorv32::reset (void)
 {
-  std::cerr << "reset NOT IMPLEMENTED" << std::endl;
-  return ResumeRes::NONE;
+  delete mPicorv32Impl;
+  mPicorv32Impl = new Picorv32Impl ();
+
+  if (mPicorv32Impl)
+  {
+    return ResumeRes::SUCCESS;
+  } else {
+    return ResumeRes::FAILURE;
+  }
 }
 
 uint64_t
@@ -85,14 +110,24 @@ Picorv32::getInstrCount (void) const
 std::size_t
 Picorv32::readRegister (const int reg, uint32_t & value) const
 {
-  value = mPicorv32Impl->readReg(reg);
+  if (RISCV_PC_REGNUM == reg)
+  {
+    value = mPicorv32Impl->readProgramAddr ();
+  } else {
+    value = mPicorv32Impl->readReg(reg);
+  }
+
   return 4;
 }
 
 std::size_t
 Picorv32::writeRegister (const int reg, const uint32_t  value)
 {
-  mPicorv32Impl->writeReg(reg, value);
+  if (RISCV_PC_REGNUM == reg) {
+    mPicorv32Impl->writeProgramAddr (value);
+  } else {
+    mPicorv32Impl->writeReg(reg, value);
+  }
   return 4;
 }
 
