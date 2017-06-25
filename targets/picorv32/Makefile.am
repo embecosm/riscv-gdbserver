@@ -21,7 +21,10 @@
 
 noinst_LTLIBRARIES = libpicorv32.la
 
-libpicorv32_la_SOURCES = Picorv32.cpp Picorv32Impl.cpp
+libpicorv32_la_SOURCES = Picorv32.cpp     \
+                         Picorv32.h       \
+                         Picorv32Impl.cpp \
+                         Picorv32Impl.h
 
 # FIXME: Remove -Wno-unused-paramted once the Picorv32 class is implemented
 # properly.

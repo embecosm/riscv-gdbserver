@@ -1,4 +1,4 @@
-// GDB RSP server PicoRV32 CPU model wrapper: declaration
+// GDB RSP server RI5CY CPU model wrapper: declaration
 
 // Copyright (C) 2017  Embecosm Limited <info@embecosm.com>
 
@@ -20,34 +20,34 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef PICORV32__H
-#define PICORV32__H
+#ifndef RI5CY__H
+#define RI5CY__H
 
 #include "ITarget.h"
 
 
-class Picorv32Impl;
+class Ri5cyImpl;
 
 
-//! The top level PicoRV32 implementation class.
+//! The top level RI5CY class.
 
 //! We hide the details away in a separate implementation class, so that this
 //! header has minimal other dependencies.
 
-class Picorv32 final : public ITarget
+class Ri5cy final : public ITarget
 {
  public:
 
   // Constructor and destructor
 
-  Picorv32 ();
-  ~Picorv32 ();
+  Ri5cy ();
+  ~Ri5cy ();
 
   virtual ResumeRes  resume (ResumeType step,
-			     SyscallInfo *syscall_info = nullptr);
+			     SyscallInfo * syscallInfo = nullptr);
   virtual ResumeRes  resume (ResumeType step,
                              std::chrono::duration <double>  timeout,
-                             SyscallInfo *syscall_info = nullptr);
+                             SyscallInfo * syscallInfo = nullptr);
 
   virtual ResumeRes  terminate (void);
   virtual ResumeRes  reset (ITarget::ResetType  type);
@@ -92,14 +92,14 @@ class Picorv32 final : public ITarget
 
 private:
 
-  //! The implementation class for PicoRV32
+  //! The implementation class for Ri5cy
 
-  Picorv32Impl * mPicorv32Impl;
+  Ri5cyImpl * mRi5cyImpl;
 
 };	// class Picorv232
 
 
-#endif	// PICORV32__H
+#endif	// RI5CY__H
 
 // Local Variables:
 // mode: C++

@@ -1,5 +1,32 @@
 2017-06-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	This will not currently compile, but shows how the interface via
+	the debug unit should work.
+
+	* targets/ITarget.h (class ITarget): Add ResetType scoped
+	enumeration, allow different types of reset, do not pass
+	matchpoint addresses by reference.
+	* targets/picorv32/Makefile.am: Add headers to sources, so they
+	are included in the distribution.
+	* targets/picorv32/Makefile.in: Regenerated.
+	* targets/picorv32/Picorv32.cpp (Picorv32::reset): Provide
+	argument for reset type
+	(Picorv32::insertMatchpoint, Picorv32::removeMatchpoint): Pass
+	address by value, not reference.
+	* targets/picorv32/Picorv32.h (class Picorv32): Add argument to
+	reset and pass address by value to insertMatchpoint and
+	removeMatchpoint.
+	* targets/picorv32/Picorv32Impl.cpp: Clarify header comment.
+	* targets/picorv32/Picorv32Impl.h: Likewise.
+	* targets/ri5cy/Makefile.am: Update list of sources.
+	* targets/ri5cy/Makefile.in: Regenerated.
+	* targets/ri5cy/Ri5cy.cpp: Created.
+	* targets/ri5cy/Ri5cy.h: Created.
+	* targets/ri5cy/Ri5cyImpl.cpp: Created.
+	* targets/ri5cy/Ri5cyImpl.h: Created.
+
+2017-06-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure.ac: Make model directories absolute.
 	* configure: Regenerated.
 

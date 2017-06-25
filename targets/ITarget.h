@@ -62,6 +62,12 @@ class ITarget
     SYSCALL     = 5,		//!< Target needs some host I/O.
   };
 
+  //! Type of reset
+  enum class ResetType {
+    COLD,			//!< Equivalent to complete class recreation
+    WARM			//!< Set relevant state back to defaul
+  };
+
   //! Type of matchpoint, with mapping to RSP Z/z packet values.
 
   enum class MatchType : int {
@@ -83,7 +89,7 @@ class ITarget
                              SyscallInfo *syscall_info = nullptr) = 0;
 
   virtual ResumeRes  terminate (void) = 0;
-  virtual ResumeRes  reset (void) = 0;
+  virtual ResumeRes  reset (ResetType  type) = 0;
 
   virtual uint64_t  getCycleCount (void) const = 0;
   virtual uint64_t  getInstrCount (void) const = 0;
@@ -113,9 +119,9 @@ class ITarget
   // Insert and remove a matchpoint (breakpoint or watchpoint) at the given
   // address.  Return value indicates whether the operation was successful.
 
-  virtual bool  insertMatchpoint (const uint32_t & addr,
+  virtual bool  insertMatchpoint (const uint32_t  addr,
 				  const MatchType  matchType) = 0;
-  virtual bool  removeMatchpoint (const uint32_t & addr,
+  virtual bool  removeMatchpoint (const uint32_t  addr,
 				  const MatchType  matchType) = 0;
 
   // Generic pass through of command

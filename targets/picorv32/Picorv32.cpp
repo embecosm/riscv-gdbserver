@@ -1,4 +1,4 @@
-// GDB RSP server CPU model wrapper: definition
+// GDB RSP server PicoRV32 CPU model wrapper: definition
 
 // Copyright (C) 2017  Embecosm Limited <info@embecosm.com>
 
@@ -109,7 +109,7 @@ Picorv32::terminate (void)
 }
 
 ITarget::ResumeRes
-Picorv32::reset (void)
+Picorv32::reset (ITarget::ResetType  type  __attribute__ ((unused)) )
 {
   delete mPicorv32Impl;
   mPicorv32Impl = new Picorv32Impl ();
@@ -182,14 +182,14 @@ Picorv32::write (const uint32_t addr,
 }
 
 bool
-Picorv32::insertMatchpoint (const uint32_t & addr, const MatchType matchType)
+Picorv32::insertMatchpoint (const uint32_t  addr, const MatchType matchType)
 {
   std::cerr << "insertMatchpoint NOT IMPLEMENTED" << std::endl;
   return false;
 }
 
 bool
-Picorv32::removeMatchpoint (const uint32_t & addr, const MatchType matchType)
+Picorv32::removeMatchpoint (const uint32_t  addr, const MatchType matchType)
 {
   std::cerr << "removeMatchpoint NOT IMPLEMENTED" << std::endl;
   return false;

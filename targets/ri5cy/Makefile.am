@@ -21,6 +21,9 @@
 
 noinst_LTLIBRARIES = libri5cy.la
 
-libri5cy_la_SOURCES =
+libri5cy_la_SOURCES = Ri5cy.cpp     \
+                      Ri5cy.h       \
+                      Ri5cyImpl.cpp \
+                      Ri5cyImpl.h
 
 libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra
