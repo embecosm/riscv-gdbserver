@@ -1,4 +1,4 @@
-// GDB RSP server CPU model wrapper: definition
+// GDB RSP server PicoRV32 CPU model: definition
 
 // Copyright (C) 2017  Embecosm Limited <info@embecosm.com>
 
