@@ -1,3 +1,68 @@
+2017-06-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure.ac: Make model directories absolute.
+	* configure: Regenerated.
+
+2017-06-25  Graham Markall  <graham.markall@embecosm.com>
+
+	* targets/picorv32/Picorv32.cpp: (RUN_SAMPLE_PERIOD) Add.
+        (resume) When step is CONTINUE, step for RUN_SAMPLE_PERIOD
+        instructions; if timeout expired, return TIMEOUT.
+        Otherwise, repeat. Default timeout if none supplied is
+        zero, resulting in single-stepping.
+
+2017-06-24  Graham Markall  <graham.markall@embecosm.com>
+
+	Partially-working implementation of Picorv32
+
+	Reading and writing memory and registers works, as does
+	single-stepping instructions. Breakpoints are not presently
+	working.
+
+        * server/GdbServer.cpp: (RISCV_PC_REGNUM) Remove, as it seems a
+	bit specific to Picorv32 (it handles the PC differently to the
+	rest of the register file).
+        * targets/picorv32/Picorv32.cpp: (RISCV_PC_REGNUM) Add.
+        (resume) Implement, but only single-stepping - no mutiple steps
+	with timeouts. (terminate) Add comment. (reset)
+	Implement. (readRegister, writeRegister) Fix handling of PC, which
+	is a special case.
+
+2017-06-24  Graham Markall  <graham.markall@embecosm.com>
+
+	* targets/picorv32/Picorv32.cpp: (readRegister, writeRegister)
+	(read, write) Implement.
+
+2017-06-24  Graham Markall  <graham.markall@embecosm.com>
+
+	Although this builds, the Picorv32 implementation is not yet
+	functioning because the functions of Picorv32 are not yet
+	implemented. Mostly they will be able to call into the
+	Picorv32Impl class, but some of the functions will need a little
+	more work.
+
+	class should be very similar to the original Cpu class
+	implementation, and the Picorv32 class adapts it and implements
+	the ITarget interface.
+
+	Some of the choices made here are not completely future-proof;
+	when we add a second core (RI5CY) we may have problems with
+	linking.
+
+        * Makefile.in: Regenerate.
+        * server/Makefile.am: Link with Verilated Picorv32 libraries.
+        * server/Makefile.in: Regenerate.
+        * targets/picorv32/Makefile.am: Compile Picorv32.cpp and
+	Picorv32Impl.cpp. Include target, target/common, and verilated
+	Picorv32 folders. Don't warn on unused params.
+        * targets/picorv32/Makefile.in: Regenerate.
+        * targets/picorv32/Picorv32.cpp: Replace old Cpu implementation
+	with stub implementations of all methods of the Picorv32 class.
+        * targets/picorv32/Picorv32Impl.cpp: Include Picorv32Impl.h,
+	rename Cpu class to Picorv32Impl.
+        * targets/picorv32/Picorv32Impl.h: Rename Cpu class to
+	Picorv32Impl.
+
 2017-06-16  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* server/RspConnection.cpp (RspConnection::getRspCharRaw): Correct
@@ -217,7 +282,7 @@
 	* server/GdbServer.cpp: Print out when we are writing PC and then read the
 	value back to confirm it was written.
 	* server/main.cpp: Cycling during reset has been deferred until we attempt
-	to write PC. 
+	to write PC.
 
 2017-05-15  Ian Bolton  <ian.bolton@embecosm.com>
 

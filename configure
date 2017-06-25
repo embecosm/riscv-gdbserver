@@ -15887,7 +15887,7 @@ CPPFLAGS="$CPPFLAGS -I$VINCDIR -I$VINCDIR/vltstd"
 
 # Check whether --with-picorv32-modeldir was given.
 if test "${with_picorv32_modeldir+set}" = set; then :
-  withval=$with_picorv32_modeldir; MDIR_PICORV32="$withval"
+  withval=$with_picorv32_modeldir; MDIR_PICORV32="$(cd $withval; pwd)"
 else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
@@ -15913,7 +15913,7 @@ fi
 
 # Check whether --with-ri5cy-modeldir was given.
 if test "${with_ri5cy_modeldir+set}" = set; then :
-  withval=$with_ri5cy_modeldir; MDIR_RI5CY="$withval"
+  withval=$with_ri5cy_modeldir; MDIR_RI5CY="$(cd $withval; pwd)"
 else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}

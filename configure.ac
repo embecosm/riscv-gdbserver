@@ -63,7 +63,7 @@ AC_ARG_WITH(
 	[picorv32-modeldir],
 	AC_HELP_STRING([--with-picorv32-modeldir],
 	               [directory containing the PicoRV32 model & headers]),
-	[MDIR_PICORV32="$withval"],
+	[MDIR_PICORV32="$(cd $withval; pwd)"],
 	[AC_MSG_FAILURE(PicoRV32 model directory not specified)])
 AC_ARG_WITH(
 	[picorv32-topmodule],
@@ -79,7 +79,7 @@ AC_ARG_WITH(
 	[ri5cy-modeldir],
 	AC_HELP_STRING([--with-ri5cy-modeldir],
 	               [directory containing the RI5CY model & headers]),
-	[MDIR_RI5CY="$withval"],
+	[MDIR_RI5CY="$(cd $withval; pwd)"],
 	[AC_MSG_FAILURE(RI5CY model directory not specified)])
 AC_ARG_WITH(
 	[ri5cy-topmodule],
