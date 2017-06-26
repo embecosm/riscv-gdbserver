@@ -68,6 +68,34 @@ Ri5cyImpl::~Ri5cyImpl ()
 }	// Ri5cyImpl::~Ri5cyImpl ()
 
 
+
+// IGB
+
+void
+Ri5cyImpl::clockStep ()
+{
+  mCpu->clk_i = 0; 
+  mCpu->eval ()
+  cpuTime += 5;
+  mCpu->clk_i = 1;
+  mCpu->eval ();
+  cpuTime += 5;
+}
+
+bool
+Ri5cyImpl::step ()
+{
+  uint32_t prev_pc = readProgramAddr ();
+  do
+  {
+    clockStep ();
+  }
+  while (prev_pc == readProgramAddr () && haveTrap () == 0);
+  return haveTrap () == 1;
+}
+
+
+
 /* FIXME: All commented out to get it to compile
 
 //! Resume execution with no timeout
