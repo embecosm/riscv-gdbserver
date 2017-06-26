@@ -57,11 +57,11 @@ class Ri5cyImpl final
 
   uint64_t  getCycleCount (void) const;
   uint64_t  getInstrCount (void) const;
-*/
+  */
   // Read contents of a target register.
 
-  std::size_t  readRegister (int  reg,
-			     uint32_t & value) const;
+  std::size_t  readRegister (const int  reg,
+			     uint32_t & value);
 
   // Write data to a target register.
 

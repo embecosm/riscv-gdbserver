@@ -20,11 +20,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream>
 #include <cstdint>
 #include <cstdlib>
 
 #include "Ri5cyImpl.h"
 #include "Vtop.h"
+
+using std::cerr;
+using std::endl;
 
 // Count of clock ticks
 // FIXME: Presumably this needs to be used by the Ri5cyImpl so that the
@@ -200,7 +204,7 @@ Ri5cyImpl::getInstrCount (void) const
   return mInstrCnt;
 
 }	// Ri5cyImpl::getInstrCount ()
-
+*/
 
 //! Read a register
 
@@ -213,9 +217,9 @@ Ri5cyImpl::getInstrCount (void) const
 //! @return  The size of the register read in bytes (always 4)
 
 std::size_t
-Ri5cyImpl::readRegister (int  reg,
-			 uint32_t & value) const
-{	
+Ri5cyImpl::readRegister (const int  reg,
+			 uint32_t & value)
+{
   if (!mCoreHalted)
     {
       cerr << "*** ABORT ***: Attempt to read register from running core"
@@ -241,7 +245,7 @@ Ri5cyImpl::readRegister (int  reg,
 
   mCpu->debug_req_i   = 1;
   mCpu->debug_addr_i  = dbg_addr;
-  mcpu->debug_we_i    = 0;
+  mCpu->debug_we_i    = 0;
 
   // Wait for the grant signal to indicate the read has been accepted.
 
@@ -262,11 +266,7 @@ Ri5cyImpl::readRegister (int  reg,
 
   mCpu->debug_req_i = 0;		// Stop requesting
 
-  if (mCpu->debug_rvalid_o == 1)
-  {
-  }
-  else {
-  do
+  while (mCpu->debug_rvalid_o == 0)
     {
       mCpu->clk_i = 0;
       mCpu->eval ();
@@ -274,10 +274,8 @@ Ri5cyImpl::readRegister (int  reg,
       mCpu->eval ();
       mCycleCnt++;
     }
-  while (mCpu->debug_rvalid_o == 0);
-  }
 
-  value = mCpu->debug_raddr_o;
+  value = mCpu->debug_rdata_o;
   return 4;
 
 }	// Ri5cyImpl::readRegister ()
@@ -299,6 +297,7 @@ std::size_t
 Ri5cyImpl::writeRegister (const int  reg,
 			  const uint32_t  value)
 {
+  /* FIXME: Complete this implementation. Commented as does not compile.
   if ((REG_R0 <= reg) && (reg <= REG_R31))
     dbg_addr = DBG_GPR0 + reg * 4;    // General register
   else if (REG_PC == reg)
@@ -308,6 +307,7 @@ Ri5cyImpl::writeRegister (const int  reg,
     cerr << "*** ABORT ***: Attempt to read non-existent register" << endl;
     exit (EXIT_FAILURE);
   }
+  */
 
   if (!mCoreHalted)
     {
@@ -319,7 +319,7 @@ Ri5cyImpl::writeRegister (const int  reg,
   return 4;
 
 }	// Ri5cyImpl::writeRegister ()
-*/
+
 
 //! Read data from memory
 
@@ -371,7 +371,7 @@ Ri5cyImpl::write (const uint32_t  addr,
   return i;
 }	// Ri5cyImpl::write ()
 
-
+/*
 //! Insert a matchpoint (breakpoint or watchpoint)
 
 //! @todo
@@ -382,7 +382,7 @@ Ri5cyImpl::write (const uint32_t  addr,
 //! @param[in] addr       Address for the matchpoint
 //! @param[in] matchType  Type of breakpoint or watchpoint
 //! @return  TRUE if the operation was successful, false otherwise.
-/*
+
 bool
 Ri5cyImpl::insertMatchpoint (const uint32_t  addr __attribute__ ((unused)),
 			     const MatchType  matchType __attribute__ ((unused)))

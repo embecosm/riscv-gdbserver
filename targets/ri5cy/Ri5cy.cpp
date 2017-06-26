@@ -167,11 +167,7 @@ std::size_t
 Ri5cy::readRegister (int  reg,
 		     uint32_t & value) const
 {
-  value=0;
-  return 4;
-  //mRi5cyImpl->haltModel ();
-  //return mRi5cyImpl->readRegister (reg, value);
-
+  return mRi5cyImpl->readRegister (reg, value);
 }	// Ri5cy::readRegister ()
 
 
@@ -187,8 +183,7 @@ std::size_t
 Ri5cy::writeRegister (const int  reg,
 		      const uint32_t  value)
 {
-  return 0;
-  //return mRi5cyImpl->readRegister (reg, value);
+  return mRi5cyImpl->writeRegister (reg, value);
 
 }	// Ri5cy::writeRegister ()
 
