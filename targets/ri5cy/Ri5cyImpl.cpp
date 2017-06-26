@@ -297,7 +297,16 @@ std::size_t
 Ri5cyImpl::writeRegister (const int  reg,
 			  const uint32_t  value)
 {
-  /* FIXME: Complete this implementation. Commented as does not compile.
+
+  if (!mCoreHalted)
+    {
+      cerr << "*** ABORT ***: Attempt to read register from running core"
+	   << endl;
+      exit (EXIT_FAILURE);
+    }
+
+  uint16_t dbg_addr;
+
   if ((REG_R0 <= reg) && (reg <= REG_R31))
     dbg_addr = DBG_GPR0 + reg * 4;    // General register
   else if (REG_PC == reg)
@@ -307,17 +316,31 @@ Ri5cyImpl::writeRegister (const int  reg,
     cerr << "*** ABORT ***: Attempt to read non-existent register" << endl;
     exit (EXIT_FAILURE);
   }
-  */
 
-  if (!mCoreHalted)
+  // Set up to write via debug
+
+  mCpu->rstn_i        = 1;
+
+  mCpu->debug_req_i   = 1;
+  mCpu->debug_addr_i  = dbg_addr;
+  mCpu->debug_wdata_i = value;
+  mCpu->debug_we_i    = 1;
+
+  // Wait for the grant signal to indicate the read has been accepted.
+
+  do
     {
-      cerr << "*** ABORT ***: Attempt to write register to running core"
-	   << endl;
-      exit (EXIT_FAILURE);
+      mCpu->clk_i = 0;
+      mCpu->eval ();
+      mCpu->clk_i = 1;
+      mCpu->eval ();
+      mCycleCnt++;
     }
+  while (mCpu->debug_gnt_o == 0);
+
+  mCpu->debug_req_i = 0;		// Stop requesting
 
   return 4;
-
 }	// Ri5cyImpl::writeRegister ()
 
 
