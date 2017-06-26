@@ -24,6 +24,8 @@
 #include "Ri5cyImpl.h"
 
 
+using std::chrono::duration;
+
 //! Constructor.
 
 //! We only instantiate the implementation class.
@@ -84,7 +86,7 @@ Ri5cy::resume (ResumeType  step,
     {
       return ResumeRes::TIMEOUT;
     } else {
-      return ResumeRes:;INTERRUPTED;
+      return ResumeRes::INTERRUPTED;
     }
   }
 
@@ -162,11 +164,12 @@ Ri5cy::getInstrCount (void) const
 //! @return  Number of bytes read into the register
 
 std::size_t
-Ri5cy::readRegister (const int  reg,
+Ri5cy::readRegister (int  reg,
 		     uint32_t & value) const
 {
   value=0;
   return 4;
+  //mRi5cyImpl->haltModel ();
   //return mRi5cyImpl->readRegister (reg, value);
 
 }	// Ri5cy::readRegister ()

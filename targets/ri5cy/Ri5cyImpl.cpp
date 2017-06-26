@@ -75,7 +75,7 @@ void
 Ri5cyImpl::clockStep ()
 {
   mCpu->clk_i = 0; 
-  mCpu->eval ()
+  mCpu->eval ();
   cpuTime += 5;
   mCpu->clk_i = 1;
   mCpu->eval ();
@@ -85,13 +85,17 @@ Ri5cyImpl::clockStep ()
 bool
 Ri5cyImpl::step ()
 {
-  uint32_t prev_pc = readProgramAddr ();
+  //uint32_t prev_pc = readProgramAddr ();
+  clockStep ();
+  return false;
+  /*
   do
   {
     clockStep ();
   }
-  while (prev_pc == readProgramAddr () && haveTrap () == 0);
-  return haveTrap () == 1;
+  while (prev_pc == readProgramAddr () && mCoreHalted == false);
+  return mCoreHalted == true;
+  */
 }
 
 
@@ -209,9 +213,9 @@ Ri5cyImpl::getInstrCount (void) const
 //! @return  The size of the register read in bytes (always 4)
 
 std::size_t
-Ri5cyImpl::readRegister (const int  reg,
+Ri5cyImpl::readRegister (int  reg,
 			 uint32_t & value) const
-{
+{	
   if (!mCoreHalted)
     {
       cerr << "*** ABORT ***: Attempt to read register from running core"
@@ -258,6 +262,10 @@ Ri5cyImpl::readRegister (const int  reg,
 
   mCpu->debug_req_i = 0;		// Stop requesting
 
+  if (mCpu->debug_rvalid_o == 1)
+  {
+  }
+  else {
   do
     {
       mCpu->clk_i = 0;
@@ -267,6 +275,7 @@ Ri5cyImpl::readRegister (const int  reg,
       mCycleCnt++;
     }
   while (mCpu->debug_rvalid_o == 0);
+  }
 
   value = mCpu->debug_raddr_o;
   return 4;
@@ -290,6 +299,16 @@ std::size_t
 Ri5cyImpl::writeRegister (const int  reg,
 			  const uint32_t  value)
 {
+  if ((REG_R0 <= reg) && (reg <= REG_R31))
+    dbg_addr = DBG_GPR0 + reg * 4;    // General register
+  else if (REG_PC == reg)
+    dbg_addr = DBG_NPC;               // Next PC
+  else
+  {
+    cerr << "*** ABORT ***: Attempt to read non-existent register" << endl;
+    exit (EXIT_FAILURE);
+  }
+
   if (!mCoreHalted)
     {
       cerr << "*** ABORT ***: Attempt to write register to running core"

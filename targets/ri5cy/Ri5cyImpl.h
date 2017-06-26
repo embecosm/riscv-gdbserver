@@ -41,6 +41,10 @@ class Ri5cyImpl final
   Ri5cyImpl ();
   ~Ri5cyImpl ();
 
+
+  bool step (void);
+
+
   /* FIXME: Commented out to fix compile.
   ResumeRes  resume (ResumeType step,
 		     SyscallInfo * syscallInfo = nullptr);
@@ -53,17 +57,17 @@ class Ri5cyImpl final
 
   uint64_t  getCycleCount (void) const;
   uint64_t  getInstrCount (void) const;
-
+*/
   // Read contents of a target register.
 
-  std::size_t  readRegister (const int  reg,
+  std::size_t  readRegister (int  reg,
 			     uint32_t & value) const;
 
   // Write data to a target register.
 
   std::size_t  writeRegister (const int  reg,
 			      const uint32_t  value);
-  */
+
   // Read data from memory.
 
   std::size_t  read (const uint32_t  addr,
@@ -139,6 +143,8 @@ private:
 
   void resetModel (void);
   void haltModel (void);
+
+  void clockStep (void);
 };
 
 #endif	// RI5CY_IMPL__H
