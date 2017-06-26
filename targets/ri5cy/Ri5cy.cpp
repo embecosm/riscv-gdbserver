@@ -204,8 +204,7 @@ Ri5cy::read (const uint32_t addr,
 	     uint8_t * buffer,
 	     const std::size_t  size) const
 {
-  return 0;
-  //return mRi5cyImpl->read (addr, buffer, size);
+  return mRi5cyImpl->read (addr, buffer, size);
 
 }	// Ri5cy::read ()
 
@@ -224,8 +223,7 @@ Ri5cy::write (const uint32_t  addr,
 	      const uint8_t * buffer,
 	      const std::size_t size)
 {
-  return 0;
-  //return mRi5cyImpl->write (addr, buffer, size);
+  return mRi5cyImpl->write (addr, buffer, size);
 
 }	// Ri5cy::write ()
 
