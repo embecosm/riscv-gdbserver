@@ -43,6 +43,7 @@ class Ri5cyImpl final
 
 
   bool step (void);
+  bool stepSingle (void);
   void unhaltModel (void);
   uint32_t readProgramAddr ();
   std::size_t writeProgramAddr (uint32_t value);

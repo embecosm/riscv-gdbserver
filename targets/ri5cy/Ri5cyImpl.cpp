@@ -108,7 +108,7 @@ Ri5cyImpl::readProgramAddr ()
 
 
 bool
-Ri5cyImpl::step ()
+Ri5cyImpl::stepSingle ()
 {
   uint32_t prev_pc = readProgramAddr ();
   do
@@ -118,6 +118,23 @@ Ri5cyImpl::step ()
     haltModel ();
   }
   while (prev_pc == readProgramAddr ());
+  return true;
+}
+
+
+// IGB: Bit of a hack because we are doing multple instructions in one go
+bool
+Ri5cyImpl::step ()
+{
+  if (mCoreHalted == true)
+  {
+    unhaltModel ();
+  }
+  do
+  {
+    clockStep ();
+  }
+  while (mCoreHalted == false);
   return true;
 }
 

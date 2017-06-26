@@ -80,19 +80,41 @@ Ri5cy::resume (ResumeType  step,
 	       std::chrono::duration <double>  timeout,
 	       SyscallInfo * syscallInfo)
 {
-  if (step == ResumeType::STEP)
+  time_point <system_clock, duration <double> > timeout_end =
+    system_clock::now () + timeout;
+
+  switch (step)
   {
-    if (mRi5cyImpl->step ())
+  case ResumeType::STEP:
+    if (mRi5cyImpl->stepSingle ())
     {
       return ResumeRes::TIMEOUT;
     } else {
       return ResumeRes::INTERRUPTED;
     }
+    break;
+  case ResumeType::CONTINUE:
+    for (;;)
+    {
+      for (size_t i = 0; i < RUN_SAMPLE_PERIOD; i++)
+      {
+        if (mRi5cyImpl->step ())
+        {
+          return ResumeRes::INTERRUPTED;
+        }
+      }
+
+      if (timeout_end < system_clock::now ())
+      {
+        return ResumeRes::TIMEOUT;
+      }
+    }
+    break;
+  case ResumeType::STOP:
+    // Do nothing. We are already "stopped"?
+    break;
   }
-
-  //return mRi5cyImpl->resume (step, timeout, syscallInfo);
   return ResumeRes::NONE;
-
 }	// Ri5cy::resume ()
 
 
