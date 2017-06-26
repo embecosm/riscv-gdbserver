@@ -29,7 +29,7 @@
 // RISC-V headers in general and for each target
 #include "ITarget.h"
 #include "Picorv32.h"
-// #include "Ri5cy.h"
+#include "Ri5cy.h"
 
 // Class headers
 #include "GdbServer.h"
@@ -134,8 +134,8 @@ main (int   argc,
 
   if (0 == strcasecmp ("PicoRV32", coreName))
     cpu = new Picorv32 ();
-  // else if (0 == strcasecmp ("RI5CY", coreName))
-  //   cpu = new Ri5cy ();
+   else if (0 == strcasecmp ("RI5CY", coreName))
+     cpu = new Ri5cy ();
   else
     {
       cerr << "ERROR: Unrecognized core: " << coreName << ": exiting" << endl;

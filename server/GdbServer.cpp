@@ -807,7 +807,7 @@ GdbServer::rspCommand ()
     {
       // Reset the CPU.  Failure to reset causes us to blow up.
 
-      if (ITarget::ResumeRes::SUCCESS != cpu->reset ())
+      if (ITarget::ResumeRes::SUCCESS != cpu->reset (ITarget::ResetType::WARM))
 	{
 	  cerr << "*** ABORT *** Failed to reset: Terminating." << endl;
 	  exit (EXIT_FAILURE);

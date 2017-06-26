@@ -58,7 +58,8 @@ ITarget::ResumeRes
 Ri5cy::resume (ResumeType  step,
 	       SyscallInfo * syscallInfo)
 {
-  return mRi5cyImpl->resume (step, syscallInfo);
+  //return mRi5cyImpl->resume (step, syscallInfo);
+  return ResumeRes::NONE;
 
 }	// Ri5cy::resume ()
 
@@ -77,7 +78,8 @@ Ri5cy::resume (ResumeType  step,
 	       std::chrono::duration <double>  timeout,
 	       SyscallInfo * syscallInfo)
 {
-  return mRi5cyImpl->resume (step, timeout, syscallInfo);
+  //return mRi5cyImpl->resume (step, timeout, syscallInfo);
+  return ResumeRes::NONE;
 
 }	// Ri5cy::resume ()
 
@@ -91,7 +93,8 @@ Ri5cy::resume (ResumeType  step,
 ITarget::ResumeRes
 Ri5cy::terminate (void)
 {
-  return  mRi5cyImpl->resume ();
+  //return  mRi5cyImpl->resume ();
+  return ResumeRes::NONE;
 
 }	// Ri5cy::terminate ()
 
@@ -105,8 +108,8 @@ Ri5cy::terminate (void)
 ITarget::ResumeRes
 Ri5cy::reset (ITarget::ResetType  type)
 {
-  return mRi5cyImpl->reset (type);
-
+  //return mRi5cyImpl->reset (type);
+  return ResumeRes::NONE;
 }	// Ri5cy::reset ()
 
 
@@ -119,7 +122,8 @@ Ri5cy::reset (ITarget::ResetType  type)
 uint64_t
 Ri5cy::getCycleCount (void) const
 {
-  return mRi5cyImpl->getCycleCount ();
+  return 0;
+  //return mRi5cyImpl->getCycleCount ();
 
 }	// Ri5cy::getCycleCount ()
 
@@ -133,7 +137,8 @@ Ri5cy::getCycleCount (void) const
 uint64_t
 Ri5cy::getInstrCount (void) const
 {
-  return mRi5cyImpl->getInstrCount ();
+  return 0;
+  //return mRi5cyImpl->getInstrCount ();
 
 }	// Ri5cy::getInstrCount ()
 
@@ -150,7 +155,8 @@ std::size_t
 Ri5cy::readRegister (const int  reg,
 		     uint32_t & value) const
 {
-  return mRi5cyImpl->readRegister (reg, value);
+  return 0;
+  //return mRi5cyImpl->readRegister (reg, value);
 
 }	// Ri5cy::readRegister ()
 
@@ -167,7 +173,8 @@ std::size_t
 Ri5cy::writeRegister (const int  reg,
 		      const uint32_t  value)
 {
-  return mRi5cyImpl->readRegister (reg, value);
+  return 0;
+  //return mRi5cyImpl->readRegister (reg, value);
 
 }	// Ri5cy::writeRegister ()
 
@@ -186,7 +193,8 @@ Ri5cy::read (const uint32_t addr,
 	     uint8_t * buffer,
 	     const std::size_t  size) const
 {
-  return mRi5cyImpl->read (addr, buffer, size);
+  return 0;
+  //return mRi5cyImpl->read (addr, buffer, size);
 
 }	// Ri5cy::read ()
 
@@ -205,7 +213,8 @@ Ri5cy::write (const uint32_t  addr,
 	      const uint8_t * buffer,
 	      const std::size_t size)
 {
-  return mRi5cyImpl->write (addr, buffer, size);
+  return 0;
+  //return mRi5cyImpl->write (addr, buffer, size);
 
 }	// Ri5cy::write ()
 
@@ -222,7 +231,8 @@ bool
 Ri5cy::insertMatchpoint (const uint32_t  addr,
 			 const MatchType  matchType)
 {
-  return mRi5cyImpl->insertMatchpoint (addr, matchType);
+  return false;
+  //return mRi5cyImpl->insertMatchpoint (addr, matchType);
 
 }	// Ri5cy::insertMatchpoint ()
 
@@ -239,7 +249,8 @@ bool
 Ri5cy::removeMatchpoint (const uint32_t  addr,
 			 const MatchType matchType)
 {
-  return mRi5cyImpl->removeMatchpoint (addr, matchType);
+  return false;
+  // return mRi5cyImpl->removeMatchpoint (addr, matchType);
 
 }	// Ri5cy::removeMatchpoint ()
 
@@ -256,7 +267,8 @@ bool
 Ri5cy::command (const std::string  cmd,
 		std::ostream & stream)
 {
-  return  mRi5cyImpl->command (cmd, stream);
+  return false;
+  //return  mRi5cyImpl->command (cmd, stream);
 
 }	// Ri5cy::command ()
 

@@ -26,4 +26,8 @@ libri5cy_la_SOURCES = Ri5cy.cpp     \
                       Ri5cyImpl.cpp \
                       Ri5cyImpl.h
 
-libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra
+# FIXME: Remove -Wno-unused-parameter once the class is implemented properly
+libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra -Wno-unused-parameter \
+                       -I$(srcdir)/..        \
+                       -I$(srcdir)/../common \
+		       -I@MDIR_RI5CY@

@@ -26,6 +26,19 @@
 #include "Ri5cyImpl.h"
 #include "Vtop.h"
 
+// Count of clock ticks
+// FIXME: Presumably this needs to be used by the Ri5cyImpl so that the
+// verilator model and the GDB server agree on CPU time?
+
+static vluint64_t  cpuTime = 0;
+
+double
+sc_time_stamp ()
+{
+  return cpuTime;
+
+}
+
 
 //! Constructor.
 
@@ -37,7 +50,7 @@ Ri5cyImpl::Ri5cyImpl () :
   mCycleCnt (0),
   mInstrCnt (0)
 {
-  mCpu = new Vtestbench;
+  mCpu = new Vtop;
 
   resetModel ();
 
@@ -54,6 +67,8 @@ Ri5cyImpl::~Ri5cyImpl ()
 
 }	// Ri5cyImpl::~Ri5cyImpl ()
 
+
+/* FIXME: All commented out to get it to compile
 
 //! Resume execution with no timeout
 
@@ -361,7 +376,7 @@ Ri5cyImpl::command (const std::string  cmd,
   return false;
 
 }	// Ri5cyImpl::command ()
-
+*/
 
 //! Helper method to reset the model
 
@@ -412,7 +427,7 @@ Ri5cyImpl::haltModel (void)
 
   mCpu->debug_req_i   = 1;
   mCpu->debug_addr_i  = DBG_CTRL;
-  mcpu->debug_we_i    = 1;
+  mCpu->debug_we_i    = 1;
   mCpu->debug_wdata_i = DBG_CTRL_HALT;
 
   // Write has succeeded when we get the grant signal asserted.

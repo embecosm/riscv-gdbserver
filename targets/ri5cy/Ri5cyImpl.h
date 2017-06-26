@@ -39,6 +39,7 @@ class Ri5cyImpl final
   Ri5cyImpl ();
   ~Ri5cyImpl ();
 
+  /* FIXME: Commented out to fix compile.
   ResumeRes  resume (ResumeType step,
 		     SyscallInfo * syscallInfo = nullptr);
   ResumeRes  resume (ResumeType step,
@@ -85,7 +86,7 @@ class Ri5cyImpl final
 
   bool command (const std::string  cmd,
 			std::ostream & stream);
-
+  */
 
 private:
 
@@ -102,12 +103,14 @@ private:
   const uint16_t DBG_GPR0    = 0x0400;	//!< General purpose register 0
   const uint16_t DBG_GPR31   = 0x047c;	//!< General purpose register 41
   const uint16_t DBG_NPC     = 0x2000;	//!< Next PC
-  const uint16_t DBG_NPC     = 0x2004;	//!< Prev PC
+  const uint16_t DBG_PPC     = 0x2004;	//!< Prev PC
 
   // Debug register flags
 
-  const uint16_t DBG_CTRL_HALT = 0x00010000;	//!< Halt core
-  const uint16_t DBG_CTRL_SSTE = 0x00010000;	//!< Single step core
+  // FIXME: Changed to uint32_t to get to compile - constants too large. Check
+  // the constants are correct.
+  const uint32_t DBG_CTRL_HALT = 0x00010000;	//!< Halt core
+  const uint32_t DBG_CTRL_SSTE = 0x00010000;	//!< Single step core
 
   // GDB register numbers
 
