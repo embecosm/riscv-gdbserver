@@ -43,7 +43,9 @@ class Ri5cyImpl final
 
 
   bool step (void);
-
+  void unhaltModel (void);
+  uint32_t readProgramAddr ();
+  std::size_t writeProgramAddr (uint32_t value);
 
   /* FIXME: Commented out to fix compile.
   ResumeRes  resume (ResumeType step,
@@ -93,6 +95,8 @@ class Ri5cyImpl final
   bool command (const std::string  cmd,
 			std::ostream & stream);
 
+  const int REG_PC  = 32;               //!< GDB PC regnum
+
 private:
 
   //! How many cycles of reset
@@ -121,7 +125,6 @@ private:
 
   const int REG_R0  = 0;		//!< GDB R0 regnum
   const int REG_R31 = 31;		//!< GDB R31 regnum
-  const int REG_PC  = 32;		//!< GDB PC regnum
 
   //! Top level Verilator model.
 

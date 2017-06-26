@@ -183,8 +183,11 @@ std::size_t
 Ri5cy::writeRegister (const int  reg,
 		      const uint32_t  value)
 {
-  return mRi5cyImpl->writeRegister (reg, value);
-
+  if (mRi5cyImpl->REG_PC == reg) {
+    return mRi5cyImpl->writeProgramAddr (value);
+  } else {
+    return mRi5cyImpl->writeRegister (reg, value);
+  }
 }	// Ri5cy::writeRegister ()
 
 

@@ -86,20 +86,39 @@ Ri5cyImpl::clockStep ()
   cpuTime += 5;
 }
 
+
+std::size_t
+Ri5cyImpl::writeProgramAddr (uint32_t value)
+{
+  haltModel ();
+  writeRegister (REG_PC, value);
+  resetModel ();
+  return 4;
+}
+
+
+uint32_t
+Ri5cyImpl::readProgramAddr ()
+{
+	uint32_t value;
+	readRegister (REG_PC, value);
+	return value;
+}
+
+
+
 bool
 Ri5cyImpl::step ()
 {
-  //uint32_t prev_pc = readProgramAddr ();
-  clockStep ();
-  return false;
-  /*
+  uint32_t prev_pc = readProgramAddr ();
   do
   {
+    unhaltModel ();
     clockStep ();
+    haltModel ();
   }
-  while (prev_pc == readProgramAddr () && mCoreHalted == false);
-  return mCoreHalted == true;
-  */
+  while (prev_pc == readProgramAddr ());
+  return true;
 }
 
 
@@ -495,6 +514,37 @@ Ri5cyImpl::resetModel (void)
 //! Helper method to halt the model
 
 //! For this we need to use the debug interface
+
+
+
+
+
+void
+Ri5cyImpl::unhaltModel (void)
+{
+  mCpu->rstn_i        = 1;
+
+  // Write HALT into the debug register
+
+  mCpu->debug_req_i   = 1;
+  mCpu->debug_addr_i  = DBG_CTRL;
+  mCpu->debug_we_i    = 1;
+  mCpu->debug_wdata_i = 0;
+
+  // Write has succeeded when we get the grant signal asserted.
+  do
+    {
+      mCpu->clk_i = 0;
+      mCpu->eval ();
+      mCpu->clk_i = 1;
+      mCpu->eval ();
+      mCycleCnt++;
+    }
+  while (mCpu->debug_gnt_o == 0);
+
+  mCoreHalted = false;
+
+}	// Ri5cyImpl::unhaltModel ()
 
 void
 Ri5cyImpl::haltModel (void)
