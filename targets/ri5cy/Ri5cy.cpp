@@ -58,8 +58,8 @@ ITarget::ResumeRes
 Ri5cy::resume (ResumeType  step,
 	       SyscallInfo * syscallInfo)
 {
-  //return mRi5cyImpl->resume (step, syscallInfo);
-  return ResumeRes::NONE;
+  return resume (step, duration <double>::zero(), syscallInfo);
+  //return ResumeRes::NONE;
 
 }	// Ri5cy::resume ()
 
@@ -78,6 +78,16 @@ Ri5cy::resume (ResumeType  step,
 	       std::chrono::duration <double>  timeout,
 	       SyscallInfo * syscallInfo)
 {
+  if (step == ResumeType::STEP)
+  {
+    if (mRi5cyImpl->step ())
+    {
+      return ResumeRes::TIMEOUT;
+    } else {
+      return ResumeRes:;INTERRUPTED;
+    }
+  }
+
   //return mRi5cyImpl->resume (step, timeout, syscallInfo);
   return ResumeRes::NONE;
 
@@ -155,7 +165,8 @@ std::size_t
 Ri5cy::readRegister (const int  reg,
 		     uint32_t & value) const
 {
-  return 0;
+  value=0;
+  return 4;
   //return mRi5cyImpl->readRegister (reg, value);
 
 }	// Ri5cy::readRegister ()
