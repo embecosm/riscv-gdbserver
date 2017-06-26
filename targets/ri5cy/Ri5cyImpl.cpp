@@ -96,6 +96,12 @@ Ri5cyImpl::writeProgramAddr (uint32_t value)
   return 4;
 }
 
+void
+Ri5cyImpl::fakeHalt ()
+{
+  haltModel ();
+}
+
 
 uint32_t
 Ri5cyImpl::readProgramAddr ()
@@ -128,14 +134,16 @@ Ri5cyImpl::step ()
 {
   if (mCoreHalted == true)
   {
+    haltModel ();
+    fprintf(stderr, "halted before step at pc=0x?\n");
     unhaltModel ();
   }
-  do
+  else
   {
-    clockStep ();
+    fprintf(stderr, "NOT halted before step at pc=0x?\n");
   }
-  while (mCoreHalted == false);
-  return true;
+  clockStep ();
+  return (mCoreHalted == true);
 }
 
 

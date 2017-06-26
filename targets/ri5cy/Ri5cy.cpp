@@ -25,6 +25,11 @@
 
 
 using std::chrono::duration;
+using std::chrono::system_clock;
+using std::chrono::time_point;
+
+static const size_t RUN_SAMPLE_PERIOD = 10000;
+
 
 //! Constructor.
 
@@ -96,12 +101,15 @@ Ri5cy::resume (ResumeType  step,
   case ResumeType::CONTINUE:
     for (;;)
     {
-      for (size_t i = 0; i < RUN_SAMPLE_PERIOD; i++)
+      for (size_t i = 0; i < 5000000 /*RUN_SAMPLE_PERIOD*/; i++)
       {
         if (mRi5cyImpl->step ())
         {
           return ResumeRes::INTERRUPTED;
         }
+	fprintf (stderr, "did 5000000 instructions so halting now\n");
+	mRi5cyImpl->fakeHalt ();
+	return ResumeRes::INTERRUPTED;
       }
 
       if (timeout_end < system_clock::now ())
