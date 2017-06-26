@@ -272,7 +272,7 @@ Ri5cyImpl::writeRegister (const int  reg,
   return 4;
 
 }	// Ri5cyImpl::writeRegister ()
-
+*/
 
 //! Read data from memory
 
@@ -295,6 +295,10 @@ Ri5cyImpl::read (const uint32_t  addr,
 		 uint8_t * buffer,
 		 const std::size_t  size) const
 {
+  size_t i;
+  for (i = 0; i < size; i++)
+    buffer[i] = mCpu->top->ram_i->dp_ram_i->readByte (addr + i);
+  return i;
 }	// Ri5cyImpl::read ()
 
 
@@ -314,6 +318,10 @@ Ri5cyImpl::write (const uint32_t  addr,
 		  const uint8_t * buffer,
 		  const std::size_t  size)
 {
+  size_t i;
+  for (i = 0; i < size; i++)
+    mCpu->top->ram_i->dp_ram_i->writeByte (addr + i, buffer[i]);
+  return i;
 }	// Ri5cyImpl::write ()
 
 
@@ -327,7 +335,7 @@ Ri5cyImpl::write (const uint32_t  addr,
 //! @param[in] addr       Address for the matchpoint
 //! @param[in] matchType  Type of breakpoint or watchpoint
 //! @return  TRUE if the operation was successful, false otherwise.
-
+/*
 bool
 Ri5cyImpl::insertMatchpoint (const uint32_t  addr __attribute__ ((unused)),
 			     const MatchType  matchType __attribute__ ((unused)))
@@ -355,7 +363,7 @@ Ri5cyImpl::removeMatchpoint (const uint32_t  addr,
   return  false;
 
 }	// Ri5cyImpl::removeMatchpoint ()
-
+*/
 
 //! Generic pass through of command
 
@@ -376,7 +384,7 @@ Ri5cyImpl::command (const std::string  cmd,
   return false;
 
 }	// Ri5cyImpl::command ()
-*/
+
 
 //! Helper method to reset the model
 

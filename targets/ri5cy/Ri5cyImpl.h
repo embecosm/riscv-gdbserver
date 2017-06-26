@@ -26,7 +26,9 @@
 #include <cstdint>
 
 #include "Vtop.h"
-
+#include "Vtop_top.h"
+#include "Vtop_ram__A10.h"
+#include "Vtop_dp_ram__A10.h"
 
 //! The RI5CY implementation class.
 
@@ -61,7 +63,7 @@ class Ri5cyImpl final
 
   std::size_t  writeRegister (const int  reg,
 			      const uint32_t  value);
-
+  */
   // Read data from memory.
 
   std::size_t  read (const uint32_t  addr,
@@ -76,17 +78,16 @@ class Ri5cyImpl final
 
   // Insert and remove a matchpoint (breakpoint or watchpoint) at the given
   // address.  Return value indicates whether the operation was successful.
-
+  /*
   bool  insertMatchpoint (const uint32_t  addr,
 			  const MatchType  matchType);
   bool  removeMatchpoint (const uint32_t  addr,
 			  const MatchType  matchType);
-
+  */
   // Generic pass through of command
 
   bool command (const std::string  cmd,
 			std::ostream & stream);
-  */
 
 private:
 
