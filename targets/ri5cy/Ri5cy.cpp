@@ -28,9 +28,11 @@
 
 //! We only instantiate the implementation class.
 
-Ri5cy::Ri5cy ()
+//! @param[in] wantVcd  TRUE if we want a VCD generated, false otherwise.
+
+Ri5cy::Ri5cy (bool  wantVcd)
 {
-  mRi5cyImpl = new Ri5cyImpl ();
+  mRi5cyImpl = new Ri5cyImpl (wantVcd);
 
 }	// Ri5cy::Ri5cy ()
 
@@ -91,7 +93,7 @@ Ri5cy::resume (ResumeType  step,
 ITarget::ResumeRes
 Ri5cy::terminate (void)
 {
-  return  mRi5cyImpl->resume ();
+  return  mRi5cyImpl->terminate ();
 
 }	// Ri5cy::terminate ()
 
@@ -167,7 +169,7 @@ std::size_t
 Ri5cy::writeRegister (const int  reg,
 		      const uint32_t  value)
 {
-  return mRi5cyImpl->readRegister (reg, value);
+  return mRi5cyImpl->writeRegister (reg, value);
 
 }	// Ri5cy::writeRegister ()
 
@@ -259,6 +261,23 @@ Ri5cy::command (const std::string  cmd,
   return  mRi5cyImpl->command (cmd, stream);
 
 }	// Ri5cy::command ()
+
+
+//! Return a timestamp.
+
+//! This is needed to support the $time function in Verilog.  This in turn is
+//! needed for VCD output.
+
+//! Pass through to the implementation class.
+
+//! @return  The current simulation time in seconds.
+
+double
+Ri5cy::timeStamp ()
+{
+  return mRi5cyImpl->timeStamp ();
+
+}	// Ri5cy::timeStamp ()
 
 
 // Local Variables:

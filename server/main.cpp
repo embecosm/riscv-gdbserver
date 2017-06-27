@@ -27,11 +27,13 @@
 #include <getopt.h>
 
 // RISC-V headers in general and for each target
+
 #include "ITarget.h"
 #include "Picorv32.h"
-// #include "Ri5cy.h"
+#include "Ri5cy.h"
 
 // Class headers
+
 #include "GdbServer.h"
 #include "TraceFlags.h"
 
@@ -42,6 +44,11 @@ using std::cout;
 using std::endl;
 using std::ostream;
 using std::strcmp;
+
+
+//! The RISC-V model
+
+static ITarget * cpu;
 
 
 //! Convenience function to output the usage to a specified stream.
@@ -140,14 +147,10 @@ main (int   argc,
   if (silent)
     traceFlags->setSilent ();
 
-  // The RISC-V model
-
-  ITarget * cpu;
-
   if (0 == strcasecmp ("PicoRV32", coreName))
-    cpu = new Picorv32 ();
-  // else if (0 == strcasecmp ("RI5CY", coreName))
-  //   cpu = new Ri5cy ();
+    cpu = new Picorv32 (traceFlags->traceVcd());
+  else if (0 == strcasecmp ("RI5CY", coreName))
+    cpu = new Ri5cy (traceFlags->traceVcd());
   else
     {
       cerr << "ERROR: Unrecognized core: " << coreName << ": exiting" << endl;
@@ -171,6 +174,16 @@ main (int   argc,
   return EXIT_FAILURE;			// If we return it's a failure!
 
 }	/* sc_main() */
+
+
+//! Function to handle $time calls in the Verilog
+
+double
+sc_time_stamp ()
+{
+  return cpu->timeStamp ();
+
+}
 
 
 // Local Variables:

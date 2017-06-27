@@ -42,10 +42,14 @@ static const int RISCV_PC_REGNUM   = 32;
 static const size_t RUN_SAMPLE_PERIOD = 10000;
 
 
-Picorv32::Picorv32()
+//! @param[in] wantVcd  TRUE if we want a VCD generated, false otherwise.
+
+Picorv32::Picorv32 (bool  wantVcd) :
+  mWantVcd (wantVcd)
 {
-  mPicorv32Impl = new Picorv32Impl();
-}
+  mPicorv32Impl = new Picorv32Impl (wantVcd);
+
+}	// Picorv32::Picorv32 ()
 
 
 Picorv32::~Picorv32()
@@ -102,7 +106,7 @@ Picorv32::resume (ResumeType step,
 }
 
 ITarget::ResumeRes
-Picorv32::terminate (void)
+Picorv32::terminate ()
 {
   // FIXME: Any action required here? I don't think so..
   return ResumeRes::NONE;
@@ -112,7 +116,7 @@ ITarget::ResumeRes
 Picorv32::reset (ITarget::ResetType  type  __attribute__ ((unused)) )
 {
   delete mPicorv32Impl;
-  mPicorv32Impl = new Picorv32Impl ();
+  mPicorv32Impl = new Picorv32Impl (mWantVcd);
 
   if (mPicorv32Impl)
   {
@@ -123,13 +127,13 @@ Picorv32::reset (ITarget::ResetType  type  __attribute__ ((unused)) )
 }
 
 uint64_t
-Picorv32::getCycleCount (void) const
+Picorv32::getCycleCount () const
 {
   std::cerr << "getCycleCount NOT IMPLEMENTED" << std::endl;
   return 0;
 }
 uint64_t
-Picorv32::getInstrCount (void) const
+Picorv32::getInstrCount () const
 {
   std::cerr << "getInstrCount NOT IMPLEMENTED" << std::endl;
   return 0;
@@ -201,6 +205,24 @@ Picorv32::command (const std::string cmd, std::ostream & stream)
   std::cerr << "command NOT IMPLEMENTED" << std::endl;
   return false;
 }
+
+
+//! Return a timestamp.
+
+//! This is needed to support the $time function in Verilog.  This in turn is
+//! needed for VCD output.
+
+//! Pass through to the implementation class.
+
+//! @return  The current simulation time in seconds.
+
+double
+Picorv32::timeStamp ()
+{
+  return mPicorv32Impl->timeStamp ();
+
+}	// Picorv32::timeStamp ()
+
 
 // Local Variables:
 // mode: C++

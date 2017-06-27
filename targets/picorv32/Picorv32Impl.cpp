@@ -26,19 +26,44 @@
 #include "Vtestbench_testbench.h"
 #include "Vtestbench_picorv32__C1_EF1_EH1.h"
 
-//! Constructor. Instantiate the Verilator model and initialize the clock.
 
-Picorv32Impl::Picorv32Impl ()
+//! Constructor.
+
+//! Initialize the clock, instantiate the Verilator model and set up VCD
+//! tracing if requested.
+
+//! @param[in] wantVcd  TRUE if we want a VCD generated, false otherwise.
+
+Picorv32Impl::Picorv32Impl (bool  wantVcd) :
+  mWantVcd (wantVcd),
+  mCpuTime (0),
+  mClk (0)
 {
   mCpu = new Vtestbench;
-  mClk = 0;
-}
+
+  // Open VCD file if requested
+
+  if (mWantVcd)
+    {
+      Verilated::traceEverOn (true);
+      mTfp = new VerilatedVcdC;
+      mCpu->trace (mTfp, 99);
+      mTfp->open ("gdbserver.vcd");
+    }
+}	// Picorv32Impl::Picorv32Impl ()
 
 
-//! Destructor. Delete the Verilator model.
+//! Destructor.
+
+// Delete the Verilator model and close the VCD if it was requested.
 
 Picorv32Impl::~Picorv32Impl ()
 {
+  // Close VCD file if requested
+
+  if (mWantVcd)
+    mTfp->close ();
+
   delete mCpu;
 }
 
@@ -51,6 +76,12 @@ Picorv32Impl::clockStep ()
   mCpu->clk = mClk;
   mCpu->eval ();
   mClk++;
+
+  if (mWantVcd)
+    {
+      mCpuTime += 5;			// in ns
+      mTfp->dump (mCpuTime);
+    }
 }	// Picorv32Impl::clockStep ()
 
 
@@ -192,6 +223,20 @@ Picorv32Impl::writeProgramAddr (uint32_t val)
   }
 
 }	// Picorv32Impl::writeProgramAddr ()
+
+
+//! Provide a time stamp (needed for $time)
+
+//! We count in nanoseconds.
+
+//! @return  The time in seconds
+
+double
+Picorv32Impl::timeStamp ()
+{
+  return static_cast<double> (mCpuTime) / 1.0e-9;
+
+}	// Picorv32Impl::timeStamp ()
 
 
 // Local Variables:

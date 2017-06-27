@@ -26,4 +26,7 @@ libri5cy_la_SOURCES = Ri5cy.cpp     \
                       Ri5cyImpl.cpp \
                       Ri5cyImpl.h
 
-libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra
+libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra    \
+                          -I$(srcdir)/..        \
+                          -I$(srcdir)/../common \
+			  -I@MDIR_RI5CY@

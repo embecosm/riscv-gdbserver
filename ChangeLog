@@ -1,5 +1,55 @@
 2017-06-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	Add VCD generation as an option.
+
+	* server/GdbServer.cpp (GdbServer::rspCommand): Pass argument to
+	reset.
+	* server/Makefile.am: Add more target libraries.
+	* server/Makefile.in: Regenerated.
+	* server/TraceFlags.cpp (TraceFlags::traceVcd): Created.
+	* server/TraceFlags.h: Add traceVcd method and constant.
+	* server/main.cpp: Include Ri5cy.h, make cpu static global.
+	(main): Allow RI5CY target.
+	(sc_time_stamp): Created.
+	* targets/ITarget.h (class ITarget): Add constructor to take
+	boolean arg, correct void argument lists, add timeStamp.
+	* targets/picorv32/Picorv32.cpp (Picorv32::Picorv32): Pass in
+	argument to select VCD.
+	(Picorv32::timeStamp): Created.
+	* targets/picorv32/Picorv32.h (class Picorv32): Add constructor to take
+	boolean arg, correct void argument lists, add timeStamp.
+	* targets/picorv32/Picorv32Impl.cpp (Picorv32Impl::Picorv32Impl):
+	Initialize VCD.
+	(Picorv32Impl::~Picorv32Impl): Close VCD.
+	(Picorv32Impl::clockStep, Picorv32Impl::writeProgramAddr):
+	Generate VCD when stepping.
+	(Picorv32Impl::timeStamp): Created.
+	* targets/picorv32/Picorv32Impl.h (class Picorv32Impl): Pass flag
+	to constructor, add timeStamp method, add VCD member variables.
+	* targets/ri5cy/Makefile.am: Add C include dirs.
+	* targets/ri5cy/Makefile.in: Regenerated.
+	* targets/ri5cy/Ri5cy.cpp (Ri5cy::Ri5cy): Add constructor to take
+	boolean arg, correct void argument lists, add timeStamp.
+	(Ri5cy::timeStamp): Creatd.
+	* targets/ri5cy/Ri5cy.h (class Ri5cy): Pass arg to constructor,
+	add timeStamp.
+	* targets/ri5cy/Ri5cyImpl.cpp Include verilcated_vcd_c.h
+	(Ri5cyImpl::Ri5cyImpl): Take arg, initialize VCD.
+	(Ri5cyImpl::~Ri5cyImpl): Close VCD
+	(Ri5cyImpl::resume, Ri5cyImpl::terminate,Ri5cyImpl::reset):
+	Correct types.
+	(Ri5cyImpl::readRegister): Fix typo, generated VCD.
+	(Ri5cyImpl::writeRegister, Ri5cyImpl::read, Ri5cyImpl::write):
+	Mark regs unused, return result.
+	(Ri5cyImpl::insertMatchpoint, Ri5cyImpl::removeMatchpoint)
+	(Ri5cyImpl::command): Mark args unused.
+	(Ri5cyImpl::timeStamp): Created.
+	(Ri5cyImpl::resetModel, Ri5cyImpl::haltModel): Generate VCD.
+	* targets/ri5cy/Ri5cyImpl.h (class Ri5cyImpl): Correct types
+	throughout.
+
+2017-06-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	Remove compile time debug flag GDBSERVER_DEBUG.
 
 	* Makefile.in: Regenerate.

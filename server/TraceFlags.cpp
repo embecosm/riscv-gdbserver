@@ -79,6 +79,18 @@ TraceFlags::traceBreak () const
 }	// TraceFlags::traceBreak ()
 
 
+//! Is VCD tracing enabled?
+
+//! @return  TRUE if the VCD tracing flag is set, FALSE otherwise
+
+bool
+TraceFlags::traceVcd () const
+{
+  return (flags & TRACE_VCD) == TRACE_VCD;
+
+}	// TraceFlags::traceVcd ()
+
+
 //! Is silent running enabled?
 
 //! @return  TRUE if the SILENT tracing flag is set, FALSE otherwise
