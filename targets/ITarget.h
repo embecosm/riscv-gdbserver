@@ -78,9 +78,11 @@ class ITarget
     WATCH_ACCESS = 4		//!< Access watchpoint
     };
 
-  // Virtual destructor for defined behavior
+  // Virtual destructor has implementation for defined behavior
 
-  virtual ~ITarget (void) {};
+  ITarget () {};
+  ITarget (bool  wantVcd __attribute__ ((unused)) ) {};
+  virtual ~ITarget () {};
 
   virtual ResumeRes  resume (ResumeType step,
 			     SyscallInfo *syscall_info = nullptr) = 0;
@@ -88,11 +90,11 @@ class ITarget
                              std::chrono::duration <double>  timeout,
                              SyscallInfo *syscall_info = nullptr) = 0;
 
-  virtual ResumeRes  terminate (void) = 0;
+  virtual ResumeRes  terminate () = 0;
   virtual ResumeRes  reset (ResetType  type) = 0;
 
-  virtual uint64_t  getCycleCount (void) const = 0;
-  virtual uint64_t  getInstrCount (void) const = 0;
+  virtual uint64_t  getCycleCount () const = 0;
+  virtual uint64_t  getInstrCount () const = 0;
 
   // Read contents of a target register.
 
@@ -128,7 +130,12 @@ class ITarget
 
   virtual bool command (const std::string  cmd,
 			std::ostream & stream) = 0;
-};
+
+  // Verilator support
+
+  virtual double timeStamp () = 0;
+
+};	// class ITarget
 
 
 // Output operators for scoped enumerations

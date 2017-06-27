@@ -25,6 +25,7 @@
 
 #include <cstdint>
 
+#include "ITarget.h"
 #include "Vtop.h"
 
 
@@ -36,25 +37,25 @@ class Ri5cyImpl final
 {
  public:
 
-  Ri5cyImpl ();
+  Ri5cyImpl (bool  wantVcd);
   ~Ri5cyImpl ();
 
-  ResumeRes  resume (ResumeType step,
-		     SyscallInfo * syscallInfo = nullptr);
-  ResumeRes  resume (ResumeType step,
-		     std::chrono::duration <double>  timeout,
-		     SyscallInfo * syscallInfo = nullptr);
+  ITarget::ResumeRes  resume (ITarget::ResumeType step,
+			      SyscallInfo * syscallInfo = nullptr);
+  ITarget::ResumeRes  resume (ITarget::ResumeType step,
+			      std::chrono::duration <double>  timeout,
+			      SyscallInfo * syscallInfo = nullptr);
 
-  ResumeRes  terminate (void);
-  ResumeRes  reset (ITarget::ResetType  type);
+  ITarget::ResumeRes  terminate ();
+  ITarget::ResumeRes  reset (ITarget::ResetType  type);
 
-  uint64_t  getCycleCount (void) const;
-  uint64_t  getInstrCount (void) const;
+  uint64_t  getCycleCount () const;
+  uint64_t  getInstrCount () const;
 
   // Read contents of a target register.
 
   std::size_t  readRegister (const int  reg,
-			     uint32_t & value) const;
+			     uint32_t & value);
 
   // Write data to a target register.
 
@@ -77,14 +78,18 @@ class Ri5cyImpl final
   // address.  Return value indicates whether the operation was successful.
 
   bool  insertMatchpoint (const uint32_t  addr,
-			  const MatchType  matchType);
+			  const ITarget::MatchType  matchType);
   bool  removeMatchpoint (const uint32_t  addr,
-			  const MatchType  matchType);
+			  const ITarget::MatchType  matchType);
 
   // Generic pass through of command
 
   bool command (const std::string  cmd,
-			std::ostream & stream);
+		std::ostream & stream);
+
+  // Verilog support functions
+
+  double timeStamp ();
 
 
 private:
@@ -102,12 +107,12 @@ private:
   const uint16_t DBG_GPR0    = 0x0400;	//!< General purpose register 0
   const uint16_t DBG_GPR31   = 0x047c;	//!< General purpose register 41
   const uint16_t DBG_NPC     = 0x2000;	//!< Next PC
-  const uint16_t DBG_NPC     = 0x2004;	//!< Prev PC
+  const uint16_t DBG_PPC     = 0x2004;	//!< Prev PC
 
   // Debug register flags
 
-  const uint16_t DBG_CTRL_HALT = 0x00010000;	//!< Halt core
-  const uint16_t DBG_CTRL_SSTE = 0x00010000;	//!< Single step core
+  const uint32_t DBG_CTRL_HALT = 0x00010000;	//!< Halt core
+  const uint32_t DBG_CTRL_SSTE = 0x00010000;	//!< Single step core
 
   // GDB register numbers
 
@@ -130,6 +135,18 @@ private:
   //! Instruction count
 
   uint64_t  mInstrCnt;
+
+  //! Do we want a VCD trace?
+
+  bool  mWantVcd;
+
+  //! VCD trace file pointer
+
+  VerilatedVcdC * mTfp;
+
+  //! VCD time. This will be in ns and we have a 50MHz device
+
+  vluint64_t  mCpuTime;
 
   // Helper methods
 

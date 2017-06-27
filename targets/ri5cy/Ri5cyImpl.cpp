@@ -25,19 +25,33 @@
 
 #include "Ri5cyImpl.h"
 #include "Vtop.h"
-
+#include "verilated_vcd_c.h"
 
 //! Constructor.
 
 //! Initialize the counters and instantiate the Verilator model. Take the
 //! model through its reset sequence.
 
-Ri5cyImpl::Ri5cyImpl () :
+Ri5cyImpl::Ri5cyImpl (bool  wantVcd) :
   mCoreHalted (false),
   mCycleCnt (0),
-  mInstrCnt (0)
+  mInstrCnt (0),
+  mWantVcd (wantVcd),
+  mCpuTime (0)
 {
-  mCpu = new Vtestbench;
+  mCpu = new Vtop;
+
+  // Open VCD file if requested
+
+  if (mWantVcd)
+    {
+      Verilated::traceEverOn (true);
+      mTfp = new VerilatedVcdC;
+      mCpu->trace (mTfp, 99);
+      mTfp->open ("gdbserver.vcd");
+    }
+
+  // Reset and halt the model
 
   resetModel ();
 
@@ -46,10 +60,15 @@ Ri5cyImpl::Ri5cyImpl () :
 
 //! Destructor.
 
-//! Delete the Verilator model.
+//! Close VCD and delete the Verilator model.
 
 Ri5cyImpl::~Ri5cyImpl ()
 {
+  // Close VCD file if requested
+
+  if (mWantVcd)
+    mTfp->close ();
+
   delete mCpu;
 
 }	// Ri5cyImpl::~Ri5cyImpl ()
@@ -65,10 +84,12 @@ Ri5cyImpl::~Ri5cyImpl ()
 //!                          handled. Not currently supported.
 //! @return Why the target stopped.
 
-ResumeRes
-Ri5cyImpl::resume (ResumeType step,
+ITarget::ResumeRes
+Ri5cyImpl::resume (ITarget::ResumeType step __attribute__ ((unused)),
 		   SyscallInfo * syscallInfo __attribute__ ((unused)) )
 {
+  return  ITarget::ResumeRes::NONE;
+
 }	// Ri5cyImpl::resume ()
 
 
@@ -83,11 +104,13 @@ Ri5cyImpl::resume (ResumeType step,
 //!                          handled. Not currently supported.
 //! @return Why the target stopped.
 
-ResumeRes
-Ri5cyImpl::resume (ResumeType step,
-		   std::chrono::duration <double>  timeout,
-		   SyscallInfo * syscallInfo = nullptr);
+ITarget::ResumeRes
+Ri5cyImpl::resume (ITarget::ResumeType step __attribute__ ((unused)),
+		   std::chrono::duration <double>  timeout __attribute__ ((unused)),
+		   SyscallInfo * syscallInfo __attribute__ ((unused)))
 {
+  return  ITarget::ResumeRes::NONE;
+
 }	// Ri5cyImpl::resume ()
 
 
@@ -95,9 +118,11 @@ Ri5cyImpl::resume (ResumeType step,
 
 //! This has no meaning for an embedded system, so it does nothing.
 
-void
-Ri5cyImpl::terminate (void)
+ITarget::ResumeRes
+Ri5cyImpl::terminate ()
 {
+  return  ITarget::ResumeRes::NONE;
+
 }	// Ri5cyImpl::terminate ()
 
 
@@ -133,7 +158,7 @@ Ri5cyImpl::reset (ITarget::ResetType  type)
 //!          reset.
 
 uint64_t
-Ri5cyImpl::getCycleCount (void) const
+Ri5cyImpl::getCycleCount () const
 {
   return mCycleCnt;
 
@@ -148,7 +173,7 @@ Ri5cyImpl::getCycleCount (void) const
 //!          reset.
 
 uint64_t
-Ri5cyImpl::getInstrCount (void) const
+Ri5cyImpl::getInstrCount () const
 {
   return mInstrCnt;
 
@@ -167,7 +192,7 @@ Ri5cyImpl::getInstrCount (void) const
 
 std::size_t
 Ri5cyImpl::readRegister (const int  reg,
-			 uint32_t & value) const
+			 uint32_t & value)
 {
   if (!mCoreHalted)
     {
@@ -194,7 +219,7 @@ Ri5cyImpl::readRegister (const int  reg,
 
   mCpu->debug_req_i   = 1;
   mCpu->debug_addr_i  = dbg_addr;
-  mcpu->debug_we_i    = 0;
+  mCpu->debug_we_i    = 0;
 
   // Wait for the grant signal to indicate the read has been accepted.
 
@@ -202,8 +227,22 @@ Ri5cyImpl::readRegister (const int  reg,
     {
       mCpu->clk_i = 0;
       mCpu->eval ();
+
+      if (mWantVcd)
+	{
+	  mCpuTime += 10;			// in ns
+	  mTfp->dump (mCpuTime);
+	}
+
       mCpu->clk_i = 1;
       mCpu->eval ();
+
+      if (mWantVcd)
+	{
+	  mCpuTime += 10;			// in ns
+	  mTfp->dump (mCpuTime);
+	}
+
       mCycleCnt++;
     }
   while (mCpu->debug_gnt_o == 0);
@@ -219,13 +258,27 @@ Ri5cyImpl::readRegister (const int  reg,
     {
       mCpu->clk_i = 0;
       mCpu->eval ();
+
+      if (mWantVcd)
+	{
+	  mCpuTime += 10;			// in ns
+	  mTfp->dump (mCpuTime);
+	}
+
       mCpu->clk_i = 1;
       mCpu->eval ();
+
+      if (mWantVcd)
+	{
+	  mCpuTime += 10;			// in ns
+	  mTfp->dump (mCpuTime);
+	}
+
       mCycleCnt++;
     }
   while (mCpu->debug_rvalid_o == 0);
 
-  value = mCpu->debug_raddr_o;
+  value = mCpu->debug_rdata_o;
   return 4;
 
 }	// Ri5cyImpl::readRegister ()
@@ -244,8 +297,8 @@ Ri5cyImpl::readRegister (const int  reg,
 //! @return  The size of the register read in bytes (always 4)
 
 std::size_t
-Ri5cyImpl::writeRegister (const int  reg,
-			  const uint32_t  value)
+Ri5cyImpl::writeRegister (const int  reg __attribute__ ((unused)),
+			  const uint32_t  value __attribute__ ((unused)) )
 {
   if (!mCoreHalted)
     {
@@ -276,10 +329,12 @@ Ri5cyImpl::writeRegister (const int  reg,
 //! @return  Number of bytes read
 
 std::size_t
-Ri5cyImpl::read (const uint32_t  addr,
-		 uint8_t * buffer,
+Ri5cyImpl::read (const uint32_t  addr __attribute__ ((unused)),
+		 uint8_t * buffer __attribute__ ((unused)),
 		 const std::size_t  size) const
 {
+  return  size;
+
 }	// Ri5cyImpl::read ()
 
 
@@ -295,10 +350,12 @@ Ri5cyImpl::read (const uint32_t  addr,
 //! @return  Number of bytes written
 
 std::size_t
-Ri5cyImpl::write (const uint32_t  addr,
-		  const uint8_t * buffer,
+Ri5cyImpl::write (const uint32_t  addr __attribute__ ((unused)),
+		  const uint8_t * buffer __attribute__ ((unused)),
 		  const std::size_t  size)
 {
+  return  size;
+
 }	// Ri5cyImpl::write ()
 
 
@@ -315,7 +372,7 @@ Ri5cyImpl::write (const uint32_t  addr,
 
 bool
 Ri5cyImpl::insertMatchpoint (const uint32_t  addr __attribute__ ((unused)),
-			     const MatchType  matchType __attribute__ ((unused)))
+			     const ITarget::MatchType  matchType __attribute__ ((unused)))
 {
   return  false;
 
@@ -334,8 +391,8 @@ Ri5cyImpl::insertMatchpoint (const uint32_t  addr __attribute__ ((unused)),
 //! @return  TRUE if the operation was successful, false otherwise.
 
 bool
-Ri5cyImpl::removeMatchpoint (const uint32_t  addr,
-			     const MatchType  matchType)
+Ri5cyImpl::removeMatchpoint (const uint32_t  addr __attribute__ ((unused)),
+			     const ITarget::MatchType  matchType __attribute__ ((unused)) )
 {
   return  false;
 
@@ -355,12 +412,26 @@ Ri5cyImpl::removeMatchpoint (const uint32_t  addr,
 //!         awlways return FALSE.
 
 bool
-Ri5cyImpl::command (const std::string  cmd,
-		    std::ostream & stream)
+Ri5cyImpl::command (const std::string  cmd __attribute__ ((unused)),
+		    std::ostream & stream __attribute__ ((unused)))
 {
   return false;
 
 }	// Ri5cyImpl::command ()
+
+
+//! Provide a time stamp (needed for $time)
+
+//! We count in nanoseconds.
+
+//! @return  The time in seconds
+
+double
+Ri5cyImpl::timeStamp ()
+{
+  return static_cast<double> (mCpuTime) / 1.0e-9;
+
+}	// Ri5cyImpl::timeStamp ()
 
 
 //! Helper method to reset the model
@@ -389,8 +460,22 @@ Ri5cyImpl::resetModel (void)
     {
       mCpu->clk_i = 0;
       mCpu->eval ();
+
+      if (mWantVcd)
+	{
+	  mCpuTime += 10;			// in ns
+	  mTfp->dump (mCpuTime);
+	}
+
       mCpu->clk_i = 1;
       mCpu->eval ();
+
+      if (mWantVcd)
+	{
+	  mCpuTime += 10;			// in ns
+	  mTfp->dump (mCpuTime);
+	}
+
       mCycleCnt++;
     }
 
@@ -412,7 +497,7 @@ Ri5cyImpl::haltModel (void)
 
   mCpu->debug_req_i   = 1;
   mCpu->debug_addr_i  = DBG_CTRL;
-  mcpu->debug_we_i    = 1;
+  mCpu->debug_we_i    = 1;
   mCpu->debug_wdata_i = DBG_CTRL_HALT;
 
   // Write has succeeded when we get the grant signal asserted.
@@ -421,8 +506,22 @@ Ri5cyImpl::haltModel (void)
     {
       mCpu->clk_i = 0;
       mCpu->eval ();
+
+      if (mWantVcd)
+	{
+	  mCpuTime += 10;			// in ns
+	  mTfp->dump (mCpuTime);
+	}
+
       mCpu->clk_i = 1;
       mCpu->eval ();
+
+      if (mWantVcd)
+	{
+	  mCpuTime += 10;			// in ns
+	  mTfp->dump (mCpuTime);
+	}
+
       mCycleCnt++;
     }
   while (mCpu->debug_gnt_o == 0);

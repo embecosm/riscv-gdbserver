@@ -40,7 +40,7 @@ class Picorv32 final : public ITarget
 
   // Constructor and destructor
 
-  Picorv32 ();
+  Picorv32 (bool  wantVcd);
   ~Picorv32 ();
 
   virtual ResumeRes  resume (ResumeType step,
@@ -49,11 +49,11 @@ class Picorv32 final : public ITarget
                              std::chrono::duration <double>  timeout,
                              SyscallInfo *syscall_info = nullptr);
 
-  virtual ResumeRes  terminate (void);
+  virtual ResumeRes  terminate ();
   virtual ResumeRes  reset (ITarget::ResetType  type);
 
-  virtual uint64_t  getCycleCount (void) const;
-  virtual uint64_t  getInstrCount (void) const;
+  virtual uint64_t  getCycleCount () const;
+  virtual uint64_t  getInstrCount () const;
 
   // Read contents of a target register.
 
@@ -90,7 +90,16 @@ class Picorv32 final : public ITarget
   virtual bool command (const std::string  cmd,
 			std::ostream & stream);
 
-private:
+  // Verilator support
+
+  virtual double timeStamp ();
+
+
+ private:
+
+  //! Do we want a VCD trace? @todo Should not have this in this class.
+
+  bool  mWantVcd;
 
   //! The implementation class for PicoRV32
 

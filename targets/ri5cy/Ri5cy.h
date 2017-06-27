@@ -40,7 +40,7 @@ class Ri5cy final : public ITarget
 
   // Constructor and destructor
 
-  Ri5cy ();
+  Ri5cy (bool  wantVcd);
   ~Ri5cy ();
 
   virtual ResumeRes  resume (ResumeType step,
@@ -90,7 +90,12 @@ class Ri5cy final : public ITarget
   virtual bool command (const std::string  cmd,
 			std::ostream & stream);
 
-private:
+  // Verilator support
+
+  virtual double timeStamp ();
+
+
+ private:
 
   //! The implementation class for Ri5cy
 

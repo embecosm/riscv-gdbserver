@@ -26,7 +26,7 @@
 #include <cstdint>
 
 #include "Vtestbench.h"
-#include "verilated.h"
+#include "verilated_vcd_c.h"
 
 class Picorv32Impl final
 {
@@ -34,7 +34,7 @@ class Picorv32Impl final
 
   // Constructor and destructor
 
-  Picorv32Impl ();
+  Picorv32Impl (bool  wantVcd);
   ~Picorv32Impl ();
 
   // Accessors
@@ -52,11 +52,28 @@ class Picorv32Impl final
   uint32_t readProgramAddr () const;
   void writeProgramAddr (uint32_t addr);
 
+  // Verilog support functions
+
+  double timeStamp ();
+
+
  private:
 
   //! Top level Verilator model.
 
   Vtestbench * mCpu;
+
+  //! Do we want a VCD trace?
+
+  bool  mWantVcd;
+
+  //! VCD trace file pointer
+
+  VerilatedVcdC * mTfp;
+
+  //! VCD time. This will be in ns and we have a 100MHz device
+
+  vluint64_t  mCpuTime;
 
   //! Clock
 
