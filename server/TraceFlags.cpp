@@ -18,44 +18,87 @@
 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// ----------------------------------------------------------------------------
-
 
 #include "TraceFlags.h"
 
 
-// ----------------------------------------------------------------------------
-// This class is to hold information about tracing.
-// ----------------------------------------------------------------------------
-
 //! Constructor for the trace flags.
 
 //! @param[in] _traceFlags  The trace flags
+
 TraceFlags::TraceFlags (unsigned int  _flags) :
   flags (_flags)
 {
 
-}	// TraceFlags ()
+}	// TraceFlags::TraceFlags ()
 
 
 //! Destructor for the trace flags.
 
 //! @param[in] _traceFlags  The trace flags
+
 TraceFlags::~TraceFlags ()
 {
 
-}	// ~TraceFlags ()
+}	// TraceFlags::~TraceFlags ()
 
 
 //! Is RSP tracing enabled?
 
 //! @return  TRUE if the RSP tracing flag is set, FALSE otherwise
+
 bool
-TraceFlags::traceRsp ()
+TraceFlags::traceRsp () const
 {
   return (flags & TRACE_RSP) == TRACE_RSP;
 
-}	// traceRsp ()
+}	// TraceFlags::traceRsp ()
+
+
+//! Is connection tracing enabled?
+
+//! @return  TRUE if the CONN tracing flag is set, FALSE otherwise
+
+bool
+TraceFlags::traceConn () const
+{
+  return (flags & TRACE_CONN) == TRACE_CONN;
+
+}	// TraceFlags::traceConn ()
+
+
+//! Is breakpoint tracing enabled?
+
+//! @return  TRUE if the BREAK tracing flag is set, FALSE otherwise
+
+bool
+TraceFlags::traceBreak () const
+{
+  return (flags & TRACE_BREAK) == TRACE_BREAK;
+
+}	// TraceFlags::traceBreak ()
+
+
+//! Is silent running enabled?
+
+//! @return  TRUE if the SILENT tracing flag is set, FALSE otherwise
+
+bool
+TraceFlags::traceSilent () const
+{
+  return (flags & TRACE_SILENT) == TRACE_SILENT;
+
+}	// TraceFlags::traceSilent ()
+
+
+//! Set silent running
+
+void
+TraceFlags::setSilent ()
+{
+  flags != TRACE_SILENT;
+
+}	// TraceFlags::setSilent ()
 
 
 // Local Variables:

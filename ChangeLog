@@ -1,3 +1,21 @@
+2017-06-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Remove compile time debug flag GDBSERVER_DEBUG.
+
+	* Makefile.in: Regenerate.
+	* server/GdbServer.cpp (GdbServer::rspRemoveMatchpoint)
+	(GdbServer::rspInsertMatchpoint): Report details of matchpoint
+	under control of trace flags.
+	* server/RspConnection.cpp (RspConnection::rspConnect)
+	(RspConnection::rspClose): Likewise.
+	* server/TraceFlags.cpp (TraceFlags::traceRsp): Make constant.
+	(TraceFlags::traceConn, TraceFlags::traceBreak)
+	(TraceFlags::traceSilent, TraceFlags::setSilent): Created.
+	* server/TraceFlags.h (class TraceFlags): Make read accessors
+	constant, add traceConn, traceBreak, traceSilent and setSilent.
+	* server/main.cpp (usage): Add help and silent flags.
+	(main): Extend command line flag for silent running.
+
 2017-06-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	This will not currently compile, but shows how the interface via

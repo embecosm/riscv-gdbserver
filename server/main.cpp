@@ -53,6 +53,8 @@ usage (ostream & s)
 {
   s << "Usage: riscv-gdbserver --core | -c <corename>" << endl
     << "                       [ --trace | -t <traceflags> ]" << endl
+    << "                       [ --silent | -q ]" << endl
+    << "                       [ --help | -h ]" << endl
     << "                       <rsp-port>" << endl;
 
 }	// usage ()
@@ -74,19 +76,21 @@ main (int   argc,
   // Argument handling.
 
   unsigned int  flags = 0;
+  bool          silent = false;
   char         *coreName = nullptr;
 
   while (true) {
     int c;
     int longOptind = 0;
     static struct option longOptions[] = {
-      {"core",  required_argument, nullptr,  'c' },
-      {"help",  no_argument,       nullptr,  'h' },
-      {"trace", required_argument, nullptr,  't' },
+      {"core",   required_argument, nullptr,  'c' },
+      {"help",   no_argument,       nullptr,  'h' },
+      {"silent", no_argument,       nullptr,  'q' },
+      {"trace",  required_argument, nullptr,  't' },
       {0,       0,                 0,  0 }
     };
 
-    if ((c = getopt_long (argc, argv, "c:t:", longOptions, &longOptind)) == -1)
+    if ((c = getopt_long (argc, argv, "c:hqt:", longOptions, &longOptind)) == -1)
       break;
 
     switch (c) {
@@ -98,10 +102,15 @@ main (int   argc,
       usage (cout);
       return  EXIT_SUCCESS;
 
+    case 'q':
+
+      return  EXIT_SUCCESS;
+
     case 't':
+
       // @todo We should allow more than just decimal values.
 
-      flags = atoi (optarg);
+      flags |= atoi (optarg);
       break;
 
     case '?':
@@ -127,6 +136,9 @@ main (int   argc,
   // Trace flags for the server
 
   TraceFlags * traceFlags = new TraceFlags (flags);
+
+  if (silent)
+    traceFlags->setSilent ();
 
   // The RISC-V model
 

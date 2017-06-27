@@ -39,6 +39,8 @@ using std::cerr;
 using std::dec;
 using std::endl;
 using std::hex;
+using std::setfill;
+using std::setw;
 using std::string;
 
 
@@ -982,9 +984,10 @@ GdbServer::rspRemoveMatchpoint ()
 	  rsp->putPkt (pkt);
 	}
 
-#ifdef GDBSERVER_DEBUG
-      fprintf (stderr, "Putting back the instruction (%x) at 0x%x.\n", instr, addr);
-#endif
+      if (traceFlags->traceBreak ())
+	cerr << "Putting back the instruction (0x" << hex << setfill ('0')
+	     << setw (4) << instr << ") at 0x" << setw(8) << addr
+	     << setfill (' ')  << setw (0) << dec << endl;
 
       // Remove the breakpoint from memory. The endianness of the instruction
       // matches that of the memory.
@@ -1150,9 +1153,10 @@ GdbServer::rspInsertMatchpoint ()
       // place.
       mpHash->add (type, addr, instr);
 
-#ifdef GDBSERVER_DEBUG
-      fprintf (stderr, "Inserting a breakpoint over the instruction (%d) at 0x%x:\n", instr, addr);
-#endif
+      if (traceFlags->traceBreak ())
+	cerr << "Inserting a breakpoint over the  instruction (0x" << hex
+	     << setfill ('0') << setw (4) << instr << ") at 0x" << setw(8)
+	     << addr << setfill (' ')  << setw (0) << dec << endl;
 
       // Little-endian, so least significant byte is at "little" address.
 
