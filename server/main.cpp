@@ -147,6 +147,8 @@ main (int   argc,
   if (silent)
     traceFlags->setSilent ();
 
+  // The RISC-V model
+
   if (0 == strcasecmp ("PicoRV32", coreName))
     cpu = new Picorv32 (traceFlags->traceVcd());
   else if (0 == strcasecmp ("RI5CY", coreName))
