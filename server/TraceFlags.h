@@ -18,37 +18,46 @@
 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// ----------------------------------------------------------------------------
 
 #ifndef TRACE_FLAGS__H
 #define TRACE_FLAGS__H
 
 
-//-----------------------------------------------------------------------------
 //! Class for trace flags
 
 //! The flags themselves are bits in an unsigned integer
-//-----------------------------------------------------------------------------
+
 class TraceFlags
 {
 public:
 
   // Constructor and destructor
+
   TraceFlags (unsigned int  _Flags = TRACE_NONE);
   ~TraceFlags ();
 
   // Accessors
-  bool traceRsp ();
+
+  bool traceRsp () const;
+  bool traceConn () const;
+  bool traceBreak () const;
+  bool traceSilent () const;
+  void setSilent ();
 
 
 private:
 
   // Definition of flag values
-  static const unsigned int TRACE_MASK = 0x00000001;	//!< Trace flag mask
-  static const unsigned int TRACE_NONE = 0x00000000;	//!< Trace nothing
-  static const unsigned int TRACE_RSP  = 0x00000001;	//!< Trace RSP packets
+
+  static const unsigned int TRACE_MASK   = 0x80000007;	//!< Trace flag mask
+  static const unsigned int TRACE_NONE   = 0x00000000;	//!< Trace nothing
+  static const unsigned int TRACE_RSP    = 0x00000001;	//!< Trace RSP packets
+  static const unsigned int TRACE_CONN   = 0x00000002;	//!< Trace connection
+  static const unsigned int TRACE_BREAK  = 0x00000004;	//!< Trace breakpoints
+  static const unsigned int TRACE_SILENT = 0x80000000;  //!< Reduce messages
 
   //! The trace flags
+
   unsigned int  flags;
 
 };	// TraceFlags ()

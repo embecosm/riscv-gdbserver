@@ -130,9 +130,8 @@ RspConnection::rspConnect ()
       return  false;
     }
 
-#ifdef GDBSERVER_DEBUG
-  cout << "Listening for RSP on port " <<  portNum << endl << flush;
-#endif
+  if (! traceFlags->traceSilent ())
+    cout << "Listening for RSP on port " <<  portNum << endl << flush;
 
   // Accept a client which connects
   socklen_t  len = sizeof (sockAddr);		// Size of the socket address
@@ -160,10 +159,10 @@ RspConnection::rspConnect ()
   close (tmpFd);			// No longer need this
   signal (SIGPIPE, SIG_IGN);		// So we don't exit if client dies
 
-#ifdef GDBSERVER_DEBUG
-  cout << "Remote debugging from host " << inet_ntoa (sockAddr.sin_addr)
-       << endl;
-#endif
+  if (! traceFlags->traceSilent ())
+    cout << "Remote debugging from host " << inet_ntoa (sockAddr.sin_addr)
+	 << endl;
+
   return true;
 
 }	// rspConnect ()
@@ -175,9 +174,9 @@ RspConnection::rspClose ()
 {
   if (isConnected ())
     {
-#ifdef GDBSERVER_DEBUG
-      cout << "Closing connection" << endl;
-#endif
+      if (! traceFlags->traceSilent ())
+	cout << "Closing connection" << endl;
+
       close (clientFd);
       clientFd = -1;
     }
