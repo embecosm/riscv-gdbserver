@@ -20,12 +20,21 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream>
 #include <cstdint>
 #include <cstdlib>
 
 #include "Ri5cyImpl.h"
 #include "Vtop.h"
+#include "Vtop_top.h"
+#include "Vtop_ram__A10.h"
+#include "Vtop_dp_ram__A10.h"
 #include "verilated_vcd_c.h"
+
+using std::chrono::duration;
+using std::chrono::system_clock;
+using std::chrono::time_point;
+
 
 //! Constructor.
 
@@ -85,10 +94,10 @@ Ri5cyImpl::~Ri5cyImpl ()
 //! @return Why the target stopped.
 
 ITarget::ResumeRes
-Ri5cyImpl::resume (ITarget::ResumeType step __attribute__ ((unused)),
-		   SyscallInfo * syscallInfo __attribute__ ((unused)) )
+Ri5cyImpl::resume (ITarget::ResumeType step,
+		   SyscallInfo * syscallInfo)
 {
-  return  ITarget::ResumeRes::NONE;
+  return resume (step, duration <double>::zero(), syscallInfo);
 
 }	// Ri5cyImpl::resume ()
 
@@ -105,10 +114,49 @@ Ri5cyImpl::resume (ITarget::ResumeType step __attribute__ ((unused)),
 //! @return Why the target stopped.
 
 ITarget::ResumeRes
-Ri5cyImpl::resume (ITarget::ResumeType step __attribute__ ((unused)),
-		   std::chrono::duration <double>  timeout __attribute__ ((unused)),
-		   SyscallInfo * syscallInfo __attribute__ ((unused)))
+Ri5cyImpl::resume (ITarget::ResumeType step,
+		   std::chrono::duration <double>  timeout,
+		   SyscallInfo * syscallInfo __attribute ((unused)) )
 {
+  time_point <system_clock, duration <double> > timeout_end =
+    system_clock::now () + timeout;
+
+  switch (step)
+    {
+    case ITarget::ResumeType::STEP:
+      if (false /*mRi5cyImpl->stepSingle ()*/)
+	{
+	  return ITarget::ResumeRes::TIMEOUT;
+	} else {
+	return ITarget::ResumeRes::INTERRUPTED;
+      }
+      break;
+    case ITarget::ResumeType::CONTINUE:
+      for (;;)
+	{
+	  for (size_t i = 0; i < 5000000 /*RUN_SAMPLE_PERIOD*/; i++)
+	    {
+	      if (false /*mRi5cyImpl->step ()*/)
+		{
+		  return ITarget::ResumeRes::INTERRUPTED;
+		}
+	      fprintf (stderr, "did 5000000 instructions so halting now\n");
+	      /* mRi5cyImpl->fakeHalt (); */
+	      return ITarget::ResumeRes::INTERRUPTED;
+	    }
+
+	  if (timeout_end < system_clock::now ())
+	    {
+	      return ITarget::ResumeRes::TIMEOUT;
+	    }
+	}
+      break;
+
+    case ITarget::ResumeType::STOP:
+      // Do nothing. We are already "stopped"?
+      break;
+    }
+
   return  ITarget::ResumeRes::NONE;
 
 }	// Ri5cyImpl::resume ()
@@ -247,14 +295,12 @@ Ri5cyImpl::readRegister (const int  reg,
     }
   while (mCpu->debug_gnt_o == 0);
 
-  // Read data is available when rvalid is asserted.
-
-  // @todo Is it correct that there must be at least one cycle? Does the
-  // while belong at the top of this loop?
+  // Read data is available when rvalid is asserted.  This might be
+  // immediately available, so test at the top of the loop.
 
   mCpu->debug_req_i = 0;		// Stop requesting
 
-  do
+  while (mCpu->debug_rvalid_o == 0)
     {
       mCpu->clk_i = 0;
       mCpu->eval ();
@@ -276,7 +322,6 @@ Ri5cyImpl::readRegister (const int  reg,
 
       mCycleCnt++;
     }
-  while (mCpu->debug_rvalid_o == 0);
 
   value = mCpu->debug_rdata_o;
   return 4;
@@ -284,9 +329,7 @@ Ri5cyImpl::readRegister (const int  reg,
 }	// Ri5cyImpl::readRegister ()
 
 
-//! Read a register
-
-//! @todo
+//! Write a register
 
 //! We assume that the core is halted. If not we have a problem.  We use the
 //! debug unit and need a different mechanism for the program counter (which
@@ -297,8 +340,8 @@ Ri5cyImpl::readRegister (const int  reg,
 //! @return  The size of the register read in bytes (always 4)
 
 std::size_t
-Ri5cyImpl::writeRegister (const int  reg __attribute__ ((unused)),
-			  const uint32_t  value __attribute__ ((unused)) )
+Ri5cyImpl::writeRegister (const int  reg,
+			  const uint32_t  value)
 {
   if (!mCoreHalted)
     {
@@ -307,6 +350,41 @@ Ri5cyImpl::writeRegister (const int  reg __attribute__ ((unused)),
       exit (EXIT_FAILURE);
     }
 
+  uint16_t dbg_addr;
+
+  if ((REG_R0 <= reg) && (reg <= REG_R31))
+    dbg_addr = DBG_GPR0 + reg * 4;    // General register
+  else if (REG_PC == reg)
+    dbg_addr = DBG_NPC;               // Next PC
+  else
+  {
+    cerr << "*** ABORT ***: Attempt to write non-existent register" << endl;
+    exit (EXIT_FAILURE);
+  }
+
+  // Set up to write via debug
+
+  mCpu->rstn_i        = 1;
+
+  mCpu->debug_req_i   = 1;
+  mCpu->debug_addr_i  = dbg_addr;
+  mCpu->debug_wdata_i = value;
+  mCpu->debug_we_i    = 1;
+
+  // Wait for the grant signal to indicate the read has been accepted.
+
+  do
+    {
+      mCpu->clk_i = 0;
+      mCpu->eval ();
+      mCpu->clk_i = 1;
+      mCpu->eval ();
+      mCycleCnt++;
+    }
+  while (mCpu->debug_gnt_o == 0);
+
+  mCpu->debug_req_i = 0;		// Stop requesting
+
   return 4;
 
 }	// Ri5cyImpl::writeRegister ()
@@ -314,10 +392,8 @@ Ri5cyImpl::writeRegister (const int  reg __attribute__ ((unused)),
 
 //! Read data from memory
 
-//! @todo
-
-//! You can't write memory via the debug registers. Instead I think we need a
-//! Verilator task in top.sv to manually read/write memory and then we can use
+//! You can't write memory via the debug registers. So we need a Verilator
+//! task in top.sv to manually read/write memory and then we can use
 //! that. With the processor halted it *should* be safe.
 
 //! Otherwise we may have to put the memory external to the core instead of in
@@ -329,11 +405,16 @@ Ri5cyImpl::writeRegister (const int  reg __attribute__ ((unused)),
 //! @return  Number of bytes read
 
 std::size_t
-Ri5cyImpl::read (const uint32_t  addr __attribute__ ((unused)),
-		 uint8_t * buffer __attribute__ ((unused)),
+Ri5cyImpl::read (const uint32_t  addr,
+		 uint8_t * buffer,
 		 const std::size_t  size) const
 {
-  return  size;
+  size_t i;
+
+  for (i = 0; i < size; i++)
+    buffer[i] = mCpu->top->ram_i->dp_ram_i->readByte (addr + i);
+
+  return i;
 
 }	// Ri5cyImpl::read ()
 
@@ -350,11 +431,16 @@ Ri5cyImpl::read (const uint32_t  addr __attribute__ ((unused)),
 //! @return  Number of bytes written
 
 std::size_t
-Ri5cyImpl::write (const uint32_t  addr __attribute__ ((unused)),
-		  const uint8_t * buffer __attribute__ ((unused)),
+Ri5cyImpl::write (const uint32_t  addr,
+		  const uint8_t * buffer,
 		  const std::size_t  size)
 {
-  return  size;
+  size_t  i;
+
+  for (i = 0; i < size; i++)
+    mCpu->top->ram_i->dp_ram_i->writeByte (addr + i, buffer[i]);
+
+  return i;
 
 }	// Ri5cyImpl::write ()
 
