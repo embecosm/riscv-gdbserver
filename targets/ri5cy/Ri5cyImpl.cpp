@@ -25,11 +25,11 @@
 #include <cstdlib>
 
 #include "Ri5cyImpl.h"
+#include "verilated_vcd_c.h"
 #include "Vtop.h"
 #include "Vtop_top.h"
-#include "Vtop_ram__A10.h"
-#include "Vtop_dp_ram__A10.h"
-#include "verilated_vcd_c.h"
+#include "Vtop_ram.h"
+#include "Vtop_sp_ram__A16.h"
 
 using std::chrono::duration;
 using std::chrono::system_clock;
@@ -116,48 +116,15 @@ Ri5cyImpl::resume (ITarget::ResumeType step,
 ITarget::ResumeRes
 Ri5cyImpl::resume (ITarget::ResumeType step,
 		   std::chrono::duration <double>  timeout,
-		   SyscallInfo * syscallInfo __attribute ((unused)) )
+		   SyscallInfo * syscallInfo)
 {
-  time_point <system_clock, duration <double> > timeout_end =
-    system_clock::now () + timeout;
+  // time_point <system_clock, duration <double> > timeout_end =
+  //   system_clock::now () + timeout;
 
-  switch (step)
-    {
-    case ITarget::ResumeType::STEP:
-      if (false /*mRi5cyImpl->stepSingle ()*/)
-	{
-	  return ITarget::ResumeRes::TIMEOUT;
-	} else {
-	return ITarget::ResumeRes::INTERRUPTED;
-      }
-      break;
-    case ITarget::ResumeType::CONTINUE:
-      for (;;)
-	{
-	  for (size_t i = 0; i < 5000000 /*RUN_SAMPLE_PERIOD*/; i++)
-	    {
-	      if (false /*mRi5cyImpl->step ()*/)
-		{
-		  return ITarget::ResumeRes::INTERRUPTED;
-		}
-	      fprintf (stderr, "did 5000000 instructions so halting now\n");
-	      /* mRi5cyImpl->fakeHalt (); */
-	      return ITarget::ResumeRes::INTERRUPTED;
-	    }
-
-	  if (timeout_end < system_clock::now ())
-	    {
-	      return ITarget::ResumeRes::TIMEOUT;
-	    }
-	}
-      break;
-
-    case ITarget::ResumeType::STOP:
-      // Do nothing. We are already "stopped"?
-      break;
-    }
-
-  return  ITarget::ResumeRes::NONE;
+  if (ITarget::ResumeType::STEP == step)
+    return stepInstr (syscallInfo);
+  else
+    return runToBreak (timeout, syscallInfo);
 
 }	// Ri5cyImpl::resume ()
 
@@ -412,7 +379,7 @@ Ri5cyImpl::read (const uint32_t  addr,
   size_t i;
 
   for (i = 0; i < size; i++)
-    buffer[i] = mCpu->top->ram_i->dp_ram_i->readByte (addr + i);
+    buffer[i] = mCpu->top->ram_i->sp_ram_i->readByte (addr + i);
 
   return i;
 
@@ -438,7 +405,7 @@ Ri5cyImpl::write (const uint32_t  addr,
   size_t  i;
 
   for (i = 0; i < size; i++)
-    mCpu->top->ram_i->dp_ram_i->writeByte (addr + i, buffer[i]);
+    mCpu->top->ram_i->sp_ram_i->writeByte (addr + i, buffer[i]);
 
   return i;
 
@@ -538,9 +505,9 @@ Ri5cyImpl::resetModel (void)
   mCpu->debug_we_i    = 0;
   mCpu->debug_wdata_i = 0;
 
-  // @todo Stray signal not yet understood
+  // @todo Fetch enable turns off fetching of new instructions.
 
-  mCpu->fetch_enable_i = 1;
+  mCpu->fetch_enable_i = 0;
 
   for (int i = 0; i < RESET_CYCLES; i++)
     {
@@ -615,6 +582,24 @@ Ri5cyImpl::haltModel (void)
   mCoreHalted = true;
 
 }	// Ri5cyImpl::haltModel ()
+
+
+//
+ITarget::ResumeRes
+Ri5cyImpl::stepInstr (SyscallInfo * syscallInfo __attribute__ ((unused)) )
+{
+  return ITarget::ResumeRes::NONE;
+
+}	// Ri5cyImpl::stepInstr ()
+
+
+ITarget::ResumeRes
+Ri5cyImpl::runToBreak (std::chrono::duration <double>  timeout __attribute__ ((unused)),
+		       SyscallInfo * syscallInfo __attribute__ ((unused)) )
+{
+  return ITarget::ResumeRes::NONE;
+
+}	// Ri5cyImpl::runToBreak ()
 
 
 // Local Variables:

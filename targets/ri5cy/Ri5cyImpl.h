@@ -150,8 +150,11 @@ private:
 
   // Helper methods
 
-  void resetModel (void);
-  void haltModel (void);
+  void resetModel ();
+  void haltModel ();
+  ITarget::ResumeRes  stepInstr (SyscallInfo * syscallInfo = nullptr);
+  ITarget::ResumeRes  runToBreak (std::chrono::duration <double>  timeout,
+				  SyscallInfo * syscallInfo = nullptr);
 };
 
 #endif	// RI5CY_IMPL__H
