@@ -835,7 +835,9 @@ GdbServer::rspCommand ()
     {
       // This is a bit of a kludge. It would be much better to be deleted
       // cleanly from the top.
-      exit (0);
+
+      delete cpu;
+      exit (EXIT_SUCCESS);
     }
 
   // Acknowledge OK

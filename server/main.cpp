@@ -171,6 +171,7 @@ main (int   argc,
 
   delete  gdbServer;
   delete  traceFlags;
+  delete  cpu;
   free (coreName);
 
   return EXIT_FAILURE;			// If we return it's a failure!

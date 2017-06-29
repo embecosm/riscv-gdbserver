@@ -1,3 +1,15 @@
+2017-06-29  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* server/GdbServer.cpp (GdbServer::rspCommand): Modify the
+	horrible hack for exit - still a horrible hack though.
+	* server/main.cpp (main): Delete the cpu at the end.
+	* targets/ri5cy/Ri5cyImpl.cpp: Fix the headers for the new model.
+	(Ri5cyImpl::resume): Mark unused param. Needs to be written properly.
+	(Ri5cyImpl::read, Ri5cyImpl::write): Use single ported RAM.
+	(Ri5cyImpl::resetModel): Set fetch_enable to 0 on reset.
+	(Ri5cyImpl::stepInstr, Ri5cyImpl::runToBreak): Created.
+	* targets/ri5cy/Ri5cyImpl.h: Add stepInstr and runToBreak.
+
 2017-06-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	This commit syncrhonizes with all the work on the ri5cy_wip branch
