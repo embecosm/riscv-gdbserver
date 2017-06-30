@@ -1,3 +1,20 @@
+2017-06-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::resume): Deal with all
+	types of step.
+	(Ri5cyImpl::readRegister, Ri5cyImpl::writeRegister): Rewrite to
+	use debug register access methods.
+	(Ri5cyImpl::read, Ri5cyImpl::write): Access dp_ram, not sp_ram.
+	(Ri5cyImpl::clockModel): Created.
+	(Ri5cyImpl::resetModel, Ri5cyImpl::haltModel): Rewritten to use
+	debug register access methods.
+	(Ri5cyImpl::readDebugReg, Ri5cyImpl::writeDebugReg): Created.
+	(Ri5cyImpl::stepInstr): Written to use SSTE debug interface and
+	handle timeouts.
+	* targets/ri5cy/Ri5cyImpl.h (class Ri5cyImpl): Add new debug
+	flags, clockModel, readDebugReg, writeDebugReg, add timeout to
+	stepInstr.
+
 2017-06-29  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* server/GdbServer.cpp (GdbServer::rspCommand): Modify the

@@ -94,6 +94,10 @@ class Ri5cyImpl final
 
 private:
 
+  //! Clock period in ns (this value for 50 MHz clock)
+
+  const unsigned int  CLK_PERIOD_NS = 20;
+
   //! How many cycles of reset
 
   const int RESET_CYCLES = 5;
@@ -112,7 +116,10 @@ private:
   // Debug register flags
 
   const uint32_t DBG_CTRL_HALT = 0x00010000;	//!< Halt core
-  const uint32_t DBG_CTRL_SSTE = 0x00010000;	//!< Single step core
+  const uint32_t DBG_CTRL_SSTE = 0x00000001;	//!< Single step core
+
+  const uint32_t DBG_HIT_SLEEP = 0x00010000;	//!< Core is sleeping
+  const uint32_t DBG_HIT_SSTE  = 0x00000001;	//!< Single step is enabled
 
   // GDB register numbers
 
@@ -150,9 +157,14 @@ private:
 
   // Helper methods
 
+  void clockModel ();
   void resetModel ();
   void haltModel ();
-  ITarget::ResumeRes  stepInstr (SyscallInfo * syscallInfo = nullptr);
+  uint32_t readDebugReg (const uint16_t  dbg_reg);
+  void writeDebugReg (const uint16_t  dbg_reg,
+		      const uint32_t  dbg_val);
+  ITarget::ResumeRes  stepInstr (std::chrono::duration <double>  timeout,
+				 SyscallInfo * syscallInfo = nullptr);
   ITarget::ResumeRes  runToBreak (std::chrono::duration <double>  timeout,
 				  SyscallInfo * syscallInfo = nullptr);
 };
