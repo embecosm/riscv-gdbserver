@@ -27,9 +27,7 @@
 #include "Ri5cyImpl.h"
 #include "verilated_vcd_c.h"
 #include "Vtop.h"
-#include "Vtop_top.h"
-#include "Vtop_ram.h"
-#include "Vtop_sp_ram__A16.h"
+#include "Vtop__Syms.h"
 
 using std::chrono::duration;
 using std::chrono::system_clock;
@@ -118,14 +116,31 @@ Ri5cyImpl::resume (ITarget::ResumeType step,
 		   std::chrono::duration <double>  timeout,
 		   SyscallInfo * syscallInfo)
 {
-  // time_point <system_clock, duration <double> > timeout_end =
-  //   system_clock::now () + timeout;
+  switch (step)
+    {
+    case ITarget::ResumeType::STEP:
 
-  if (ITarget::ResumeType::STEP == step)
-    return stepInstr (syscallInfo);
-  else
-    return runToBreak (timeout, syscallInfo);
+      return stepInstr (timeout, syscallInfo);
 
+    case ITarget::ResumeType::CONTINUE:
+
+      return runToBreak (timeout, syscallInfo);
+
+    case ITarget::ResumeType::STOP:
+
+      // Request to halt the processor (typically due to a gross timeout)
+
+      haltModel ();
+      return ITarget::ResumeRes::SUCCESS;
+
+    default:
+
+      // Eek!
+
+      cerr << "*** ABORT ***: Unknown step type when resuming: "
+	   << static_cast<int> (step) << endl;
+      exit (EXIT_FAILURE);
+    }
 }	// Ri5cyImpl::resume ()
 
 
@@ -228,69 +243,9 @@ Ri5cyImpl::readRegister (const int  reg,
       exit (EXIT_FAILURE);
     }
 
-  // Set up to read via debug
+  // Read via debug
 
-  mCpu->rstn_i        = 1;
-
-  mCpu->debug_req_i   = 1;
-  mCpu->debug_addr_i  = dbg_addr;
-  mCpu->debug_we_i    = 0;
-
-  // Wait for the grant signal to indicate the read has been accepted.
-
-  do
-    {
-      mCpu->clk_i = 0;
-      mCpu->eval ();
-
-      if (mWantVcd)
-	{
-	  mCpuTime += 10;			// in ns
-	  mTfp->dump (mCpuTime);
-	}
-
-      mCpu->clk_i = 1;
-      mCpu->eval ();
-
-      if (mWantVcd)
-	{
-	  mCpuTime += 10;			// in ns
-	  mTfp->dump (mCpuTime);
-	}
-
-      mCycleCnt++;
-    }
-  while (mCpu->debug_gnt_o == 0);
-
-  // Read data is available when rvalid is asserted.  This might be
-  // immediately available, so test at the top of the loop.
-
-  mCpu->debug_req_i = 0;		// Stop requesting
-
-  while (mCpu->debug_rvalid_o == 0)
-    {
-      mCpu->clk_i = 0;
-      mCpu->eval ();
-
-      if (mWantVcd)
-	{
-	  mCpuTime += 10;			// in ns
-	  mTfp->dump (mCpuTime);
-	}
-
-      mCpu->clk_i = 1;
-      mCpu->eval ();
-
-      if (mWantVcd)
-	{
-	  mCpuTime += 10;			// in ns
-	  mTfp->dump (mCpuTime);
-	}
-
-      mCycleCnt++;
-    }
-
-  value = mCpu->debug_rdata_o;
+  value = readDebugReg (dbg_addr);
   return 4;
 
 }	// Ri5cyImpl::readRegister ()
@@ -329,29 +284,9 @@ Ri5cyImpl::writeRegister (const int  reg,
     exit (EXIT_FAILURE);
   }
 
-  // Set up to write via debug
+  // Write via debug
 
-  mCpu->rstn_i        = 1;
-
-  mCpu->debug_req_i   = 1;
-  mCpu->debug_addr_i  = dbg_addr;
-  mCpu->debug_wdata_i = value;
-  mCpu->debug_we_i    = 1;
-
-  // Wait for the grant signal to indicate the read has been accepted.
-
-  do
-    {
-      mCpu->clk_i = 0;
-      mCpu->eval ();
-      mCpu->clk_i = 1;
-      mCpu->eval ();
-      mCycleCnt++;
-    }
-  while (mCpu->debug_gnt_o == 0);
-
-  mCpu->debug_req_i = 0;		// Stop requesting
-
+  writeDebugReg (dbg_addr, value);
   return 4;
 
 }	// Ri5cyImpl::writeRegister ()
@@ -379,7 +314,7 @@ Ri5cyImpl::read (const uint32_t  addr,
   size_t i;
 
   for (i = 0; i < size; i++)
-    buffer[i] = mCpu->top->ram_i->sp_ram_i->readByte (addr + i);
+    buffer[i] = mCpu->top->ram_i->dp_ram_i->readByte (addr + i);
 
   return i;
 
@@ -405,7 +340,7 @@ Ri5cyImpl::write (const uint32_t  addr,
   size_t  i;
 
   for (i = 0; i < size; i++)
-    mCpu->top->ram_i->sp_ram_i->writeByte (addr + i, buffer[i]);
+    mCpu->top->ram_i->dp_ram_i->writeByte (addr + i, buffer[i]);
 
   return i;
 
@@ -487,12 +422,43 @@ Ri5cyImpl::timeStamp ()
 }	// Ri5cyImpl::timeStamp ()
 
 
+//! Helper method to clock the model
+
+//! Clock the model through one full cycle, saving to VCD if requested.  It is
+//! up to the caller to set any other signals.
+
+void
+Ri5cyImpl::clockModel ()
+{
+  mCpu->clk_i = 0;
+  mCpu->eval ();
+
+  if (mWantVcd)
+    {
+      mCpuTime += CLK_PERIOD_NS / 2;
+      mTfp->dump (mCpuTime);
+    }
+
+  mCpu->clk_i = 1;
+  mCpu->eval ();
+
+  if (mWantVcd)
+    {
+      mCpuTime += CLK_PERIOD_NS / 2;
+      mTfp->dump (mCpuTime);
+    }
+
+  mCycleCnt++;
+
+}	// Ri5cyImpl::clockModel ()
+
+
 //! Helper method to reset the model
 
 //! Take the verilator model through its reset sequence.
 
 void
-Ri5cyImpl::resetModel (void)
+Ri5cyImpl::resetModel ()
 {
   // Assert reset
 
@@ -510,27 +476,11 @@ Ri5cyImpl::resetModel (void)
   mCpu->fetch_enable_i = 0;
 
   for (int i = 0; i < RESET_CYCLES; i++)
-    {
-      mCpu->clk_i = 0;
-      mCpu->eval ();
+    clockModel ();
 
-      if (mWantVcd)
-	{
-	  mCpuTime += 10;			// in ns
-	  mTfp->dump (mCpuTime);
-	}
+  // Now out of reset
 
-      mCpu->clk_i = 1;
-      mCpu->eval ();
-
-      if (mWantVcd)
-	{
-	  mCpuTime += 10;			// in ns
-	  mTfp->dump (mCpuTime);
-	}
-
-      mCycleCnt++;
-    }
+  mCpu->rstn_i = 1;
 
   haltModel ();
 
@@ -542,53 +492,111 @@ Ri5cyImpl::resetModel (void)
 //! For this we need to use the debug interface
 
 void
-Ri5cyImpl::haltModel (void)
+Ri5cyImpl::haltModel ()
 {
-  mCpu->rstn_i        = 1;
+  // Write HALT into the debug control register
 
-  // Write HALT into the debug register
+  writeDebugReg (DBG_CTRL, DBG_CTRL_HALT);
 
-  mCpu->debug_req_i   = 1;
-  mCpu->debug_addr_i  = DBG_CTRL;
-  mCpu->debug_we_i    = 1;
-  mCpu->debug_wdata_i = DBG_CTRL_HALT;
+  // Wait until we see the halted line asserted.
 
-  // Write has succeeded when we get the grant signal asserted.
-
-  do
-    {
-      mCpu->clk_i = 0;
-      mCpu->eval ();
-
-      if (mWantVcd)
-	{
-	  mCpuTime += 10;			// in ns
-	  mTfp->dump (mCpuTime);
-	}
-
-      mCpu->clk_i = 1;
-      mCpu->eval ();
-
-      if (mWantVcd)
-	{
-	  mCpuTime += 10;			// in ns
-	  mTfp->dump (mCpuTime);
-	}
-
-      mCycleCnt++;
-    }
-  while (mCpu->debug_gnt_o == 0);
+  while (0 == mCpu->debug_halted_o)
+    clockModel ();
 
   mCoreHalted = true;
 
 }	// Ri5cyImpl::haltModel ()
 
 
-//
-ITarget::ResumeRes
-Ri5cyImpl::stepInstr (SyscallInfo * syscallInfo __attribute__ ((unused)) )
+//! Helper function to read a debug register.
+
+//! This only sets the debug signals. It is up to the caller to set any other
+//! signals (e.g. reset).
+
+//! @param[in] dbg_reg  The debug register to read.
+//! @return  The value read.
+
+uint32_t
+Ri5cyImpl::readDebugReg (const uint16_t  dbg_reg)
 {
-  return ITarget::ResumeRes::NONE;
+  // Set up the register to read
+
+  mCpu->debug_req_i   = 1;
+  mCpu->debug_addr_i  = dbg_reg;
+  mCpu->debug_we_i    = 0;
+
+  // Wait for the grant signal to indicate the read has been accepted.
+
+  do
+    clockModel ();
+  while (mCpu->debug_gnt_o == 0);
+
+  // Read data is available when rvalid is asserted.  This might be
+  // immediately available, so test at the top of the loop.
+
+  mCpu->debug_req_i = 0;		// Stop requesting
+
+  while (mCpu->debug_rvalid_o == 0)
+    clockModel ();
+
+  return mCpu->debug_rdata_o;
+
+}	// Ri5cyImpl::readDebugReg ()
+
+
+//! Helper function to write a debug register.
+
+//! This only sets the debug signals. It is up to the caller to set any other
+//! signals (e.g. reset).
+
+//! @param[in] dbg_reg  The debug register to write.
+//! @param[in] dbg_val  The value to write
+
+void
+Ri5cyImpl::writeDebugReg (const uint16_t  dbg_reg,
+			  const uint32_t  dbg_val)
+{
+  mCpu->debug_req_i   = 1;
+  mCpu->debug_addr_i  = dbg_reg;
+  mCpu->debug_we_i    = 1;
+  mCpu->debug_wdata_i = dbg_val;
+
+  // Write has succeeded when we get the grant signal asserted.
+
+  do
+    clockModel ();
+  while (mCpu->debug_gnt_o == 0);
+
+  mCpu->debug_req_i = 0;		// Stop requesting
+
+}	// Ri5cyImpl::writeDebugReg ()
+
+
+//! Do a single step.
+
+//! This is achieved using the debug unit's single step enable.
+
+
+ITarget::ResumeRes
+Ri5cyImpl::stepInstr (std::chrono::duration <double>  timeout,
+		      SyscallInfo * syscallInfo)
+{
+  if (nullptr != syscallInfo)
+    cerr << "Warning: syscalls not supported when stepping" << endl;
+
+  time_point <system_clock, duration <double> > timeout_end =
+    system_clock::now () + timeout;
+
+  writeDebugReg (DBG_CTRL, DBG_CTRL_SSTE);
+
+  while ((DBG_HIT_SSTE & readDebugReg (DBG_HIT)) != DBG_HIT_SSTE)
+    if (system_clock::now () > timeout_end)
+      return  ITarget::ResumeRes::TIMEOUT;
+
+  // Clear the flag
+  writeDebugReg (DBG_HIT, 0);
+
+  return  ITarget::ResumeRes::INTERRUPTED;
 
 }	// Ri5cyImpl::stepInstr ()
 
