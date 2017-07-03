@@ -943,6 +943,10 @@ GdbServer::rspRemoveMatchpoint ()
   int       len;			// Matchpoint length
   uint8_t  *instrVec;			// Instruction as byte vector
 
+  pkt->packStr ("");
+  rsp->putPkt (pkt);
+  return;
+
   // Break out the instruction
   string ui32Fmt = SCNx32;
   string fmt = "z%1d,%" + ui32Fmt + ",%1d";
@@ -1117,6 +1121,10 @@ GdbServer::rspInsertMatchpoint ()
   uint32_t  instr;			// Instruction value found
   int       len;			// Matchpoint length
   uint8_t  *instrVec;			// Instruction as byte vector
+
+  pkt->packStr ("");
+  rsp->putPkt (pkt);
+  return;
 
   // Break out the instruction
   string ui32Fmt = SCNx32;
