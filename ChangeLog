@@ -1,5 +1,21 @@
 2017-07-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	This implementation provides a way to resume continuously, but
+	does not yet work with the RI5CY implementation. It seems the
+	pipeline does not get fully flushed.
+
+	* server/GdbServer.cpp (GdbServer::rspRemoveMatchpoint)
+	(GdbServer::rspInsertMatchpoint): Just return empty packets, so
+	GDB does breakpoints by steam.
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::readRegister)
+	(Ri5cyImpl::writeRegister): Warn rather than abort if asked for
+	unkown registers, this is a GDB problem.
+	(Ri5cyImpl::stepInstr): Write NPC first to flush pipeline.
+	(Ri5cyImpl::runToBreak): Implementation provided, but does not yet
+	work.
+
+2017-07-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* targets/picorv32/Picorv32Impl.cpp: Unify header inclusion.
 	* targets/ri5cy/Ri5cyImpl.cpp: Remove std::chrono:: namespace
 	qualifiers throughout, covered by using declarations.

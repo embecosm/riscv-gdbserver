@@ -239,8 +239,10 @@ Ri5cyImpl::readRegister (const int  reg,
       dbg_addr = DBG_NPC;		// Next PC
   else
     {
-      cerr << "*** ABORT ***: Attempt to read non-existent register" << endl;
-      exit (EXIT_FAILURE);
+      cerr << "Warning: Attempt to read non-existent register: zero returned."
+	   << endl;
+      value = 0;
+      return 4;
     }
 
   // Read via debug
@@ -280,8 +282,8 @@ Ri5cyImpl::writeRegister (const int  reg,
     dbg_addr = DBG_NPC;               // Next PC
   else
   {
-    cerr << "*** ABORT ***: Attempt to write non-existent register" << endl;
-    exit (EXIT_FAILURE);
+    cerr << "Warning: Attempt to write non-existent register: ignored." << endl;
+    return 4;
   }
 
   // Write via debug
@@ -605,10 +607,10 @@ Ri5cyImpl::stepInstr (duration <double>  timeout,
 
   mCpu->fetch_enable_i = 1;
 
+  writeDebugReg (DBG_NPC, readDebugReg (DBG_NPC));	// Flush pipeline
   writeDebugReg (DBG_HIT, 0);
   writeDebugReg (DBG_CTRL, DBG_CTRL_SSTE);
   waitForHalt ();
-  writeDebugReg (DBG_NPC, readDebugReg (DBG_NPC));
 
   // @todo For now only timeout if it took too long.
 
@@ -621,10 +623,40 @@ Ri5cyImpl::stepInstr (duration <double>  timeout,
 
 
 ITarget::ResumeRes
-Ri5cyImpl::runToBreak (duration <double>  timeout __attribute__ ((unused)),
-		       SyscallInfo * syscallInfo __attribute__ ((unused)) )
+Ri5cyImpl::runToBreak (duration <double>  timeout,
+		       SyscallInfo * syscallInfo)
 {
-  return ITarget::ResumeRes::NONE;
+  if (nullptr != syscallInfo)
+    cerr << "Warning: syscalls not supported when continuing" << endl;
+
+  bool haveTimeout = duration <double>::zero() != timeout;
+  time_point <system_clock, duration <double> > timeout_end;
+
+  if (haveTimeout)
+    timeout_end = system_clock::now () + timeout;
+
+  mCpu->fetch_enable_i = 1;
+
+  writeDebugReg (DBG_NPC, readDebugReg (DBG_NPC));	// Flush pipeline
+  writeDebugReg (DBG_HIT, 0);
+  writeDebugReg (DBG_CTRL, readDebugReg (DBG_CTRL) & ~DBG_CTRL_SSTE);
+  writeDebugReg (DBG_CTRL, readDebugReg (DBG_CTRL) & ~DBG_CTRL_HALT);
+
+  // @todo this is a type of waitForHalt
+
+  while (DBG_CTRL_HALT != (readDebugReg (DBG_CTRL) & DBG_CTRL_HALT))
+    if (haveTimeout && (system_clock::now () > timeout_end))
+      {
+	haltModel ();
+	return ITarget::ResumeRes::TIMEOUT;
+      }
+    else
+      {
+	cout << "Got here" << endl;
+	clockModel ();
+      }
+
+  return ITarget::ResumeRes::INTERRUPTED;
 
 }	// Ri5cyImpl::runToBreak ()
 
