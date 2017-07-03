@@ -607,9 +607,9 @@ Ri5cyImpl::stepInstr (duration <double>  timeout,
 
   mCpu->fetch_enable_i = 1;
 
+  writeDebugReg (DBG_CTRL, DBG_CTRL_SSTE);		// SSTE
   writeDebugReg (DBG_NPC, readDebugReg (DBG_NPC));	// Flush pipeline
-  writeDebugReg (DBG_HIT, 0);
-  writeDebugReg (DBG_CTRL, DBG_CTRL_SSTE);
+  writeDebugReg (DBG_HIT, 0);				// Release
   waitForHalt ();
 
   // @todo For now only timeout if it took too long.
@@ -637,9 +637,9 @@ Ri5cyImpl::runToBreak (duration <double>  timeout,
 
   mCpu->fetch_enable_i = 1;
 
-  writeDebugReg (DBG_NPC, readDebugReg (DBG_NPC));	// Flush pipeline
-  writeDebugReg (DBG_HIT, 0);
   writeDebugReg (DBG_CTRL, readDebugReg (DBG_CTRL) & ~DBG_CTRL_SSTE);
+  writeDebugReg (DBG_HIT, 0);
+  writeDebugReg (DBG_NPC, readDebugReg (DBG_NPC));	// Flush pipeline
   writeDebugReg (DBG_CTRL, readDebugReg (DBG_CTRL) & ~DBG_CTRL_HALT);
 
   // @todo this is a type of waitForHalt

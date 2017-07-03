@@ -1,5 +1,10 @@
 2017-07-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::runToBreak): Tried a
+	different sequence.
+
+2017-07-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	This implementation provides a way to resume continuously, but
 	does not yet work with the RI5CY implementation. It seems the
 	pipeline does not get fully flushed.
