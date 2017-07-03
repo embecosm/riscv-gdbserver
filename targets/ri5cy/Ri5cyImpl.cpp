@@ -113,7 +113,7 @@ Ri5cyImpl::resume (ITarget::ResumeType step,
 
 ITarget::ResumeRes
 Ri5cyImpl::resume (ITarget::ResumeType step,
-		   std::chrono::duration <double>  timeout,
+		   duration <double>  timeout,
 		   SyscallInfo * syscallInfo)
 {
   switch (step)
@@ -482,7 +482,10 @@ Ri5cyImpl::resetModel ()
 
   mCpu->rstn_i = 1;
 
+  // Halt the model, then set to halt on exceptions of interest
+
   haltModel ();
+  writeDebugReg (DBG_IE, DBG_IE_BP | DBG_IE_ILL);
 
 }	// Ri5cyImpl::resetModel ()
 
@@ -494,18 +497,26 @@ Ri5cyImpl::resetModel ()
 void
 Ri5cyImpl::haltModel ()
 {
-  // Write HALT into the debug control register
+  // Write HALT into the debug control register, then wait until we see the
+  // processor has halted.
 
-  writeDebugReg (DBG_CTRL, DBG_CTRL_HALT);
+  writeDebugReg (DBG_CTRL, readDebugReg (DBG_CTRL) | DBG_CTRL_HALT);
+  waitForHalt ();
 
-  // Wait until we see the halted line asserted.
+}	// Ri5cyImpl::haltModel ()
 
-  while (0 == mCpu->debug_halted_o)
+
+//! Helper method to wait until the model is halted.
+
+void
+Ri5cyImpl::waitForHalt ()
+{
+  while (DBG_CTRL_HALT != (readDebugReg (DBG_CTRL) & DBG_CTRL_HALT))
     clockModel ();
 
   mCoreHalted = true;
 
-}	// Ri5cyImpl::haltModel ()
+}	// Ri5cyImpl::waitForHalt ()
 
 
 //! Helper function to read a debug register.
@@ -578,35 +589,39 @@ Ri5cyImpl::writeDebugReg (const uint16_t  dbg_reg,
 
 
 ITarget::ResumeRes
-Ri5cyImpl::stepInstr (std::chrono::duration <double>  timeout,
+Ri5cyImpl::stepInstr (duration <double>  timeout,
 		      SyscallInfo * syscallInfo)
 {
   if (nullptr != syscallInfo)
     cerr << "Warning: syscalls not supported when stepping" << endl;
 
-  time_point <system_clock, duration <double> > timeout_end =
-    system_clock::now () + timeout;
+  bool haveTimeout = duration <double>::zero() != timeout;
+  time_point <system_clock, duration <double> > timeout_end;
+
+  if (haveTimeout)
+    timeout_end = system_clock::now () + timeout;
 
   // @todo Fetch enable turns off fetching of new instructions.
 
-  mCpu->fetch_enable_i = 0;
+  mCpu->fetch_enable_i = 1;
 
-  writeDebugReg (DBG_CTRL, DBG_CTRL_SSTE);
-
-  while ((DBG_HIT_SSTE & readDebugReg (DBG_HIT)) != DBG_HIT_SSTE)
-    if (system_clock::now () > timeout_end)
-      return  ITarget::ResumeRes::TIMEOUT;
-
-  // Clear the flag
   writeDebugReg (DBG_HIT, 0);
+  writeDebugReg (DBG_CTRL, DBG_CTRL_SSTE);
+  waitForHalt ();
+  writeDebugReg (DBG_NPC, readDebugReg (DBG_NPC));
 
-  return  ITarget::ResumeRes::INTERRUPTED;
+  // @todo For now only timeout if it took too long.
+
+  if (haveTimeout && (system_clock::now () > timeout_end))
+    return  ITarget::ResumeRes::TIMEOUT;
+  else
+    return  ITarget::ResumeRes::INTERRUPTED;
 
 }	// Ri5cyImpl::stepInstr ()
 
 
 ITarget::ResumeRes
-Ri5cyImpl::runToBreak (std::chrono::duration <double>  timeout __attribute__ ((unused)),
+Ri5cyImpl::runToBreak (duration <double>  timeout __attribute__ ((unused)),
 		       SyscallInfo * syscallInfo __attribute__ ((unused)) )
 {
   return ITarget::ResumeRes::NONE;

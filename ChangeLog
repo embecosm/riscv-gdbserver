@@ -1,3 +1,17 @@
+2017-07-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* targets/picorv32/Picorv32Impl.cpp: Unify header inclusion.
+	* targets/ri5cy/Ri5cyImpl.cpp: Remove std::chrono:: namespace
+	qualifiers throughout, covered by using declarations.
+	(Ri5cyImpl::resetModel): Set the DBG_IE reg to trap on breakpoint
+	and illegal instruction.
+	(Ri5cyImpl::haltModel): Rewrite using waitForHalt.
+	(Ri5cyImpl::waitForHalt): Created.
+	(Ri5cyImpl::stepInstr): Rewritten to write the NPC to flush the
+	pipeline.
+	* targets/ri5cy/Ri5cyImpl.h (class Ri5cyImple): Add constants for
+	DBG_IE fields and waitForHalt method.
+
 2017-07-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::stepInstr): clear
