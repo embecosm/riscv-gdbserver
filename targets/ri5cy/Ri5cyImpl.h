@@ -121,6 +121,16 @@ private:
   const uint32_t DBG_HIT_SLEEP = 0x00010000;	//!< Core is sleeping
   const uint32_t DBG_HIT_SSTE  = 0x00000001;	//!< Single step is enabled
 
+  const uint32_t DBG_IE_ECALL  = 0x00000800;	//!< ECALL from M-Mode
+  const uint32_t DBG_IE_SAF    = 0x00000080;	//!< Store access fault
+  const uint32_t DBG_IE_SAM    = 0x00000040;	//!< Store address misaligned
+  const uint32_t DBG_IE_LAF    = 0x00000020;	//!< Load access fault
+  const uint32_t DBG_IE_LAM    = 0x00000010;	//!< Load address misaligned
+  const uint32_t DBG_IE_BP     = 0x00000008;	//!< Breakpoint
+  const uint32_t DBG_IE_ILL    = 0x00000004;	//!< Illegal instruction
+  const uint32_t DBG_IE_IAF    = 0x00000002;	//!< Instruction access fault
+  const uint32_t DBG_IE_IAM    = 0x00000001;	//!< Instr address misaligned
+
   // GDB register numbers
 
   const int REG_R0  = 0;		//!< GDB R0 regnum
@@ -160,6 +170,7 @@ private:
   void clockModel ();
   void resetModel ();
   void haltModel ();
+  void waitForHalt ();
   uint32_t readDebugReg (const uint16_t  dbg_reg);
   void writeDebugReg (const uint16_t  dbg_reg,
 		      const uint32_t  dbg_val);
