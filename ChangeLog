@@ -1,3 +1,8 @@
+2017-07-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::stepInstr): clear
+	fetch_enable_i.
+
 2017-06-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::resume): Deal with all

@@ -587,6 +587,10 @@ Ri5cyImpl::stepInstr (std::chrono::duration <double>  timeout,
   time_point <system_clock, duration <double> > timeout_end =
     system_clock::now () + timeout;
 
+  // @todo Fetch enable turns off fetching of new instructions.
+
+  mCpu->fetch_enable_i = 0;
+
   writeDebugReg (DBG_CTRL, DBG_CTRL_SSTE);
 
   while ((DBG_HIT_SSTE & readDebugReg (DBG_HIT)) != DBG_HIT_SSTE)
