@@ -1,5 +1,15 @@
 2017-07-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	This is a GDB server to work with RI5CY with 128-bit wide
+	instruction FIFO. It also fixes a minor glitch with RSP.
+
+	* server/RspConnection.cpp (RspConnection::RspConnection):
+	Initialize mNumGetBufChars.
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::stepInstr)
+	(Ri5cyImpl::runToBreak): No need to flush the pipeline.
+
+2017-07-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* server/GdbServer.cpp (GdbServer::rspCommand): Add "monitor
 	cyclecount".
 	* targets/ri5cy/Ri5cyImpl.h: Correct name of DBG_HIT_SSTH from
