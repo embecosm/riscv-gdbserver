@@ -1,3 +1,10 @@
+2017-07-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::stepInstr): Write
+	DBG_CTRL after flushing pipeline.
+	(Ri5cyImpl::runToBreak): Compute value for DBG_CTRL before
+	flushing the pipeline, so can write DBG_CTRL in the next cycle.
+
 2017-07-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::runToBreak): Tried a
