@@ -119,7 +119,7 @@ private:
   const uint32_t DBG_CTRL_SSTE = 0x00000001;	//!< Single step core
 
   const uint32_t DBG_HIT_SLEEP = 0x00010000;	//!< Core is sleeping
-  const uint32_t DBG_HIT_SSTE  = 0x00000001;	//!< Single step is enabled
+  const uint32_t DBG_HIT_SSTH  = 0x00000001;	//!< Single step halted
 
   const uint32_t DBG_IE_ECALL  = 0x00000800;	//!< ECALL from M-Mode
   const uint32_t DBG_IE_SAF    = 0x00000080;	//!< Store access fault

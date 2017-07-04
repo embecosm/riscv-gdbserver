@@ -819,17 +819,12 @@ GdbServer::rspCommand ()
     {
       timeout = timeout * CLOCKS_PER_SEC;
     }
-  else if (0 == strcmp (cmd, "timestamp"))
+  else if (0 == strcmp (cmd, "cyclecount"))
     {
       std::ostringstream  oss;
-      cout << "Timestamp NOT IMPLEMENTED" << endl;
-      /*
-      oss << "Cycles since last call: " << cpu->getCycleCounter () << endl;
-      pkt->packHexstr (oss.str ().c_str ());
-      oss << "Cycles since reset:     " << cpu->getLifetimeCounter () << endl;
+      oss << cpu->getCycleCount () << endl;
       pkt->packHexstr (oss.str ().c_str ());
       rsp->putPkt (pkt);
-      */
     }
   else if (0 == strcmp (cmd, "exit"))
     {
