@@ -607,7 +607,6 @@ Ri5cyImpl::stepInstr (duration <double>  timeout,
 
   mCpu->fetch_enable_i = 1;
 
-  writeDebugReg (DBG_NPC, readDebugReg (DBG_NPC));	// Flush pipeline
   writeDebugReg (DBG_CTRL, DBG_CTRL_SSTE);		// SSTE
   writeDebugReg (DBG_HIT, 0);				// Release
   waitForHalt ();
@@ -640,7 +639,6 @@ Ri5cyImpl::runToBreak (duration <double>  timeout,
   uint32_t newDbgCtrl;
 
   newDbgCtrl = readDebugReg (DBG_CTRL) & ~(DBG_CTRL_SSTE | DBG_CTRL_HALT);
-  writeDebugReg (DBG_NPC, readDebugReg (DBG_NPC));	// Flush pipeline
   writeDebugReg (DBG_CTRL, newDbgCtrl);
 
   // @todo this is a type of waitForHalt
