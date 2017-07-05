@@ -123,6 +123,8 @@ private:
   void  rspWriteReg ();
   void  rspQuery ();
   void  rspCommand ();
+  void  rspSetCommand (const char* cmd);
+  void  rspShowCommand (const char* cmd);
   void  rspSet ();
   void  rspRestart ();
   void  rspVpkt ();

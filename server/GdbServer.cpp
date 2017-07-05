@@ -23,10 +23,11 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 #include <sstream>
-#include <cstdlib>
+#include <vector>
 
 #include "GdbServer.h"
 #include "Utils.h"
@@ -39,9 +40,12 @@ using std::cerr;
 using std::dec;
 using std::endl;
 using std::hex;
+using std::ostringstream;
 using std::setfill;
 using std::setw;
 using std::string;
+using std::stringstream;
+using std::vector;
 
 
 // For now these are hard-coded constants, but they need to be made
@@ -805,9 +809,74 @@ GdbServer::rspCommand ()
       cout << "RSP trace: qRcmd," << cmd << endl;
     }
 
-  if (0 == strcmp (cmd, "reset"))
+  if (0 == strncmp ("help", cmd, strlen (cmd)))
     {
-      // Reset the CPU.  Failure to reset causes us to blow up.
+      static const char *mess [] = {
+	"The following generic monitor commands are supported:\n",
+	"  help\n",
+	"    Produce this message\n",
+	"  reset [cold | warm]\n",
+	"    Reset the simulator (default warm)\n",
+	"  exit\n",
+	"    Exit the GDB server\n",
+	"  timeout <interval>\n",
+	"    Maximum time in seconds taken by continue packet\n",
+	"  cyclecount\n",
+	"    Report cycles executed since last report and since reset\n",
+	"  instrcount\n",
+	"    Report instructions executed since last report and since reset\n",
+	"  set debug <level>\n",
+	"    Set debug messaging in target to <level>\n",
+	"  show debug\n",
+	"    Show current level of debug messaging in target\n",
+	"  set remote-debug <0|1>\n",
+	"    Disable/enable tracing of Remote Serial Protocol (RSP)\n",
+	"  show remote-debug\n",
+	"    Show whether RSP tracing is enabled\n",
+	"  echo <message>\n",
+	"    Echo <message> on stdout of the gdbserver\n",
+	nullptr };
+
+      for (int i = 0; nullptr != mess[i]; i++)
+	{
+	  pkt->packRcmdStr (mess[i], true);
+	  rsp->putPkt (pkt);
+	}
+
+      // Now get any help from the target
+
+      stringstream  ss;
+      if (cpu->command (string ("help"), ss))
+	{
+	  string line;
+
+	  pkt->packRcmdStr ("The following target specific monitor commands are supported:\n",
+			     true);
+	  rsp->putPkt (pkt);
+	  while (getline (ss, line, '\n'))
+	    {
+	      line.append ("\n");
+	      pkt->packRcmdStr (line.c_str (), true);
+	      rsp->putPkt (pkt);
+	    }
+	}
+      else
+	{
+	  // No target specific help
+
+	  pkt->packRcmdStr ("There are no target specific monitor commands",
+			     true);
+	  rsp->putPkt (pkt);
+	}
+
+      // Not silent, so acknowledge OK
+
+      pkt->packStr ("OK");
+      rsp->putPkt (pkt);
+    }
+  else if ((0 == strcmp (cmd, "reset")) || (0 == strcmp (cmd, "reset warm")))
+    {
+      // Warm reset the CPU.  Failure to reset causes us to blow up.
 
       if (ITarget::ResumeRes::SUCCESS != cpu->reset (ITarget::ResetType::WARM))
 	{
@@ -815,6 +884,24 @@ GdbServer::rspCommand ()
 	  exit (EXIT_FAILURE);
 	}
     }
+    else if (0 == strcmp (cmd, "reset cold"))
+      {
+	// Cold reset the CPU.  Failure to reset causes us to blow up.
+
+	if (ITarget::ResumeRes::SUCCESS != cpu->reset (ITarget::ResetType::COLD))
+	  {
+	    cerr << "*** ABORT *** Failed to cold reset: Terminating." << endl;
+	    exit (EXIT_FAILURE);
+	  }
+      }
+    else if (0 == strcmp (cmd, "exit"))
+      {
+	// This is a bit of a kludge. It would be much better to be deleted
+	// cleanly from the top.
+
+	delete cpu;
+	exit (EXIT_SUCCESS);
+      }
   else if (1 == sscanf (cmd, "timeout %d", &timeout))
     {
       timeout = timeout * CLOCKS_PER_SEC;
@@ -826,22 +913,250 @@ GdbServer::rspCommand ()
       pkt->packHexstr (oss.str ().c_str ());
       rsp->putPkt (pkt);
     }
-  else if (0 == strcmp (cmd, "exit"))
+  else if (0 == strcmp (cmd, "cyclecount"))
     {
-      // This is a bit of a kludge. It would be much better to be deleted
-      // cleanly from the top.
-
-      delete cpu;
-      exit (EXIT_SUCCESS);
+      std::ostringstream  oss;
+      oss << cpu->getCycleCount () << endl;
+      pkt->packHexstr (oss.str ().c_str ());
+      rsp->putPkt (pkt);
     }
+  else if (0 == strcmp (cmd, "instrcount"))
+    {
+      std::ostringstream  oss;
+      oss << cpu->getInstrCount () << endl;
+      pkt->packHexstr (oss.str ().c_str ());
+      rsp->putPkt (pkt);
+    }
+    else if (0 == strncmp (cmd, "echo", 4))
+      {
+	const char *tmp = cmd + 4;
+	while (*tmp != '\0' && isspace (*tmp))
+	  ++tmp;
+	cerr << std::flush;
+	cout << tmp << std::endl << std::flush;
+	pkt->packStr ("OK");
+	rsp->putPkt (pkt);
+      }
+    // Insert any new generic commands here.
+    // Don't forget to document them.
 
-  // Acknowledge OK
-  pkt->packStr ("OK");
-  rsp->putPkt (pkt);
+    else if (0 == strncmp (cmd, "set ", strlen ("set ")))
+      {
+	int i;
+
+	for (i =  strlen ("set ") ; isspace (cmd[i]) ; i++)
+	  ;
+
+	rspSetCommand (cmd + i);
+      }
+    else if (0 == strncmp (cmd, "show ", strlen ("show ")))
+      {
+	int i;
+
+	for (i =  strlen ("show ") ; isspace (cmd[i]) ; i++)
+	  ;
+
+	rspShowCommand (cmd + i);
+      }
+    else
+      {
+	// Fallback is to pass the command to the target.
+
+	ostringstream  oss;
+
+	if (cpu->command (string (cmd), oss))
+	  {
+	    pkt->packRcmdStr (oss.str ().c_str (), true);
+	    rsp->putPkt (pkt);
+
+	    // Not silent, so acknowledge OK
+
+	    pkt->packStr ("OK");
+	    rsp->putPkt (pkt);
+	  }
+	else
+	  {
+	    // Command failed
+
+	    pkt->packStr ("E01");
+	    rsp->putPkt (pkt);
+	  }
+      }
 
   delete [] cmd;
 
 }	// rspCommand ()
+
+
+//! Handle a RSP qRcmd request for set
+
+//! The main rspCommand function has decoded the argument string and
+//! stripped off "set" and any spaces separating it from the rest.
+
+//! Any unrecognized command is passed to the target to process.
+
+//! @param[in] cmd  The RSP set command string (excluding "set ")
+
+void
+GdbServer::rspSetCommand (const char* cmd)
+{
+  vector<string> tokens;
+  Utils::split (cmd, " ", tokens);
+  int numTok = tokens.size ();
+
+  // Look for any options we can handle.
+
+  if ((numTok == 2) && (string ("remote-debug") == tokens[0]))
+    {
+      // Should we turn on RSP tracing?
+
+      unsigned int logLevel;
+
+      try
+	{
+	  logLevel = std::stoul (tokens[1], nullptr);
+	}
+      catch (const std::invalid_argument & /* err */) // Var would be unused
+	{
+	  pkt->packStr ("E01");
+	  rsp->putPkt (pkt);
+	  return;
+	}
+
+      switch (logLevel)
+	{
+	case 0:
+	case 1:
+
+	  // Only valid values are 0 and 1
+
+	  traceFlags->traceRsp (logLevel == 1);
+	  pkt->packStr ("OK");
+	  rsp->putPkt (pkt);
+	  return;
+
+	default:
+	  pkt->packStr ("E02");
+	  rsp->putPkt (pkt);
+	  return;
+	}
+    }
+  else if ((numTok == 2) && (string ("debug") == tokens[0]))
+    {
+      // Generally set trace level.
+
+      unsigned int logLevel;
+
+      try
+	{
+	  logLevel = static_cast<unsigned int> (std::stoul (tokens[1],
+							    nullptr, 0));
+	}
+      catch (const std::invalid_argument & /* err */) // Var would be unused
+	{
+	  pkt->packStr ("E03");
+	  rsp->putPkt (pkt);
+	  return;
+	}
+
+      traceFlags->allFlags (logLevel);
+      pkt->packStr ("OK");
+      rsp->putPkt (pkt);
+      return;
+    }
+  else
+    {
+      // Not handled here, try the target
+
+      ostringstream  oss;
+      string fullCmd = string ("set ") + string (cmd);
+
+      if (cpu->command (string (fullCmd), oss))
+	{
+	  pkt->packRcmdStr (oss.str ().c_str (), true);
+	  rsp->putPkt (pkt);
+
+	  // Not silent, so acknowledge OK
+
+	  pkt->packStr ("OK");
+	  rsp->putPkt (pkt);
+	}
+      else
+	{
+	  // Command failed
+
+	  pkt->packStr ("E04");
+	  rsp->putPkt (pkt);
+	}
+    }
+}	// RspSetCommand ()
+
+
+//! Handle a RSP qRcmd request for show
+
+//! The main rspCommand function has decoded the argument string and
+//! stripped off "show" and any spaces separating it from the rest.
+
+//! Any unrecognized command is passed to the target to process.
+
+//! @param[in] cmd  The RSP command string (excluding "show ")
+
+void
+GdbServer::rspShowCommand (const char* cmd)
+{
+  vector<string> tokens;
+  Utils::split (cmd, " ", tokens);
+  int numTok = tokens.size ();
+
+  if ((numTok == 1) && (string ("remote-debug") == tokens[0]))
+    {
+      // Are we tracing RSP?
+
+      pkt->packRcmdStr (traceFlags->traceRsp () ? "1" : "0", true);
+      rsp->putPkt (pkt);
+      return;
+    }
+  else if ((numTok == 1) && (string ("debug") == tokens[0]))
+    {
+      // What is our current trace level?
+
+      ostringstream  oss;
+
+      oss << "0x" << hex << traceFlags->allFlags () << endl;
+      pkt->packRcmdStr (oss.str ().c_str (), true);
+      rsp->putPkt (pkt);
+
+      // Not silent, so acknowledge OK
+
+      pkt->packStr ("OK");
+      rsp->putPkt (pkt);
+    }
+  else
+    {
+      // Not handled here, try the target
+
+      ostringstream  oss;
+      string fullCmd = string ("show ") + string (cmd);
+
+      if (cpu->command (string (fullCmd), oss))
+	{
+	  pkt->packRcmdStr (oss.str ().c_str (), true);
+	  rsp->putPkt (pkt);
+
+	  // Not silent, so acknowledge OK
+
+	  pkt->packStr ("OK");
+	  rsp->putPkt (pkt);
+	}
+      else
+	{
+	  // Command failed
+
+	  pkt->packStr ("E04");
+	  rsp->putPkt (pkt);
+	}
+    }
+}	// rspShowCommand ()
 
 
 //! Handle a RSP set request.

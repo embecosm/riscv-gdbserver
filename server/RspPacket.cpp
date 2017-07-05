@@ -124,6 +124,59 @@ RspPacket::packHexstr (const char *str)
 }	// packStr ()
 
 
+//! Pack a const string as a hex encoded string into a packet for qRcmd.
+
+//! The reply to qRcmd packets can be O followed by hex encoded ASCII and the
+//! client will print them on standard output. If there is no initial O, then
+//! the code is silently put into a buffer by the client.
+
+//! @param  str        The string to copy into the data packet before sending
+//! @param  toStdoutP  TRUE if the client should send to stdout, FALSE if the
+//!                    result should silently go into a buffer.
+
+void
+RspPacket::packRcmdStr (const char *str,
+			const bool toStdoutP)
+{
+  unsigned int  slen = strlen (str);
+
+  // Construct the packet to send, so long as string is not too big, otherwise
+  // truncate. Add EOS at the end for convenient debug printout
+  if (slen >= (bufSize / 2 - 1))
+    {
+      cerr << "Warning: String \"" << str
+		<< "\" too large for RSP packet: truncated\n" << endl;
+      slen = bufSize / 2 - 1;
+    }
+
+  // Construct the string the hard way
+  int offset;
+  if (toStdoutP)
+    {
+      data[0] = 'O';
+	  offset = 1;
+    }
+  else
+    {
+      offset = 0;
+    }
+
+  for (unsigned int i = 0; i < slen; i++)
+    {
+      uint8_t nybble_hi = str[i] >> 4;
+      uint8_t nybble_lo = str[i] & 0x0f;
+
+      data[i * 2 + offset + 0] =
+	  static_cast<char> (nybble_hi + (nybble_hi > 9 ? 'a' - 10 : '0'));
+      data[i * 2 + offset + 1] =
+	  static_cast<char> (nybble_lo + (nybble_lo > 9 ? 'a' - 10 : '0'));
+    }
+  len       = slen * 2 + offset;
+  data[len] = 0;
+
+}	// packRcmdStr ()
+
+
 //! Get the data buffer size
 
 //! @return  The data buffer size

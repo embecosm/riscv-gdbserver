@@ -39,11 +39,14 @@ public:
   // Accessors
 
   bool traceRsp () const;
+  void traceRsp (const bool  flagState);
   bool traceConn () const;
   bool traceBreak () const;
   bool traceVcd () const;
   bool traceSilent () const;
   void setSilent ();
+  void allFlags (const unsigned int  flags);
+  unsigned int allFlags () const;
 
 
 private:
