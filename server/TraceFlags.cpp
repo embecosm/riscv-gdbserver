@@ -55,6 +55,22 @@ TraceFlags::traceRsp () const
 }	// TraceFlags::traceRsp ()
 
 
+//! Set whether RSP tracing is enabled
+
+//! @param[in] traceRsp  TRUE if the RSP tracing flag should be set, FALSE if
+//!                      it should be cleared.
+
+void
+TraceFlags::traceRsp (const bool  flagState)
+{
+  if (flagState)
+    flags |= TRACE_RSP;
+  else
+    flags &= ~TRACE_RSP;
+
+}	// TraceFlags::traceRsp ()
+
+
 //! Is connection tracing enabled?
 
 //! @return  TRUE if the CONN tracing flag is set, FALSE otherwise
@@ -111,6 +127,30 @@ TraceFlags::setSilent ()
   flags != TRACE_SILENT;
 
 }	// TraceFlags::setSilent ()
+
+
+//! Set all trace flags.
+
+//! @param[in] _flags  The values to set.
+
+void
+TraceFlags::allFlags (const unsigned int  _flags)
+{
+  flags = _flags;
+
+}	// TraceFlags::allFlags ()
+
+
+//! Get all trace flags
+
+//! @ return  The flags value.
+
+unsigned int
+TraceFlags::allFlags () const
+{
+  return  flags;
+
+}	// TraceFlags::allFlags ()
 
 
 // Local Variables:

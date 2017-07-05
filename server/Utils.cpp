@@ -27,6 +27,8 @@
 using std::cout;
 using std::hex;
 using std::endl;
+using std::string;
+using std::vector;
 
 
 //!Utility to give the value of a hex char
@@ -251,3 +253,38 @@ Utils::rspUnescape (char *buf,
   return  toOffset;
 
 }	// rspUnescape () */
+
+
+//! Split a string into delimited tokens
+
+//! @param[in]  s      The string of tokes
+//! @param[in]  delim  The delimiter characters
+//! @param[out] elems  Vector the individual tokens
+
+//! @return  The vector of tokens
+
+vector<string> &
+Utils::split (const string        & s,
+	      const string        & delim,
+	      vector<string> & elems)
+{
+  elems.clear();
+  size_t current;
+  size_t next = s.npos;
+
+  do
+    {
+      next = s.find_first_not_of(delim, next + 1);
+      if(next == s.npos)
+        {
+	  break;
+        }
+      current = next;
+      next = s.find_first_of(delim, current);
+      elems.push_back(s.substr(current, next - current));
+    }
+  while (next != s.npos);
+
+  return elems;
+
+}	// split ()

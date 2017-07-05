@@ -1,3 +1,20 @@
+2017-07-05  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* server/GdbServer.cpp (GdbServer::rspCommand): Add missing
+	monitor commands.
+	(GdbServer::rspSetCommand): Created.
+	(GdbServer::rspShowCommand): Created.
+	* server/GdbServer.h (class GdbServer): Add rspSetCommand and
+	rspShowCommand methods.
+	* server/RspPacket.cpp (RspPacket::packRcmdStr): Created.
+	* server/RspPacket.h (class RspPacket): Add packRcmdStr method.
+	* server/TraceFlags.cpp (TraceFlags::traceRsp): Add setter.
+	(TraceFlags::allFlags): Created setter and getter.
+	* server/TraceFlags.h: Add traceRsp setter and allFlags setter and
+	getter methods.
+	* server/Utils.cpp (Utils::split): Created.
+	* server/Utils.h (class Utils): Added split method.
+
 2017-07-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	This is a GDB server to work with RI5CY with 128-bit wide

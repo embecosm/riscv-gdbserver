@@ -23,7 +23,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <stdint.h>
+#include <cstdint>
+#include <string>
+#include <vector>
 
 
 //! A class offering a number of convenience utilities for the GDB Server.
@@ -48,6 +50,9 @@ public:
 				char *src);
   static int         rspUnescape (char *buf,
 				  int   len);
+  static std::vector<std::string> & split (const std::string & s,
+  					   const std::string & delim,
+  					   std::vector<std::string> & elems);
 
 private:
 

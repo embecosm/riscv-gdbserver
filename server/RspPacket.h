@@ -41,7 +41,9 @@ public:
   ~RspPacket ();
 
   // Pack a constant string into a packet
-  void  packStr (const char *str);	// For fixed packets
+  void  packStr (const char * str);	// For fixed packets
+  void  packRcmdStr (const char * str,	// For qRcmd replies
+		     const bool   toStdoutP);
 
   // Pack a hex encoded string into a packet
   void  packHexstr (const char *str);
