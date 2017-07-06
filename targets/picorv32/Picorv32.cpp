@@ -129,14 +129,12 @@ Picorv32::reset (ITarget::ResetType  type  __attribute__ ((unused)) )
 uint64_t
 Picorv32::getCycleCount () const
 {
-  std::cerr << "getCycleCount NOT IMPLEMENTED" << std::endl;
-  return 0;
+  return mPicorv32Impl->getCycleCount ();
 }
 uint64_t
 Picorv32::getInstrCount () const
 {
-  std::cerr << "getInstrCount NOT IMPLEMENTED" << std::endl;
-  return 0;
+  return mPicorv32Impl->getInstrCount ();
 }
 
 std::size_t
