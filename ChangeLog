@@ -1,3 +1,11 @@
+2017-07-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* server/GdbServer.cpp: Include ctime, provide using for
+	std::localtime and std::put_time.
+	(GdbServer::rspClientRequest): Remove redundant std::chrono.
+	(GdbServer::rspCommand): Fix some alignment issues, add OK
+	responses for several commands, implement timestamp.
+
 2017-07-05  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* server/GdbServer.cpp (GdbServer::rspCommand): Add missing

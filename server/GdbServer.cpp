@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -40,7 +41,9 @@ using std::cerr;
 using std::dec;
 using std::endl;
 using std::hex;
+using std::localtime;
 using std::ostringstream;
+using std::put_time;
 using std::setfill;
 using std::setw;
 using std::string;
@@ -196,7 +199,7 @@ GdbServer::rspClientRequest ()
 
 	duration <double>  interruptTimeout (0.1);
 	time_point <system_clock, duration <double> >  timeout_end =
-	  std::chrono::system_clock::now () + timeout;
+	  system_clock::now () + timeout;
 
 	// Check for break before resuming the machine.
 
@@ -237,7 +240,7 @@ GdbServer::rspClientRequest ()
 
 		// Check for timeout, unless the timeout was zero
 		if ((duration <double>::zero () != timeout)
-		    && (timeout_end < std::chrono::system_clock::now ()))
+		    && (timeout_end < system_clock::now ()))
 		  {
 		    // Force the target to stop. Ignore return value.
 
@@ -883,34 +886,50 @@ GdbServer::rspCommand ()
 	  cerr << "*** ABORT *** Failed to reset: Terminating." << endl;
 	  exit (EXIT_FAILURE);
 	}
+
+      pkt->packStr ("OK");
+      rsp->putPkt (pkt);
     }
-    else if (0 == strcmp (cmd, "reset cold"))
-      {
-	// Cold reset the CPU.  Failure to reset causes us to blow up.
+  else if (0 == strcmp (cmd, "reset cold"))
+    {
+      // Cold reset the CPU.  Failure to reset causes us to blow up.
 
-	if (ITarget::ResumeRes::SUCCESS != cpu->reset (ITarget::ResetType::COLD))
-	  {
-	    cerr << "*** ABORT *** Failed to cold reset: Terminating." << endl;
-	    exit (EXIT_FAILURE);
-	  }
-      }
-    else if (0 == strcmp (cmd, "exit"))
-      {
-	// This is a bit of a kludge. It would be much better to be deleted
-	// cleanly from the top.
+      if (ITarget::ResumeRes::SUCCESS != cpu->reset (ITarget::ResetType::COLD))
+	{
+	  cerr << "*** ABORT *** Failed to cold reset: Terminating." << endl;
+	  exit (EXIT_FAILURE);
+	}
 
-	delete cpu;
-	exit (EXIT_SUCCESS);
-      }
+      pkt->packStr ("OK");
+      rsp->putPkt (pkt);
+    }
+  else if (0 == strcmp (cmd, "exit"))
+    {
+      // This is a bit of a kludge. It would be much better to be deleted
+      // cleanly from the top.
+
+      delete cpu;
+      exit (EXIT_SUCCESS);
+    }
   else if (1 == sscanf (cmd, "timeout %d", &timeout))
     {
       timeout = timeout * CLOCKS_PER_SEC;
+
+      pkt->packStr ("OK");
+      rsp->putPkt (pkt);
     }
-  else if (0 == strcmp (cmd, "cyclecount"))
+  else if (0 == strcmp (cmd, "timestamp"))
     {
       std::ostringstream  oss;
-      oss << cpu->getCycleCount () << endl;
+      time_t now_c = system_clock::to_time_t (system_clock::now ());
+      oss << put_time (localtime (&now_c), "%F %T")
+	  << endl;
       pkt->packHexstr (oss.str ().c_str ());
+      rsp->putPkt (pkt);
+
+      // Not silent, so acknowledge OK
+
+      pkt->packStr ("OK");
       rsp->putPkt (pkt);
     }
   else if (0 == strcmp (cmd, "cyclecount"))
@@ -918,6 +937,11 @@ GdbServer::rspCommand ()
       std::ostringstream  oss;
       oss << cpu->getCycleCount () << endl;
       pkt->packHexstr (oss.str ().c_str ());
+      rsp->putPkt (pkt);
+
+      // Not silent, so acknowledge OK
+
+      pkt->packStr ("OK");
       rsp->putPkt (pkt);
     }
   else if (0 == strcmp (cmd, "instrcount"))
@@ -925,6 +949,11 @@ GdbServer::rspCommand ()
       std::ostringstream  oss;
       oss << cpu->getInstrCount () << endl;
       pkt->packHexstr (oss.str ().c_str ());
+      rsp->putPkt (pkt);
+
+      // Not silent, so acknowledge OK
+
+      pkt->packStr ("OK");
       rsp->putPkt (pkt);
     }
     else if (0 == strncmp (cmd, "echo", 4))
