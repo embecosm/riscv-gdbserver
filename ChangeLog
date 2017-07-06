@@ -1,5 +1,17 @@
 2017-07-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	* targets/picorv32/Picorv32.cpp (Picorv32::getCycleCount)
+	(Picorv32::getInstrCount): Call corresponding method in
+	mPicorv32Impl.
+	* targets/picorv32/Picorv32Impl.cpp (Picorv32Impl::Picorv32Impl):
+	Initialize mInstr.
+	(Picorv32Impl::getCycleCount, Picorv32Impl::getInstrCount):
+	Created.
+	* targets/picorv32/Picorv32Impl.h (class Picorv32Impl): Add
+	getCycleCount and getInstrCount.
+
+2017-07-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* server/GdbServer.cpp: Include ctime, provide using for
 	std::localtime and std::put_time.
 	(GdbServer::rspClientRequest): Remove redundant std::chrono.

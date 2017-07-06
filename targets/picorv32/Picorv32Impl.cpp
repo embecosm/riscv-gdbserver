@@ -36,7 +36,8 @@
 Picorv32Impl::Picorv32Impl (bool  wantVcd) :
   mWantVcd (wantVcd),
   mCpuTime (0),
-  mClk (0)
+  mClk (0),
+  mInstr (0)
 {
   mCpu = new Vtestbench;
 
@@ -65,6 +66,36 @@ Picorv32Impl::~Picorv32Impl ()
 
   delete mCpu;
 }
+
+
+//! Accessor for the cycle count
+
+//! The value is set during the execution of the model.
+
+//! @return  The number of cycles executed since startup or the last cold
+//!          reset.
+
+uint64_t
+Picorv32Impl::getCycleCount () const
+{
+  return mClk;
+
+}	// Picorv32Impl::getCycleCount ()
+
+
+//! Accessor for the instruction count
+
+//! The value is set during the execution of the model.
+
+//! @return  The number of instructions executed since startup or the last cold
+//!          reset.
+
+uint64_t
+Picorv32Impl::getInstrCount () const
+{
+  return mInstr;
+
+}	// Picorv32Impl::getInstrCount ()
 
 
 // ! Step one single clock of the processor

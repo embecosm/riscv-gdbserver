@@ -39,6 +39,9 @@ class Picorv32Impl final
 
   // Accessors
 
+  uint64_t  getCycleCount () const;
+  uint64_t  getInstrCount () const;
+
   void clearTrapAndRestartInstruction (void);
   bool step (void);
   bool inReset (void) const;
@@ -77,7 +80,11 @@ class Picorv32Impl final
 
   //! Clock
 
-  unsigned int  mClk = 0;
+  uint64_t  mClk;
+
+  //! Clock
+
+  uint64_t  mInstr;
 
   //! For advancing the clock
 
