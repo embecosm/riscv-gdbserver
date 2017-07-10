@@ -59,6 +59,7 @@ RspConnection::RspConnection (int         _portNum,
   portNum (_portNum),
   traceFlags (_traceFlags),
   clientFd (-1),
+  mHavePendingBreak (false),
   mNumGetBufChars (0)
 {
 

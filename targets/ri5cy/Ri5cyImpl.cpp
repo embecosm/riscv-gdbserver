@@ -32,7 +32,8 @@
 using std::chrono::duration;
 using std::chrono::system_clock;
 using std::chrono::time_point;
-
+using std::cerr;
+using std::endl;
 
 //! Constructor.
 

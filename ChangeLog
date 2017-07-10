@@ -1,3 +1,10 @@
+2017-07-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* server/RspConnection.cpp (RspConnection::RspConnection):
+	Initialize mHavePendingBreak.
+	* targets/ri5cy/Ri5cyImpl.cpp: Add using declaration for std::cerr
+	and std::endl.
+
 2017-07-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* targets/picorv32/Picorv32.cpp (Picorv32::getCycleCount)
