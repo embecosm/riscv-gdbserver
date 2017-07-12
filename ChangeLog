@@ -1,5 +1,9 @@
 2017-07-12  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	* server/GdbServer.cpp: Add stdexcept header.
+
+2017-07-12  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* server/GdbServer.cpp (GdbServer::rspSetCommand): Make catch
 	friendlier to old compilers.
 
