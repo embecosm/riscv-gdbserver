@@ -1050,8 +1050,9 @@ GdbServer::rspSetCommand (const char* cmd)
 	{
 	  logLevel = std::stoul (tokens[1], nullptr);
 	}
-      catch (const std::invalid_argument & /* err */) // Var would be unused
+      catch (const std::invalid_argument & err)
 	{
+	  (void) err;			 // Var would otherise be unused
 	  pkt->packStr ("E01");
 	  rsp->putPkt (pkt);
 	  return;
@@ -1086,8 +1087,9 @@ GdbServer::rspSetCommand (const char* cmd)
 	  logLevel = static_cast<unsigned int> (std::stoul (tokens[1],
 							    nullptr, 0));
 	}
-      catch (const std::invalid_argument & /* err */) // Var would be unused
+      catch (const std::invalid_argument & err)
 	{
+	  (void) err;			 // Var would be unused
 	  pkt->packStr ("E03");
 	  rsp->putPkt (pkt);
 	  return;
