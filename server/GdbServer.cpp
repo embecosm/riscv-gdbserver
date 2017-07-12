@@ -43,7 +43,6 @@ using std::endl;
 using std::hex;
 using std::localtime;
 using std::ostringstream;
-using std::put_time;
 using std::setfill;
 using std::setw;
 using std::string;
@@ -920,10 +919,16 @@ GdbServer::rspCommand ()
     }
   else if (0 == strcmp (cmd, "timestamp"))
     {
+      // @todo Do this using std::put_time, which is not in pre 5.0 GCC. Not
+      // thread safe.
+
       std::ostringstream  oss;
       time_t now_c = system_clock::to_time_t (system_clock::now ());
-      oss << put_time (localtime (&now_c), "%F %T")
-	  << endl;
+      struct tm * timeinfo = localtime (&(now_c));
+      char buff[20];
+
+      strftime (buff, 20, "%F %T", timeinfo);
+      oss << buff << endl;
       pkt->packHexstr (oss.str ().c_str ());
       rsp->putPkt (pkt);
 
