@@ -1,3 +1,10 @@
+2017-07-12  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Prior to GCC 5.0 std::put_time is not supported.
+
+	* server/GdbServer.cpp: Remove using for std::put_time.
+	(GdbServer::rspCommand): Rewrite timestamp to not use put_time.
+
 2017-07-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* server/RspConnection.cpp (RspConnection::RspConnection):
