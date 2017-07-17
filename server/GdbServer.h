@@ -104,6 +104,10 @@ private:
   //! there is no need to repeatedly allocate and delete it.
   RspPacket *pkt;
 
+  //! We track the last type of packet for when we have to create an F request
+  //! and later need to either continue or step after receiving the F reply.
+  char lastPacketType;
+
   //! Hash table for matchpoints
   MpHash *mpHash;
 
@@ -114,6 +118,9 @@ private:
   void  rspClientRequest ();
 
   // Handle the various RSP requests
+  int   stringLength (uint32_t addr);
+  void  rspSyscallRequest ();
+  void  rspSyscallReply ();
   void  rspReportException (TargetSignal  sig = TargetSignal::TRAP);
   void  rspReadAllRegs ();
   void  rspWriteAllRegs ();
