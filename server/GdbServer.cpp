@@ -130,6 +130,89 @@ GdbServer::rspServer ()
 }	// rspServer ()
 
 
+//! Some F request packets want to know the length of the string
+//! argument, so we have this simple function here to calculate that.
+int
+GdbServer::stringLength (uint32_t addr)
+{
+  uint8_t ch;
+  int count = 0;
+  while (1 == cpu->read (addr + count, &ch, 1))
+  {
+    count++;
+    if (ch == 0)
+      break;
+  }
+  return count;
+}
+
+
+//! We achieve a syscall on the host by sending an F request packet to
+//! the GDB client. The arguments for the call will have already been
+//! put into registers via its newlib/libgloss implementation.
+void
+GdbServer::rspSyscallRequest ()
+{
+  // Keep track of whether we were in the middle of a Continue or Step
+  lastPacketType = pkt->data[0];
+
+  // Get the args from the appropriate regs and send an F packet
+  uint32_t a0, a1, a2, a3, a7;
+  cpu->readRegister (10, a0);
+  cpu->readRegister (11, a1);
+  cpu->readRegister (12, a2);
+  cpu->readRegister (13, a3);
+  cpu->readRegister (17, a7);
+
+  // Work out which syscall we've got
+  switch (a7) {
+    case 57   : sprintf (pkt->data, "Fclose,%x", a0);
+                break;
+    case 62   : sprintf (pkt->data, "Flseek,%x,%x,%x", a0, a1, a2);
+                break;
+    case 63   : sprintf (pkt->data, "Fread,%x,%x,%x", a0, a1, a2);
+                break;
+    case 64   : sprintf (pkt->data, "Fwrite,%x,%x,%x", a0, a1, a2);
+                break;
+    case 80   : sprintf (pkt->data, "Ffstat,%x,%x", a0, a1);
+                break;
+    case 169  : sprintf (pkt->data, "Fgettimeofday,%x,%x", a0, a1);
+                break;
+    case 1024 : sprintf (pkt->data, "Fopen,%x/%x,%x,%x", a0, stringLength (a0), a1, a2);
+                break;
+    case 1026 : sprintf (pkt->data, "Funlink,%x/%x", a0, stringLength (a0));
+                break;
+    case 1038 : sprintf (pkt->data, "Fstat,%x/%x,%x", a0, stringLength (a0), a1);
+                break;
+    default   : rspReportException (TargetSignal::TRAP);
+                return;
+  }
+
+  // Send the packet
+  pkt->setLen (strlen (pkt->data));
+  rsp->putPkt (pkt);
+}
+
+
+//! The F reply is sent by the GDB client to us after a syscall has been handled.
+void
+GdbServer::rspSyscallReply ()
+{
+  uint32_t  retvalue;
+
+  // Get the return value from the F reply
+  if (1 != sscanf (pkt->data, "F%x", &retvalue))
+  {
+    cerr << "Freply received unexpected amount of variables" << endl;
+  }
+
+  // TODO: fstat currently returns -1 after resetting and re-loading within a single GDB session
+  //       which causes GCC regression tests to fail, so we sidestep it here with a HACK.
+  if (retvalue != -1)
+    cpu->writeRegister (10, retvalue);
+}
+
+
 //! Deal with a request from the GDB client session
 
 //! In general, apart from the simplest requests, this function replies on
@@ -183,9 +266,13 @@ GdbServer::rspClientRequest ()
 	   << "packets instead): ignored" << endl;
       return;
 
+    case 'F':
+      // Handle the syscall reply then continue
+      rspSyscallReply ();
+      // intentionally carry on here rather than break
+
     case 'c':
     case 'C':
-
       // Continue.  We have two timeouts to worry about.  The first is any
       // timeout set by the user (through "monitor timeout", the second is a
       // timeout for checking for crtl-C.
@@ -220,13 +307,9 @@ GdbServer::rspClientRequest ()
 	      {
 	      case ITarget::ResumeRes::SYSCALL:
 
-		// @todo Waiting for syscall. Should not occur, if it does, we
-		// treat it as a trap.
-
-		cerr << "Warning: Unexpected SYSCALL return in 'c' packet: "
-		     << "treating as TRAP." << endl;
-
-		rspReportException (TargetSignal::INT);
+		// We have changed all support syscalls to have a nop,ebreak,nop which was caught
+		// in Ri5cyImpl.cc and then SYSCALL was returned (to get us to this point)
+ 		rspSyscallRequest ();
 		return;
 
 	      case ITarget::ResumeRes::INTERRUPTED:
@@ -284,12 +367,6 @@ GdbServer::rspClientRequest ()
       pkt->packStr("OK");
       rsp->putPkt (pkt);
       rsp->rspClose ();
-      return;
-
-    case 'F':
-      // File I/O is not currently supported
-      cerr << "Warning: RSP file I/O not currently supported: 'F' "
-	   << "packet ignored" << endl;
       return;
 
     case 'g':

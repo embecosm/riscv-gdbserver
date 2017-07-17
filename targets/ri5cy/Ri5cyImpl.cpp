@@ -653,7 +653,25 @@ Ri5cyImpl::runToBreak (duration <double>  timeout,
     else
       clockModel ();
 
-  return ITarget::ResumeRes::INTERRUPTED;
+  // Find out where we stopped, so we can look for our Syscall pattern planted
+  // within newlib/libgloss.
+  uint32_t stoppedAddress = readDebugReg (DBG_PPC);
+
+  // The pattern we've used in newlib/libgloss for each supported syscall
+  // is an ebreak with a nop before and after it. (It would ordinarily have
+  // been an ecall, which is less straightforward to handle when doing
+  // file I/O within GDB on bare-metal.)
+  if (mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress-4) == 0x13 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress-3) == 0 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress-2) == 0 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress-1) == 0 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress+4) == 0x13 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress+5) == 0 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress+6) == 0 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress+7) == 0)
+    return ITarget::ResumeRes::SYSCALL;
+  else
+    return ITarget::ResumeRes::INTERRUPTED;
 
 }	// Ri5cyImpl::runToBreak ()
 
