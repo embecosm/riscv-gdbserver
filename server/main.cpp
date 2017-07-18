@@ -184,8 +184,11 @@ main (int   argc,
 double
 sc_time_stamp ()
 {
-  return cpu->timeStamp ();
-
+  // If we are called before cpu has been constructed, return 0.0
+  if (cpu != 0)
+    return cpu->timeStamp ();
+  else
+    return 0.0;
 }
 
 

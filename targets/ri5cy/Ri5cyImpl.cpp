@@ -415,13 +415,12 @@ Ri5cyImpl::command (const std::string  cmd __attribute__ ((unused)),
 
 //! We count in nanoseconds.
 
-//! @return  The time in seconds
+//! @return  The time in nanoseconds (as specified in Verilator user manual)
 
 double
 Ri5cyImpl::timeStamp ()
 {
-  return static_cast<double> (mCpuTime) / 1.0e-9;
-
+  return mCpuTime;
 }	// Ri5cyImpl::timeStamp ()
 
 
@@ -436,20 +435,18 @@ Ri5cyImpl::clockModel ()
   mCpu->clk_i = 0;
   mCpu->eval ();
 
+  mCpuTime += CLK_PERIOD_NS / 2;
+
   if (mWantVcd)
-    {
-      mCpuTime += CLK_PERIOD_NS / 2;
-      mTfp->dump (mCpuTime);
-    }
+    mTfp->dump (mCpuTime);
 
   mCpu->clk_i = 1;
   mCpu->eval ();
 
+  mCpuTime += CLK_PERIOD_NS / 2;
+
   if (mWantVcd)
-    {
-      mCpuTime += CLK_PERIOD_NS / 2;
-      mTfp->dump (mCpuTime);
-    }
+    mTfp->dump (mCpuTime);
 
   mCycleCnt++;
 
