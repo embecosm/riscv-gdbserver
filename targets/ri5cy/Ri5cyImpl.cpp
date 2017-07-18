@@ -172,6 +172,9 @@ Ri5cyImpl::reset (ITarget::ResetType  type)
     {
       mCycleCnt = 0;
       mInstrCnt = 0;
+
+      // Reset the time to make it consistent with the other counters
+      mCpuTime = 0;
     }
 
   resetModel ();
@@ -413,7 +416,7 @@ Ri5cyImpl::command (const std::string  cmd __attribute__ ((unused)),
 
 //! Provide a time stamp (needed for $time)
 
-//! We count in nanoseconds.
+//! We count in nanoseconds since (cold) reset.
 
 //! @return  The time in nanoseconds (as specified in Verilator user manual)
 
