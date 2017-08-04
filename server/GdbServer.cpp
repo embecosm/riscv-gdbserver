@@ -79,7 +79,7 @@ static const int RSP_PKT_SIZE =
 //! @param[in] _cpu         The simulated CPU
 //! @param[in] _traceFlags  Flags controlling tracing
 
-GdbServer::GdbServer (int rspPort,
+GdbServer::GdbServer (AbstractConnection * _conn,
 		      ITarget * _cpu,
 		      TraceFlags * _traceFlags) :
   cpu (_cpu),
@@ -87,7 +87,7 @@ GdbServer::GdbServer (int rspPort,
   timeout (duration <double>::zero ())
 {
   pkt       = new RspPacket (RSP_PKT_SIZE);
-  rsp       = new RspConnection (rspPort, traceFlags);
+  rsp       = _conn;
   mpHash    = new MpHash ();
 
 }	// GdbServer ()
