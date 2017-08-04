@@ -129,6 +129,8 @@ am_riscv_gdbserver_OBJECTS = riscv_gdbserver-GdbServer.$(OBJEXT) \
 	riscv_gdbserver-main.$(OBJEXT) \
 	riscv_gdbserver-MpHash.$(OBJEXT) \
 	riscv_gdbserver-RspConnection.$(OBJEXT) \
+	riscv_gdbserver-StreamConnection.$(OBJEXT) \
+	riscv_gdbserver-AbstractConnection.$(OBJEXT) \
 	riscv_gdbserver-RspPacket.$(OBJEXT) \
 	riscv_gdbserver-TraceFlags.$(OBJEXT) \
 	riscv_gdbserver-Utils.$(OBJEXT)
@@ -354,6 +356,10 @@ riscv_gdbserver_SOURCES = GdbServer.cpp     \
                           MpHash.h          \
                           RspConnection.cpp \
                           RspConnection.h   \
+                          StreamConnection.cpp \
+                          StreamConnection.h   \
+                          AbstractConnection.cpp \
+                          AbstractConnection.h \
                           RspPacket.cpp     \
                           RspPacket.h       \
                           TraceFlags.cpp    \
@@ -469,10 +475,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-AbstractConnection.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-GdbServer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-MpHash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-RspConnection.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-RspPacket.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-StreamConnection.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-TraceFlags.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-Utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-main.Po@am__quote@
@@ -553,6 +561,34 @@ riscv_gdbserver-RspConnection.obj: RspConnection.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='RspConnection.cpp' object='riscv_gdbserver-RspConnection.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-RspConnection.obj `if test -f 'RspConnection.cpp'; then $(CYGPATH_W) 'RspConnection.cpp'; else $(CYGPATH_W) '$(srcdir)/RspConnection.cpp'; fi`
+
+riscv_gdbserver-StreamConnection.o: StreamConnection.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-StreamConnection.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-StreamConnection.Tpo -c -o riscv_gdbserver-StreamConnection.o `test -f 'StreamConnection.cpp' || echo '$(srcdir)/'`StreamConnection.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-StreamConnection.Tpo $(DEPDIR)/riscv_gdbserver-StreamConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='StreamConnection.cpp' object='riscv_gdbserver-StreamConnection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-StreamConnection.o `test -f 'StreamConnection.cpp' || echo '$(srcdir)/'`StreamConnection.cpp
+
+riscv_gdbserver-StreamConnection.obj: StreamConnection.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-StreamConnection.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-StreamConnection.Tpo -c -o riscv_gdbserver-StreamConnection.obj `if test -f 'StreamConnection.cpp'; then $(CYGPATH_W) 'StreamConnection.cpp'; else $(CYGPATH_W) '$(srcdir)/StreamConnection.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-StreamConnection.Tpo $(DEPDIR)/riscv_gdbserver-StreamConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='StreamConnection.cpp' object='riscv_gdbserver-StreamConnection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-StreamConnection.obj `if test -f 'StreamConnection.cpp'; then $(CYGPATH_W) 'StreamConnection.cpp'; else $(CYGPATH_W) '$(srcdir)/StreamConnection.cpp'; fi`
+
+riscv_gdbserver-AbstractConnection.o: AbstractConnection.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-AbstractConnection.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-AbstractConnection.Tpo -c -o riscv_gdbserver-AbstractConnection.o `test -f 'AbstractConnection.cpp' || echo '$(srcdir)/'`AbstractConnection.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-AbstractConnection.Tpo $(DEPDIR)/riscv_gdbserver-AbstractConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='AbstractConnection.cpp' object='riscv_gdbserver-AbstractConnection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-AbstractConnection.o `test -f 'AbstractConnection.cpp' || echo '$(srcdir)/'`AbstractConnection.cpp
+
+riscv_gdbserver-AbstractConnection.obj: AbstractConnection.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-AbstractConnection.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-AbstractConnection.Tpo -c -o riscv_gdbserver-AbstractConnection.obj `if test -f 'AbstractConnection.cpp'; then $(CYGPATH_W) 'AbstractConnection.cpp'; else $(CYGPATH_W) '$(srcdir)/AbstractConnection.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-AbstractConnection.Tpo $(DEPDIR)/riscv_gdbserver-AbstractConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='AbstractConnection.cpp' object='riscv_gdbserver-AbstractConnection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-AbstractConnection.obj `if test -f 'AbstractConnection.cpp'; then $(CYGPATH_W) 'AbstractConnection.cpp'; else $(CYGPATH_W) '$(srcdir)/AbstractConnection.cpp'; fi`
 
 riscv_gdbserver-RspPacket.o: RspPacket.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-RspPacket.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-RspPacket.Tpo -c -o riscv_gdbserver-RspPacket.o `test -f 'RspPacket.cpp' || echo '$(srcdir)/'`RspPacket.cpp

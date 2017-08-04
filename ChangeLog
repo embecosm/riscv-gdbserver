@@ -1,5 +1,44 @@
 2017-08-04  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/AbstractConnection.cpp: New file.
+	* server/AbstractConnection.h: New file.
+	* server/GdbServer.cpp (GdbServer::GdbServer): Takes connection
+	object instead of port number.
+	* server/GdbServer.h (GdbServer::GdbServer): Takes connection
+	object instead of port number.
+	(GdbServer::rsp): Is now an AbstractConnection.
+	* server/Makefile.am (riscv_gdbserver_SOURCES): Add new files.
+	* server/Makefile.in: Regenerate.
+	* server/RspConnection.cpp (RspConnection::RspConnection): Update
+	initialisation list.
+	(RspConnection::getPkt): Move to AbstractConnection.cpp.
+	(RspConnection::putPkt): Likewise.
+	(RspConnection::putRspChar): Likewise.
+	(RspConnection::getRspChar): Likewise.
+	(RspConnection::haveBreak): Likewise.
+	* server/RspConnection.h: Add include.
+	(class RspConnection): Add parent class.
+	(getPkt): Moved to AbstractConnection.h.
+	(putPkt): Likewise.
+	(haveBreak): Likewise.
+	(BREAK_CHAR): Likewise.
+	(traceFlags): Likewise.
+	(mHavePendingBreak): Likewise.
+	(mGetCharBuf): Likewise.
+	(mNumGetBufChars): Likewise.
+	(putRspChar): Likewise.
+	(getRspChar): Likewise.
+	(putRspCharRaw): Mark as virtual.
+	(getRspCharRaw): Likewise.
+	* server/StreamConnection.cpp: New file.
+	* server/StreamConnection.h: New file.
+	* server/main.cpp: New includes.
+	(usage): Add new options.
+	(main): Handle new --stdin/s option, create a connection object of
+	the correct type, and pass this to gdbserver.
+
+2017-08-04  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/main.cpp (main): Check for null coreName.
 
 2017-07-12  Jeremy Bennett  <jeremy.bennett@embecosm.com>
