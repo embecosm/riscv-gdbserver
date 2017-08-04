@@ -132,7 +132,7 @@ main (int   argc,
 
   // 1 positional arg
 
-  if ((argc - optind) != 1)
+  if ((argc - optind) != 1 || coreName == nullptr)
     {
       usage (cerr);
       return  EXIT_FAILURE;
