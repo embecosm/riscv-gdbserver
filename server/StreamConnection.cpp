@@ -1,8 +1,6 @@
 // Remote Serial Protocol connection: implementation
 
-// Copyright (C) 2009, 2013  Embecosm Limited <info@embecosm.com>
-
-// Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+// Copyright (C) 2017  Embecosm Limited <info@embecosm.com>
 
 // This file is part of the RISC-V GDB server
 
@@ -27,15 +25,10 @@
 #include <csignal>
 #include <cstring>
 
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <sys/socket.h>
-#include <poll.h>
+#include <sys/select.h>
 #include <unistd.h>
 
-#include "RspConnection.h"
+#include "StreamConnection.h"
 #include "Utils.h"
 
 using std::cerr;
@@ -54,24 +47,20 @@ using std::setw;
 
 //! @param[in] _portNum     the port number to connect to
 //! @param[in] _traceFlags  flags controlling tracing
-RspConnection::RspConnection (int         _portNum,
-			      TraceFlags *_traceFlags) :
-  AbstractConnection (_traceFlags),
-  portNum (_portNum),
-  clientFd (-1)
+StreamConnection::StreamConnection (TraceFlags *_traceFlags) :
+  AbstractConnection (_traceFlags)
 {
-
-}	// RspConnection ()
+  // Nothing.
+}	// StreamConnection ()
 
 
 //! Destructor
 
 //! Close the connection if it is still open
-RspConnection::~RspConnection ()
+StreamConnection::~StreamConnection ()
 {
   this->rspClose ();		// Don't confuse with any other close ()
-
-}	// ~RspConnection ()
+}	// ~StreamConnection ()
 
 
 //! Get a new client connection.
@@ -96,90 +85,20 @@ RspConnection::~RspConnection ()
 //! @return  TRUE if the connection was established or can be retried. FALSE
 //!          if the error was so serious the program must be aborted.
 bool
-RspConnection::rspConnect ()
+StreamConnection::rspConnect ()
 {
-  // Open a socket on which we'll listen for clients
-  int  tmpFd = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if (tmpFd < 0)
-    {
-      cerr << "ERROR: Cannot open RSP socket" << endl;
-      return  false;
-    }
-
-  // Allow rapid reuse of the port on this socket
-  int  optval = 1;
-  setsockopt (tmpFd, SOL_SOCKET, SO_REUSEADDR, (char *)&optval,
-	      sizeof (optval));
-
-  // Bind the port to the socket
-  struct sockaddr_in  sockAddr;
-  sockAddr.sin_family      = PF_INET;
-  sockAddr.sin_port        = htons (portNum);
-  sockAddr.sin_addr.s_addr = INADDR_ANY;
-
-  if (bind (tmpFd, (struct sockaddr *) &sockAddr, sizeof (sockAddr)))
-    {
-      cerr << "ERROR: Cannot bind to RSP socket" << endl;
-      return  false;
-    }
-
-  // Listen for (at most one) client
-  if (listen (tmpFd, 1))
-    {
-      cerr << "ERROR: Cannot listen on RSP socket" << endl;
-      return  false;
-    }
-
-  if (! traceFlags->traceSilent ())
-    cout << "Listening for RSP on port " <<  portNum << endl << flush;
-
-  // Accept a client which connects
-  socklen_t  len = sizeof (sockAddr);		// Size of the socket address
-  clientFd = accept (tmpFd, (struct sockaddr *)&sockAddr, &len);
-
-  if (-1 == clientFd)
-    {
-	cerr << "Warning: Failed to accept RSP client: " << strerror (errno)
-	     << endl;
-      return  true;			// OK to retry
-    }
-
-  // Enable TCP keep alive process
-  optval = 1;
-  setsockopt (clientFd, SOL_SOCKET, SO_KEEPALIVE, (char *)&optval,
-	      sizeof (optval));
-
-  // Don't delay small packets, for better interactive response (disable
-  // Nagel's algorithm)
-  optval = 1;
-  setsockopt (clientFd, IPPROTO_TCP, TCP_NODELAY, (char *)&optval,
-	      sizeof (optval));
-
-  // Socket is no longer needed
-  close (tmpFd);			// No longer need this
-  signal (SIGPIPE, SIG_IGN);		// So we don't exit if client dies
-
-  if (! traceFlags->traceSilent ())
-    cout << "Remote debugging from host " << inet_ntoa (sockAddr.sin_addr)
-	 << endl;
-
-  return true;
-
+  // There's no way to connect, we rely on stdin / stdout being passe into
+  // the process, we're connected from the start.  As we currently always
+  // report that we're connected this should never be called.
+  return false;
 }	// rspConnect ()
 
 
 //! Close a client connection if it is open
 void
-RspConnection::rspClose ()
+StreamConnection::rspClose ()
 {
-  if (isConnected ())
-    {
-      if (! traceFlags->traceSilent ())
-	cout << "Closing connection" << endl;
-
-      close (clientFd);
-      clientFd = -1;
-    }
+  abort ();
 }	// rspClose ()
 
 
@@ -187,9 +106,11 @@ RspConnection::rspClose ()
 
 //! @return  TRUE if we are connected, FALSE otherwise
 bool
-RspConnection::isConnected ()
+StreamConnection::isConnected ()
 {
-  return -1 != clientFd;
+  // TODO: We're only closed if stdin or stdout are closed.  Is this
+  // something we care about?  For now just say we're always connected.
+  return true;
 
 }	// isConnected ()
 
@@ -203,20 +124,13 @@ RspConnection::isConnected ()
 //! @return  TRUE if char sent OK, FALSE if not (communications failure)
 
 bool
-RspConnection::putRspCharRaw (char  c)
+StreamConnection::putRspCharRaw (char  c)
 {
-  if (-1 == clientFd)
-    {
-      cerr << "Warning: Attempt to write '" << c
-		<< "' to unopened RSP client: Ignored" << endl;
-      return  false;
-    }
-
   // Write until successful (we retry after interrupts) or catastrophic
   // failure.
   while (true)
     {
-      switch (write (clientFd, &c, sizeof (c)))
+      switch (write (STDOUT_FILENO, &c, sizeof (c)))
 	{
 	case -1:
 	  // Error: only allow interrupts or would block
@@ -250,29 +164,31 @@ RspConnection::putRspCharRaw (char  c)
 //!          block, and blocking is true.
 
 int
-RspConnection::getRspCharRaw (bool blocking)
+StreamConnection::getRspCharRaw (bool blocking)
 {
-  if (-1 == clientFd)
-    {
-      cerr << "Warning: Attempt to read from "
-  	   << "unopened RSP client: Ignored" << endl;
-      return  -1;
-    }
-
   // Blocking read until successful (we retry after interrupts) or
   // catastrophic failure.
 
   for (;;)
     {
       unsigned char  c;
+      int res;
+      struct timeval timeout;
+      fd_set readfds;
 
-      switch (recv (clientFd, &c, sizeof (c), (blocking ? 0 : MSG_DONTWAIT)))
+      timeout.tv_sec = 0;
+      timeout.tv_usec = 0;
+
+      FD_ZERO (&readfds);
+      FD_SET (STDIN_FILENO, &readfds);
+
+      res = select (STDIN_FILENO + 1,
+                    &readfds, NULL, NULL,
+                    (blocking ? NULL : &timeout));
+
+      switch (res)
   	{
   	case -1:
-	  if (!blocking
-	      && (errno == EAGAIN || errno == EWOULDBLOCK))
-	    return -1;
-
   	  // Error: only allow interrupts
 
   	  if (EINTR != errno)
@@ -285,9 +201,12 @@ RspConnection::getRspCharRaw (bool blocking)
   	  break;
 
   	case 0:
+          // Timeout, only happens in the blocking case.
   	  return  -1;
 
   	default:
+          if (read (STDIN_FILENO, &c, sizeof (c)) == -1)
+            return -1;
   	  return  c & 0xff;	// Success, we can return (no sign extend!)
   	}
     }

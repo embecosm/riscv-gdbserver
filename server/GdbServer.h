@@ -52,7 +52,7 @@ class GdbServer
 public:
 
   // Constructor and destructor
-  GdbServer (int  rspPort,
+  GdbServer (AbstractConnection * _conn,
 	     ITarget * _cpu,
 	     TraceFlags * _traceFlags);
   ~GdbServer ();
@@ -97,8 +97,8 @@ private:
   //! Our trace flags
   TraceFlags *traceFlags;
 
-  //! Our associated RSP interface (which we create)
-  RspConnection *rsp;
+  //! Our associated RSP interface
+  AbstractConnection *rsp;
 
   //! The packet pointer. There is only ever one packet in use at one time, so
   //! there is no need to repeatedly allocate and delete it.
