@@ -453,6 +453,12 @@ Ri5cyImpl::clockModel ()
 
   mCycleCnt++;
 
+  // IGB-TODO: This should be going in a file really, but that can be added after I've got it disassembling (the hard part)
+  if (mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->id_valid_o)
+  {
+    printf ("TRACE: %08lu %08x %08x\n", mCycleCnt, mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->pc_id_i, mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->instr);
+  }
+
 }	// Ri5cyImpl::clockModel ()
 
 
