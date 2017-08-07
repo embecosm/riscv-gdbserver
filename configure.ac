@@ -90,6 +90,22 @@ AC_ARG_WITH(
 AC_SUBST(MDIR_RI5CY)
 AC_SUBST(MODNAME_RI5CY)
 
+# We need to know where to find our binutils source and binutils libraries
+AC_ARG_WITH(
+	[binutils-srcdir],
+	AC_HELP_STRING([--with-binutils-srcdir],
+	               [root directory for headers from binutils source]),
+	[BINUTILS_SRCDIR="$(cd $withval; pwd)"],
+	[AC_MSG_FAILURE(Binutils source directory not specified)])
+AC_ARG_WITH(
+	[binutils-libdir],
+	AC_HELP_STRING([--with-binutils-libdir],
+	               [installation directory for binutils libraries]),
+	[BINUTILS_LIBDIR="$withval"],
+	[AC_MSG_FAILURE(Binutils library directory not specified)])
+AC_SUBST(BINUTILS_SRCDIR)
+AC_SUBST(BINUTILS_LIBDIR)
+
 # This is GNU compliant source and uses GNU libraries
 AC_DEFINE(_GNU_SOURCE, 1, "The source code uses the GNU libraries)
 
