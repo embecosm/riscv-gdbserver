@@ -124,7 +124,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libri5cy_la_LIBADD =
-am_libri5cy_la_OBJECTS = libri5cy_la-Ri5cy.lo libri5cy_la-Ri5cyImpl.lo
+am_libri5cy_la_OBJECTS = libri5cy_la-Disassembler.lo \
+	libri5cy_la-Ri5cy.lo libri5cy_la-Ri5cyImpl.lo
 libri5cy_la_OBJECTS = $(am_libri5cy_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -221,6 +222,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BINUTILS_INCDIR = @BINUTILS_INCDIR@
+BINUTILS_LIBDIR = @BINUTILS_LIBDIR@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -339,14 +342,17 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libri5cy.la
-libri5cy_la_SOURCES = Ri5cy.cpp     \
-                      Ri5cy.h       \
-                      Ri5cyImpl.cpp \
+libri5cy_la_SOURCES = Disassembler.h   \
+                      Disassembler.cpp \
+                      Ri5cy.cpp        \
+                      Ri5cy.h          \
+                      Ri5cyImpl.cpp    \
                       Ri5cyImpl.h
 
 libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra    \
                           -I$(srcdir)/..        \
                           -I$(srcdir)/../common \
+                          -I$(BINUTILS_INCDIR)  \
 			  -I@MDIR_RI5CY@
 
 all: all-am
@@ -403,6 +409,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libri5cy_la-Disassembler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libri5cy_la-Ri5cy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libri5cy_la-Ri5cyImpl.Plo@am__quote@
 
@@ -426,6 +433,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+libri5cy_la-Disassembler.lo: Disassembler.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libri5cy_la_CXXFLAGS) $(CXXFLAGS) -MT libri5cy_la-Disassembler.lo -MD -MP -MF $(DEPDIR)/libri5cy_la-Disassembler.Tpo -c -o libri5cy_la-Disassembler.lo `test -f 'Disassembler.cpp' || echo '$(srcdir)/'`Disassembler.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libri5cy_la-Disassembler.Tpo $(DEPDIR)/libri5cy_la-Disassembler.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Disassembler.cpp' object='libri5cy_la-Disassembler.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libri5cy_la_CXXFLAGS) $(CXXFLAGS) -c -o libri5cy_la-Disassembler.lo `test -f 'Disassembler.cpp' || echo '$(srcdir)/'`Disassembler.cpp
 
 libri5cy_la-Ri5cy.lo: Ri5cy.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libri5cy_la_CXXFLAGS) $(CXXFLAGS) -MT libri5cy_la-Ri5cy.lo -MD -MP -MF $(DEPDIR)/libri5cy_la-Ri5cy.Tpo -c -o libri5cy_la-Ri5cy.lo `test -f 'Ri5cy.cpp' || echo '$(srcdir)/'`Ri5cy.cpp

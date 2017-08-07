@@ -1,3 +1,35 @@
+2017-08-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Fix the automake files for using disassembly.  The issue was that
+	binutils dis-asm.h did not have print_insn_riscv marked as for
+	external use.  Once that is resolved these changes allow the
+	server to build.
+
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+	* configure.ac: Cleanly define BINUTILS_INCDIR and BINUTILS_LIBDIR
+	* server/Makefile.am: No need for libibert in LDADD
+	* server/Makefile.in: Regenerated.
+	* targets/Makefile.in: Regenerated.
+	* targets/common/Makefile.in: Regenerated.
+	* targets/ri5cy/Disassembler.cpp: Add license header, use C++
+	style C includes.
+	* targets/ri5cy/Disassembler.h (class Disassembler): Add license
+	header, use C++ style C includes
+	* targets/ri5cy/Makefile.am: Simplify includes dir for binutils
+	utils.
+	* targets/ri5cy/Makefile.in: Regenerated.
+
+2017-08-07  Ian Bolton  <ian.bolton@embecosm.com>
+
+	* configure.ac: Some new configure parameters.
+	* server/Makefile.am: Bring in required binutils libraries.
+	* targets/ri5cy/Disassembler.cpp: New file.
+	* targets/ri5cy/Disassembler.h: New file.
+	* targets/ri5cy/Makefile.am: Compile new files.
+	* targets/ri5cy/Ri5cyImpl.cpp: Call into Disassembler.
+	* targets/ri5cy/Ri5cyImpl.h: New Disassembler member.
+
 2017-08-04  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/AbstractConnection.cpp: New file.
