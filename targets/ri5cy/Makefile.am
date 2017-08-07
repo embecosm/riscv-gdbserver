@@ -28,12 +28,8 @@ libri5cy_la_SOURCES = Disassembler.h   \
                       Ri5cyImpl.cpp    \
                       Ri5cyImpl.h
 
-libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra           \
-                          -I$(srcdir)/..               \
-                          -I$(srcdir)/../common        \
-                          -I$(BINUTILS_SRCDIR)/opcodes \
-                          -I$(BINUTILS_SRCDIR)/bfd     \
-                          -I$(BINUTILS_LIBDIR)/include \
+libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra    \
+                          -I$(srcdir)/..        \
+                          -I$(srcdir)/../common \
+                          -I$(BINUTILS_INCDIR)  \
 			  -I@MDIR_RI5CY@
-
-#libri5cy_la_LDFLAGS = -L$(BINUTILS_LIBDIR)/lib -lopcodes -lbfd -liberty

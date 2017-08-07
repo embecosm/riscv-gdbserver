@@ -43,9 +43,6 @@ AC_PROG_INSTALL
 # Add -Werror to the CXXFLAGS. For now this is not configurable.
 CXXFLAGS="$CXXFLAGS -Werror -std=gnu++11"
 
-# Add the supplied VTESTBENCH dir to CPPFLAGS
-#CPPFLAGS="$CPPFLAGS -I$VTESTBENCH"
-
 # We need to know where the generic verilator headers are
 AC_ARG_WITH(
 	[verilator-headers],
@@ -92,18 +89,18 @@ AC_SUBST(MODNAME_RI5CY)
 
 # We need to know where to find our binutils source and binutils libraries
 AC_ARG_WITH(
-	[binutils-srcdir],
-	AC_HELP_STRING([--with-binutils-srcdir],
-	               [root directory for headers from binutils source]),
-	[BINUTILS_SRCDIR="$(cd $withval; pwd)"],
-	[AC_MSG_FAILURE(Binutils source directory not specified)])
+	[binutils-incdir],
+	AC_HELP_STRING([--with-binutils-incdir],
+	               [include directory for binutils utilities]),
+	[BINUTILS_INCDIR="$(cd $withval; pwd)"],
+	[AC_MSG_FAILURE(Binutils include directory not specified)])
 AC_ARG_WITH(
 	[binutils-libdir],
 	AC_HELP_STRING([--with-binutils-libdir],
 	               [installation directory for binutils libraries]),
-	[BINUTILS_LIBDIR="$withval"],
+	[BINUTILS_LIBDIR="$(cd $withval; pwd)"],
 	[AC_MSG_FAILURE(Binutils library directory not specified)])
-AC_SUBST(BINUTILS_SRCDIR)
+AC_SUBST(BINUTILS_INCDIR)
 AC_SUBST(BINUTILS_LIBDIR)
 
 # This is GNU compliant source and uses GNU libraries

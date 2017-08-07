@@ -638,6 +638,8 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 VTESTBENCH
+BINUTILS_LIBDIR
+BINUTILS_INCDIR
 MODNAME_RI5CY
 MDIR_RI5CY
 MODNAME_PICORV32
@@ -780,6 +782,8 @@ with_picorv32_modeldir
 with_picorv32_topmodule
 with_ri5cy_modeldir
 with_ri5cy_topmodule
+with_binutils_incdir
+with_binutils_libdir
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1444,6 +1448,8 @@ Optional Packages:
                           Name of the top module in the PicoRV32 Verilog
   --with-ri5cy-modeldir   directory containing the RI5CY model & headers
   --with-ri5cy-topmodule  Name of the top module in the RI5CY Verilog
+  --with-binutils-incdir  include directory for binutils utilities
+  --with-binutils-libdir  installation directory for binutils libraries
 
 Some influential environment variables:
   CC          C compiler command
@@ -15865,9 +15871,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 # Add -Werror to the CXXFLAGS. For now this is not configurable.
 CXXFLAGS="$CXXFLAGS -Werror -std=gnu++11"
 
-# Add the supplied VTESTBENCH dir to CPPFLAGS
-#CPPFLAGS="$CPPFLAGS -I$VTESTBENCH"
-
 # We need to know where the generic verilator headers are
 
 # Check whether --with-verilator-headers was given.
@@ -15929,6 +15932,32 @@ else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "RI5CY top module not specified
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+
+
+# We need to know where to find our binutils source and binutils libraries
+
+# Check whether --with-binutils-incdir was given.
+if test "${with_binutils_incdir+set}" = set; then :
+  withval=$with_binutils_incdir; BINUTILS_INCDIR="$(cd $withval; pwd)"
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Binutils include directory not specified
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+# Check whether --with-binutils-libdir was given.
+if test "${with_binutils_libdir+set}" = set; then :
+  withval=$with_binutils_libdir; BINUTILS_LIBDIR="$(cd $withval; pwd)"
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Binutils library directory not specified
 See \`config.log' for more details" "$LINENO" 5; }
 fi
 
