@@ -40,11 +40,12 @@ riscv_gdbserver_SOURCES = GdbServer.cpp     \
 # the actual models.
 
 riscv_gdbserver_LDADD = ../targets/libtargets.la                   \
-                        @MDIR_PICORV32@/verilated.o                \
-                        @MDIR_PICORV32@/verilated_vcd_c.o          \
-                        @MDIR_PICORV32@/verilated_dpi.o            \
+                        @MDIR_RI5CY@/verilated.o                   \
+                        @MDIR_RI5CY@/verilated_vcd_c.o             \
+                        @MDIR_RI5CY@/verilated_dpi.o               \
                         @MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a \
-                        @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a
+                        @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a       \
+                        -L$(BINUTILS_LIBDIR)/lib -lopcodes -lbfd   
 
 riscv_gdbserver_CPPFLAGS = -I$(top_srcdir)/targets          \
                            -I$(top_srcdir)/targets/common   \

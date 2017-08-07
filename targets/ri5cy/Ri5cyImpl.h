@@ -28,6 +28,7 @@
 #include "ITarget.h"
 #include "Vtop.h"
 
+class Disassembler;
 
 //! The RI5CY implementation class.
 
@@ -140,6 +141,10 @@ private:
   //! Top level Verilator model.
 
   Vtop * mCpu;
+
+  //! Disassembler for tracing of instructions executed
+
+  Disassembler * disasm;
 
   //! Is the core halted?
 

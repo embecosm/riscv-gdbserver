@@ -28,6 +28,7 @@
 #include "verilated_vcd_c.h"
 #include "Vtop.h"
 #include "Vtop__Syms.h"
+#include "Disassembler.h"
 
 using std::chrono::duration;
 using std::chrono::system_clock;
@@ -48,6 +49,7 @@ Ri5cyImpl::Ri5cyImpl (bool  wantVcd) :
   mCpuTime (0)
 {
   mCpu = new Vtop;
+  disasm = new Disassembler;
 
   // Open VCD file if requested
 
@@ -78,7 +80,7 @@ Ri5cyImpl::~Ri5cyImpl ()
     mTfp->close ();
 
   delete mCpu;
-
+  delete disasm;
 }	// Ri5cyImpl::~Ri5cyImpl ()
 
 
@@ -456,6 +458,9 @@ Ri5cyImpl::clockModel ()
   // IGB-TODO: This should be going in a file really, but that can be added after I've got it disassembling (the hard part)
   if (mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->id_valid_o)
   {
+    // IGB-TODO: We should pass the stream into this really, but for now we just want to link into the disassembler 
+    disasm->disassemble_riscv (mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->instr);
+    // IGB-TODO: This should go into a file and also include the disassembly
     printf ("TRACE: %08lu %08x %08x\n", mCycleCnt, mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->pc_id_i, mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->instr);
   }
 
