@@ -455,15 +455,11 @@ Ri5cyImpl::clockModel ()
 
   mCycleCnt++;
 
-  // IGB-TODO: This should be going in a file really, but that can be added after I've got it disassembling (the hard part)
-  if (mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->id_valid_o)
-  {
-    // IGB-TODO: We should pass the stream into this really, but for now we just want to link into the disassembler 
-    disasm->disassemble_riscv (mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->instr);
-    // IGB-TODO: This should go into a file and also include the disassembly
-    printf ("TRACE: %08lu %08x %08x\n", mCycleCnt, mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->pc_id_i, mCpu->top->core_label__BRA__0__KET____DOT__riscv_core_i->id_stage_i->instr);
-  }
-
+  // IGB-TODO: We should pass the stream into this really, but for now we just want to link into the disassembler
+  //           This the correct parts of the model are not yet exposed, we simply pass nop every time
+  uint32_t nop = 0x00000013;
+  disasm->disassemble_riscv (nop);
+  printf ("\n");
 }	// Ri5cyImpl::clockModel ()
 
 
