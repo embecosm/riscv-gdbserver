@@ -51,7 +51,6 @@ class Cpu final
 		 uint32_t     val);
   uint32_t readProgramAddr () const;
   void writeProgramAddr (uint32_t addr);
-  uint32_t getLifetimeCounter();
 
  private:
 

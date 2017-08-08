@@ -761,9 +761,14 @@ GdbServer::rspCommand ()
   else if (0 == strcmp (cmd, "timestamp"))
     {
       std::ostringstream  oss;
+      cout << "Timestamp NOT IMPLEMENTED" << endl;
+      /*
+      oss << "Cycles since last call: " << cpu->getCycleCounter () << endl;
+      pkt->packHexstr (oss.str ().c_str ());
       oss << "Cycles since reset:     " << cpu->getLifetimeCounter () << endl;
       pkt->packHexstr (oss.str ().c_str ());
       rsp->putPkt (pkt);
+      */
     }
   else if (0 == strcmp (cmd, "exit"))
     {
