@@ -29,6 +29,10 @@ riscv_gdbserver_SOURCES = GdbServer.cpp     \
                           MpHash.h          \
                           RspConnection.cpp \
                           RspConnection.h   \
+                          StreamConnection.cpp \
+                          StreamConnection.h   \
+                          AbstractConnection.cpp \
+                          AbstractConnection.h \
                           RspPacket.cpp     \
                           RspPacket.h       \
                           TraceFlags.cpp    \

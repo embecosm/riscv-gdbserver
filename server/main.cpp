@@ -37,6 +37,8 @@
 #include "GdbServer.h"
 #include "TraceFlags.h"
 
+#include "RspConnection.h"
+#include "StreamConnection.h"
 
 using std::atoi;
 using std::cerr;
@@ -61,6 +63,7 @@ usage (ostream & s)
   s << "Usage: riscv-gdbserver --core | -c <corename>" << endl
     << "                       [ --trace | -t <traceflags> ]" << endl
     << "                       [ --silent | -q ]" << endl
+    << "                       [ --stdin | -s ]" << endl
     << "                       [ --help | -h ]" << endl
     << "                       <rsp-port>" << endl;
 
@@ -85,6 +88,8 @@ main (int   argc,
   unsigned int  flags = 0;
   bool          silent = false;
   char         *coreName = nullptr;
+  bool          from_stdin = false;
+  int           port = -1;
 
   while (true) {
     int c;
@@ -94,10 +99,11 @@ main (int   argc,
       {"help",   no_argument,       nullptr,  'h' },
       {"silent", no_argument,       nullptr,  'q' },
       {"trace",  required_argument, nullptr,  't' },
+      {"stdin",  no_argument,       nullptr,  's' },
       {0,       0,                 0,  0 }
     };
 
-    if ((c = getopt_long (argc, argv, "c:hqt:", longOptions, &longOptind)) == -1)
+    if ((c = getopt_long (argc, argv, "c:hqt:s", longOptions, &longOptind)) == -1)
       break;
 
     switch (c) {
@@ -120,6 +126,10 @@ main (int   argc,
       flags |= atoi (optarg);
       break;
 
+    case 's':
+      from_stdin = true;
+      break;
+
     case '?':
     case ':':
       usage (cerr);
@@ -132,13 +142,12 @@ main (int   argc,
 
   // 1 positional arg
 
-  if ((argc - optind) != 1 || coreName == nullptr)
+  if (((argc - optind) != 1 && !from_stdin)
+      || coreName == nullptr)
     {
       usage (cerr);
       return  EXIT_FAILURE;
     }
-
-  int   port = atoi (argv[optind]);
 
   // Trace flags for the server
 
@@ -159,9 +168,18 @@ main (int   argc,
       return  EXIT_FAILURE;
     }
 
+  AbstractConnection *conn;
+  if (from_stdin)
+    conn = new StreamConnection (traceFlags);
+  else
+    {
+      port = atoi (argv[optind]);
+      conn = new RspConnection (port, traceFlags);
+    }
+
   // The RSP server
 
-  GdbServer *gdbServer = new GdbServer (port, cpu, traceFlags);
+  GdbServer *gdbServer = new GdbServer (conn, cpu, traceFlags);
 
   // Run the GDB server. If we return, then we have hit some sort of problem.
 

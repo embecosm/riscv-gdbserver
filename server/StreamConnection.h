@@ -1,8 +1,6 @@
 // Remote Serial Protocol connection: declaration
 
-// Copyright (C) 2009, 2013  Embecosm Limited <info@embecosm.com>
-
-// Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+// Copyright (C) 2017  Embecosm Limited <info@embecosm.com>
 
 // This file is part of the RISC-V GDB server
 
@@ -19,52 +17,42 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RSP_CONNECTION__H
-#define RSP_CONNECTION__H
+#ifndef STREAM_CONNECTION__H
+#define STREAM_CONNECTION__H
 
 #include "AbstractConnection.h"
-#include "RspPacket.h"
 #include "TraceFlags.h"
 
 //! Class implementing the RSP connection listener
 
-//! This class is entirely passive. It is up to the caller to determine that a
-//! packet will become available before calling ::getPkt ().
+//! This class is entirely passive. It is up to the caller to determine
+//! that a packet will become available before calling ::getPkt ().
 
-class RspConnection : public AbstractConnection
+class StreamConnection : public AbstractConnection
 {
 public:
 
   // Constructors and destructor
 
-  RspConnection (int         _portNum,
-		 TraceFlags *_traceFlags);
-  ~RspConnection ();
+  StreamConnection (TraceFlags *_traceFlags);
+  ~StreamConnection ();
 
   // Public interface: manage client connections
 
-  bool  rspConnect ();
-  void  rspClose ();
-  bool  isConnected ();
+  virtual bool  rspConnect ();
+  virtual void  rspClose ();
+  virtual bool  isConnected ();
 
 private:
-
-  //! The port number to listen on
-
-  int  portNum;
-
-  //! The client file descriptor
-
-  int  clientFd;
 
   // Implementation specific routines to handle individual chars.
 
   virtual bool  putRspCharRaw (char  c);
   virtual int   getRspCharRaw (bool blocking);
 
-};	// RspConnection ()
+};	// StreamConnection ()
 
-#endif	// RSP_CONNECTION__H
+#endif	// STREAM_CONNECTION__H
 
 
 // Local Variables:
