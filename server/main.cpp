@@ -187,6 +187,7 @@ main (int   argc,
 
   // Free memory
 
+  delete  conn;
   delete  gdbServer;
   delete  traceFlags;
   delete  cpu;
