@@ -1,3 +1,7 @@
+2017-08-09  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* server/main.cpp (main): Delete connection.
+
 2017-08-04  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/AbstractConnection.cpp: New file.
