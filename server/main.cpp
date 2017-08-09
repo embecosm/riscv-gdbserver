@@ -169,17 +169,22 @@ main (int   argc,
     }
 
   AbstractConnection *conn;
+  GdbServer::KillBehaviour killBehaviour;
   if (from_stdin)
-    conn = new StreamConnection (traceFlags);
+    {
+      conn = new StreamConnection (traceFlags);
+      killBehaviour = GdbServer::KillBehaviour::EXIT_ON_KILL;
+    }
   else
     {
       port = atoi (argv[optind]);
       conn = new RspConnection (port, traceFlags);
+      killBehaviour = GdbServer::KillBehaviour::RESET_ON_KILL;
     }
 
   // The RSP server
 
-  GdbServer *gdbServer = new GdbServer (conn, cpu, traceFlags);
+  GdbServer *gdbServer = new GdbServer (conn, cpu, traceFlags, killBehaviour);
 
   // Run the GDB server. If we return, then we have hit some sort of problem.
 
