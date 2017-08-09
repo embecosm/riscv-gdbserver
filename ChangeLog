@@ -1,5 +1,16 @@
 2017-08-09  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/GdbServer.cpp (GdbServer::GdbServer): Add new parameter,
+	initialise member variable.
+	(GdbServer::rspClientRequest): Modify handling of kill packet.
+	* server/GdbServer.h (GdbServer::KillBehaviour): New enum.
+	(GdbServer::GdbServer): Add new parameter.
+	(GdbServer::killBehaviour): New member variable.
+	* server/main.cpp (main): Pass suitable GdbServer::KillBehaviour
+	value to new GdbServer object.
+
+2017-08-09  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/main.cpp (main): Delete connection.
 
 2017-08-04  Andrew Burgess  <andrew.burgess@embecosm.com>

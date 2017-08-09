@@ -51,10 +51,21 @@ class GdbServer
 {
 public:
 
+  /* How should we behave when GDB sends a kill (k) packet?  */
+  enum KillBehaviour
+    {
+      /* Reset the target, but remain alive.  */
+      RESET_ON_KILL,
+
+      /* Stop the target, close the connection and return.  */
+      EXIT_ON_KILL
+    };
+
   // Constructor and destructor
   GdbServer (AbstractConnection * _conn,
 	     ITarget * _cpu,
-	     TraceFlags * _traceFlags);
+	     TraceFlags * _traceFlags,
+	     KillBehaviour _killBehaviour);
   ~GdbServer ();
 
   // Main loop to listen for and service RSP requests.
@@ -113,6 +124,9 @@ private:
 
   //! Timeout for continue.
   std::chrono::duration<double>  timeout;
+
+  //! How to behave when we get a kill (k) packet.
+  KillBehaviour killBehaviour;
 
   // Main RSP request handler
   void  rspClientRequest ();
