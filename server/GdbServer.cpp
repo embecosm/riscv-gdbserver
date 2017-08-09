@@ -81,10 +81,12 @@ static const int RSP_PKT_SIZE =
 
 GdbServer::GdbServer (AbstractConnection * _conn,
 		      ITarget * _cpu,
-		      TraceFlags * _traceFlags) :
+		      TraceFlags * _traceFlags,
+		      KillBehaviour _killBehaviour) :
   cpu (_cpu),
   traceFlags (_traceFlags),
-  timeout (duration <double>::zero ())
+  timeout (duration <double>::zero ()),
+  killBehaviour (_killBehaviour)
 {
   pkt       = new RspPacket (RSP_PKT_SIZE);
   rsp       = _conn;
@@ -397,7 +399,20 @@ GdbServer::rspClientRequest ()
       return;
 
     case 'k':
-      // Kill request. Do nothing for now.
+      // Kill request.
+      switch (killBehaviour)
+	{
+	case EXIT_ON_KILL:
+	  // Like the 'monitor exit' command this is a bit grotty.  Would
+	  // be better if we could return from gdbserver and have main
+	  // delete everything and exit cleanly that way.
+	  exit (EXIT_SUCCESS);
+	  break;
+
+	case RESET_ON_KILL:
+	  // Shhh! We don't actually reset right now.  Just keep going.
+	  break;
+	}
       return;
 
     case 'm':
