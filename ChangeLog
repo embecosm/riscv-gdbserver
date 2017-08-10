@@ -1,3 +1,29 @@
+-2017-08-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Use symbolic names for trace flags.
+
+	* server/GdbServer.cpp (GdbServer::rspSetCommand): Remove
+	"remote-debug", make "debug" take 2 args, flag name and value.
+	(GdbServer::rspShowCommand): Remove "remote-debug2, allow "debug"
+	to take a second arg to specify particular flags.
+	* server/Makefile.am: Remove trailing whitespace.
+	* server/Makefile.in: Regenerated.
+	* server/TraceFlags.cpp (TraceFlags::iterator::iterator)
+	(TraceFlags::iterator::operator++ TraceFlags::iterator::operator==)
+	(TraceFlags::iterator::operator!= TraceFlags::iterator::operator*):
+	Created.
+	(TraceFlags::TraceFlags): Remove argument, initialize flags to zero.
+	(TraceFlags::traceRsp TraceFlags::traceConn TraceFlags::traceBreak)
+	(TraceFlags::traceVcd TraceFlags::traceSilent): Rename flags to
+	mFlags.
+	(TraceFlags::traceDisas TraceFlags::isFlag TraceFlags::flag)
+	(TraceFlags::begin TraceFlags::end TraceFlags::flagLookup): Created.
+	* server/TraceFlags.h (class TraceFlags): Add iterator nested
+	class, remove setSilent, allFlags, add traceDisas, isFlag, flag,
+	add flagInfo struct, rename flags as mFlags, add flagLookup helper.
+	* server/main.cpp (usage): Add new trace info.
+	(main): Use new flag argument handling.
+
 2017-08-09  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/GdbServer.cpp (GdbServer::GdbServer): Add new parameter,

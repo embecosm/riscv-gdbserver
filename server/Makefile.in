@@ -21,7 +21,7 @@
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 #
 # This file is part of the RISCV GDB server
-# 
+#
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
 # Software Foundation; either version 3 of the License, or (at your option)
@@ -378,7 +378,7 @@ riscv_gdbserver_LDADD = ../targets/libtargets.la                   \
                         @MDIR_RI5CY@/verilated_dpi.o               \
                         @MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a \
                         @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a       \
-                        -L$(BINUTILS_LIBDIR) -lopcodes -lbfd   
+                        -L$(BINUTILS_LIBDIR) -lopcodes -lbfd
 
 riscv_gdbserver_CPPFLAGS = -I$(top_srcdir)/targets          \
                            -I$(top_srcdir)/targets/common   \
