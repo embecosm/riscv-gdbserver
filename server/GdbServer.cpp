@@ -1133,62 +1133,45 @@ GdbServer::rspSetCommand (const char* cmd)
 
   // Look for any options we can handle.
 
-  if ((numTok == 2) && (string ("remote-debug") == tokens[0]))
+  if ((numTok == 3) && (string ("debug") == tokens[0]))
     {
-      // Should we turn on RSP tracing?
+      // monitor set debug <flag> [1|0|on|off|true|false]
 
-      unsigned int logLevel;
+      const char * flagName = tokens[1].c_str ();
 
-      try
+      // Valid flag?
+
+      if (!traceFlags->isFlag (flagName))
+ 	{
+	  // Not a valid flag
+
+ 	  pkt->packStr ("E01");
+ 	  rsp->putPkt (pkt);
+ 	  return;
+ 	}
+
+      // Valid value?
+
+      bool flagVal;
+
+      if ((0 == strcasecmp (tokens[2].c_str (), "0"))
+	  || (0 == strcasecmp (tokens[2].c_str (), "off"))
+	  || (0 == strcasecmp (tokens[2].c_str (), "false")))
+	flagVal = false;
+      else if ((0 == strcasecmp (tokens[2].c_str (), "1"))
+	  || (0 == strcasecmp (tokens[2].c_str (), "on"))
+	  || (0 == strcasecmp (tokens[2].c_str (), "true")))
+	flagVal = true;
+      else
 	{
-	  logLevel = std::stoul (tokens[1], nullptr);
-	}
-      catch (const std::invalid_argument & err)
-	{
-	  (void) err;			 // Var would otherise be unused
-	  pkt->packStr ("E01");
-	  rsp->putPkt (pkt);
-	  return;
-	}
+	  // Not a valid level
 
-      switch (logLevel)
-	{
-	case 0:
-	case 1:
+ 	  pkt->packStr ("E02");
+ 	  rsp->putPkt (pkt);
+ 	  return;
+ 	}
 
-	  // Only valid values are 0 and 1
-
-	  traceFlags->traceRsp (logLevel == 1);
-	  pkt->packStr ("OK");
-	  rsp->putPkt (pkt);
-	  return;
-
-	default:
-	  pkt->packStr ("E02");
-	  rsp->putPkt (pkt);
-	  return;
-	}
-    }
-  else if ((numTok == 2) && (string ("debug") == tokens[0]))
-    {
-      // Generally set trace level.
-
-      unsigned int logLevel;
-
-      try
-	{
-	  logLevel = static_cast<unsigned int> (std::stoul (tokens[1],
-							    nullptr, 0));
-	}
-      catch (const std::invalid_argument & err)
-	{
-	  (void) err;			 // Var would be unused
-	  pkt->packStr ("E03");
-	  rsp->putPkt (pkt);
-	  return;
-	}
-
-      traceFlags->allFlags (logLevel);
+      traceFlags->flag (flagName, flagVal);
       pkt->packStr ("OK");
       rsp->putPkt (pkt);
       return;
@@ -1237,26 +1220,43 @@ GdbServer::rspShowCommand (const char* cmd)
   Utils::split (cmd, " ", tokens);
   int numTok = tokens.size ();
 
-  if ((numTok == 1) && (string ("remote-debug") == tokens[0]))
+  if ((numTok == 1) && (string ("debug") == tokens[0]))
     {
-      // Are we tracing RSP?
-
-      pkt->packRcmdStr (traceFlags->traceRsp () ? "1" : "0", true);
-      rsp->putPkt (pkt);
-      return;
-    }
-  else if ((numTok == 1) && (string ("debug") == tokens[0]))
-    {
-      // What is our current trace level?
+      // monitor show debug
 
       ostringstream  oss;
 
-      oss << "0x" << hex << traceFlags->allFlags () << endl;
+      for (auto it = traceFlags->begin (); it != traceFlags->end (); it++)
+	oss << *it << ": " << (traceFlags->flag (*it) ? "ON" : "OFF") << endl;
+
       pkt->packRcmdStr (oss.str ().c_str (), true);
       rsp->putPkt (pkt);
+      pkt->packStr ("OK");
+      rsp->putPkt (pkt);
+    }
+  else if ((numTok == 2) && (string ("debug") == tokens[0]))
+    {
+      // monitor show debug <flag>
 
-      // Not silent, so acknowledge OK
+      ostringstream  oss;
+      const char * flagName = tokens[1].c_str ();
 
+      // Valid flag?
+
+      if (!traceFlags->isFlag (flagName))
+	{
+	  // Not a valid flag
+
+	  pkt->packStr ("E01");
+	  rsp->putPkt (pkt);
+	  return;
+	}
+
+      oss << flagName << ": " << (traceFlags->flag (flagName) ? "ON" : "OFF")
+	  << endl;
+
+      pkt->packRcmdStr (oss.str ().c_str (), true);
+      rsp->putPkt (pkt);
       pkt->packStr ("OK");
       rsp->putPkt (pkt);
     }

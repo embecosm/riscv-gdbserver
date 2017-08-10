@@ -61,11 +61,19 @@ static void
 usage (ostream & s)
 {
   s << "Usage: riscv-gdbserver --core | -c <corename>" << endl
-    << "                       [ --trace | -t <traceflags> ]" << endl
+    << "                       [ --trace | -t <traceflag> ]" << endl
     << "                       [ --silent | -q ]" << endl
     << "                       [ --stdin | -s ]" << endl
     << "                       [ --help | -h ]" << endl
-    << "                       <rsp-port>" << endl;
+    << "                       <rsp-port>" << endl
+    << endl
+    << "The trace option may appear multiple times. Trace flags are:" << endl
+    << "  rsp     Trace RSP packets" << endl
+    << "  conn    Trace RSP connection handling" << endl
+    << "  break   Trace breakpoint handling" << endl
+    << "  vcd     Generate a Verilog Change Dump" << endl
+    << "  disass  Disassemble each instruction executed" << endl
+    << "  silent  Minimize informative messages (synonym for -q)" << endl;
 
 }	// usage ()
 
@@ -90,6 +98,7 @@ main (int   argc,
   char         *coreName = nullptr;
   bool          from_stdin = false;
   int           port = -1;
+  TraceFlags *  traceFlags = new TraceFlags ();
 
   while (true) {
     int c;
@@ -117,13 +126,19 @@ main (int   argc,
 
     case 'q':
 
-      return  EXIT_SUCCESS;
+      traceFlags->flag ("silent", true);
+      break;
 
     case 't':
 
-      // @todo We should allow more than just decimal values.
+      if (!traceFlags->isFlag (optarg))
+	{
+	  cerr << "ERROR: Bad trace flag " << optarg << endl;
+	  usage (cerr);
+	  return EXIT_FAILURE;
+	}
 
-      flags |= atoi (optarg);
+      traceFlags->flag (optarg, true);
       break;
 
     case 's':
@@ -137,6 +152,7 @@ main (int   argc,
 
     default:
       cerr << "ERROR: getopt_long returned character code " << c << endl;
+      return  EXIT_FAILURE;
     }
   }
 
@@ -148,13 +164,6 @@ main (int   argc,
       usage (cerr);
       return  EXIT_FAILURE;
     }
-
-  // Trace flags for the server
-
-  TraceFlags * traceFlags = new TraceFlags (flags);
-
-  if (silent)
-    traceFlags->setSilent ();
 
   // The RISC-V model
 
