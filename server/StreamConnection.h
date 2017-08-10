@@ -17,8 +17,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef STREAM_CONNECTION__H
-#define STREAM_CONNECTION__H
+#ifndef STREAM_CONNECTION_H
+#define STREAM_CONNECTION_H
 
 #include "AbstractConnection.h"
 #include "TraceFlags.h"
@@ -52,7 +52,7 @@ private:
 
 };	// StreamConnection ()
 
-#endif	// STREAM_CONNECTION__H
+#endif	// STREAM_CONNECTION_H
 
 
 // Local Variables:

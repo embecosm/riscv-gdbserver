@@ -168,9 +168,9 @@ main (int   argc,
   // The RISC-V model
 
   if (0 == strcasecmp ("PicoRV32", coreName))
-    cpu = new Picorv32 (traceFlags->traceVcd());
+    cpu = new Picorv32 (traceFlags);
   else if (0 == strcasecmp ("RI5CY", coreName))
-    cpu = new Ri5cy (traceFlags->traceVcd());
+    cpu = new Ri5cy (traceFlags);
   else
     {
       cerr << "ERROR: Unrecognized core: " << coreName << ": exiting" << endl;
@@ -191,9 +191,10 @@ main (int   argc,
       killBehaviour = GdbServer::KillBehaviour::RESET_ON_KILL;
     }
 
-  // The RSP server
+  // The RSP server, connecting it to its CPU.
 
   GdbServer *gdbServer = new GdbServer (conn, cpu, traceFlags, killBehaviour);
+  cpu->gdbServer (gdbServer);
 
   // Run the GDB server. If we return, then we have hit some sort of problem.
 

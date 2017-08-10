@@ -28,7 +28,11 @@ libpicorv32_la_SOURCES = Picorv32.cpp     \
 
 # FIXME: Remove -Wno-unused-paramted once the Picorv32 class is implemented
 # properly.
-libpicorv32_la_CXXFLAGS = -Werror -Wall -Wextra -Wno-unused-parameter \
-                          -I$(srcdir)/..        \
-                          -I$(srcdir)/../common \
+
+libpicorv32_la_CPPFLAGS = -I$(srcdir)/..         \
+                          -I$(srcdir)/../common  \
+                          -I$(top_srcdir)/server \
+                          -I$(top_srcdir)/trace  \
 			  -I@MDIR_PICORV32@
+
+libpicorv32_la_CXXFLAGS = -Werror -Wall -Wextra -Wno-unused-parameter

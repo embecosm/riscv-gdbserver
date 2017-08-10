@@ -17,8 +17,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ABSTRACT_CONNECTION__H
-#define ABSTRACT_CONNECTION__H
+#ifndef ABSTRACT_CONNECTION_H
+#define ABSTRACT_CONNECTION_H
 
 #include "RspPacket.h"
 #include "TraceFlags.h"
@@ -103,7 +103,7 @@ AbstractConnection::AbstractConnection (TraceFlags *_traceFlags) :
   // Nothing.
 }
 
-#endif	// ABSTRACT_CONNECTION__H
+#endif	// ABSTRACT_CONNECTION_H
 
 
 // Local Variables:

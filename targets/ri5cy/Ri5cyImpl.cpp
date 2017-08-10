@@ -23,37 +23,43 @@
 #include <iostream>
 #include <cstdint>
 #include <cstdlib>
+#include <sstream>
 
+#include "GdbServer.h"
 #include "Ri5cyImpl.h"
+#include "TraceFlags.h"
 #include "verilated_vcd_c.h"
 #include "Vtop.h"
 #include "Vtop__Syms.h"
-#include "Disassembler.h"
 
 using std::chrono::duration;
 using std::chrono::system_clock;
 using std::chrono::time_point;
 using std::cerr;
+using std::cout;
 using std::endl;
+using std::ostringstream;
 
 //! Constructor.
 
 //! Initialize the counters and instantiate the Verilator model. Take the
 //! model through its reset sequence.
 
-Ri5cyImpl::Ri5cyImpl (bool  wantVcd) :
+//! @param[in] flags  The trace flags
+
+Ri5cyImpl::Ri5cyImpl (TraceFlags * flags) :
+  mServer (nullptr),
+  mFlags (flags),
   mCoreHalted (false),
   mCycleCnt (0),
   mInstrCnt (0),
-  mWantVcd (wantVcd),
   mCpuTime (0)
 {
   mCpu = new Vtop;
-  disasm = new Disassembler;
 
   // Open VCD file if requested
 
-  if (mWantVcd)
+  if (mFlags->traceVcd ())
     {
       Verilated::traceEverOn (true);
       mTfp = new VerilatedVcdC;
@@ -76,11 +82,11 @@ Ri5cyImpl::~Ri5cyImpl ()
 {
   // Close VCD file if requested
 
-  if (mWantVcd)
+  if (mFlags->traceVcd ())
     mTfp->close ();
 
   delete mCpu;
-  delete disasm;
+
 }	// Ri5cyImpl::~Ri5cyImpl ()
 
 
@@ -416,6 +422,18 @@ Ri5cyImpl::command (const std::string  cmd __attribute__ ((unused)),
 }	// Ri5cyImpl::command ()
 
 
+//! Record the server we are associated with.
+
+//! @param[in] server  Our invoking server.
+
+void
+Ri5cyImpl::gdbServer (GdbServer *server)
+{
+  mServer = server;
+
+}	// Ri5cyImpl::gdbServer ()
+
+
 //! Provide a time stamp (needed for $time)
 
 //! We count in nanoseconds since (cold) reset.
@@ -426,6 +444,7 @@ double
 Ri5cyImpl::timeStamp ()
 {
   return mCpuTime;
+
 }	// Ri5cyImpl::timeStamp ()
 
 
@@ -442,7 +461,7 @@ Ri5cyImpl::clockModel ()
 
   mCpuTime += CLK_PERIOD_NS / 2;
 
-  if (mWantVcd)
+  if (mFlags->traceVcd ())
     mTfp->dump (mCpuTime);
 
   mCpu->clk_i = 1;
@@ -450,16 +469,30 @@ Ri5cyImpl::clockModel ()
 
   mCpuTime += CLK_PERIOD_NS / 2;
 
-  if (mWantVcd)
+  if (mFlags->traceVcd ())
     mTfp->dump (mCpuTime);
 
   mCycleCnt++;
 
-  // IGB-TODO: We should pass the stream into this really, but for now we just want to link into the disassembler
-  //           This the correct parts of the model are not yet exposed, we simply pass nop every time
-  uint32_t nop = 0x00000013;
-  disasm->disassemble_riscv (nop);
-  printf ("\n");
+  if (mFlags->traceDisas ())
+    {
+      // Optionally disassemble an instruction.  This is Ian Bolton's code,
+      // moved to the server to be generic.
+
+      // @todo We need to be able to extract the actual instruction from the
+      //       Verilator model.  For now we hard code NOP (0x00000013).
+
+      // @todo We can only do this once we have the server available to do
+      //       disassembly. This means it can't be done during the reset
+      //       sequence, since that is part of the constructor.
+
+      if (nullptr != mServer)
+	{
+	  ostringstream oss;
+	  mServer->command ("disas 0x00000013", oss);
+	  cout << oss.str () << endl;
+	}
+    }
 }	// Ri5cyImpl::clockModel ()
 
 

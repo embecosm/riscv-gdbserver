@@ -19,8 +19,8 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SYSCALL_INFO__H
-#define SYSCALL_INFO__H
+#ifndef SYSCALL_INFO_H
+#define SYSCALL_INFO_H
 
 
 #include <cstddef>
@@ -114,7 +114,7 @@ operator<< (std::ostream & s,
 	    SyscallInfo::Syscall  p);
 
 
-#endif //SYSCALL_INFO__H
+#endif //SYSCALL_INFO_H
 
 
 // Local Variables:

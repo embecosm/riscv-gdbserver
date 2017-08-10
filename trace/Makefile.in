@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Makefile.am -- automake configuration file for the PicoRV32 target
+# Makefile.am -- automake configuration file for library common to all targets
 
 # Copyright (C) 2017 Embecosm Limited
 
@@ -109,7 +109,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = targets/picorv32
+subdir = trace
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -123,18 +123,16 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libpicorv32_la_LIBADD =
-am_libpicorv32_la_OBJECTS = libpicorv32_la-Picorv32.lo \
-	libpicorv32_la-Picorv32Impl.lo
-libpicorv32_la_OBJECTS = $(am_libpicorv32_la_OBJECTS)
+libtrace_la_LIBADD =
+am_libtrace_la_OBJECTS = libtrace_la-TraceFlags.lo
+libtrace_la_OBJECTS = $(am_libtrace_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libpicorv32_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(libpicorv32_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+libtrace_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libtrace_la_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -187,8 +185,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libpicorv32_la_SOURCES)
-DIST_SOURCES = $(libpicorv32_la_SOURCES)
+SOURCES = $(libtrace_la_SOURCES)
+DIST_SOURCES = $(libtrace_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -342,22 +340,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-noinst_LTLIBRARIES = libpicorv32.la
-libpicorv32_la_SOURCES = Picorv32.cpp     \
-                         Picorv32.h       \
-                         Picorv32Impl.cpp \
-                         Picorv32Impl.h
+noinst_LTLIBRARIES = libtrace.la
+libtrace_la_SOURCES = TraceFlags.cpp \
+                      TraceFlags.h
 
-
-# FIXME: Remove -Wno-unused-paramted once the Picorv32 class is implemented
-# properly.
-libpicorv32_la_CPPFLAGS = -I$(srcdir)/..         \
-                          -I$(srcdir)/../common  \
-                          -I$(top_srcdir)/server \
-                          -I$(top_srcdir)/trace  \
-			  -I@MDIR_PICORV32@
-
-libpicorv32_la_CXXFLAGS = -Werror -Wall -Wextra -Wno-unused-parameter
+libtrace_la_CXXFLAGS = -Werror -Wall -Wextra
 all: all-am
 
 .SUFFIXES:
@@ -371,9 +358,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu targets/picorv32/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu trace/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu targets/picorv32/Makefile
+	  $(AUTOMAKE) --gnu trace/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -403,8 +390,8 @@ clean-noinstLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libpicorv32.la: $(libpicorv32_la_OBJECTS) $(libpicorv32_la_DEPENDENCIES) $(EXTRA_libpicorv32_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libpicorv32_la_LINK)  $(libpicorv32_la_OBJECTS) $(libpicorv32_la_LIBADD) $(LIBS)
+libtrace.la: $(libtrace_la_OBJECTS) $(libtrace_la_DEPENDENCIES) $(EXTRA_libtrace_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(libtrace_la_LINK)  $(libtrace_la_OBJECTS) $(libtrace_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -412,8 +399,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpicorv32_la-Picorv32.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpicorv32_la-Picorv32Impl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtrace_la-TraceFlags.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -436,19 +422,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-libpicorv32_la-Picorv32.lo: Picorv32.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpicorv32_la_CPPFLAGS) $(CPPFLAGS) $(libpicorv32_la_CXXFLAGS) $(CXXFLAGS) -MT libpicorv32_la-Picorv32.lo -MD -MP -MF $(DEPDIR)/libpicorv32_la-Picorv32.Tpo -c -o libpicorv32_la-Picorv32.lo `test -f 'Picorv32.cpp' || echo '$(srcdir)/'`Picorv32.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libpicorv32_la-Picorv32.Tpo $(DEPDIR)/libpicorv32_la-Picorv32.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Picorv32.cpp' object='libpicorv32_la-Picorv32.lo' libtool=yes @AMDEPBACKSLASH@
+libtrace_la-TraceFlags.lo: TraceFlags.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtrace_la_CXXFLAGS) $(CXXFLAGS) -MT libtrace_la-TraceFlags.lo -MD -MP -MF $(DEPDIR)/libtrace_la-TraceFlags.Tpo -c -o libtrace_la-TraceFlags.lo `test -f 'TraceFlags.cpp' || echo '$(srcdir)/'`TraceFlags.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libtrace_la-TraceFlags.Tpo $(DEPDIR)/libtrace_la-TraceFlags.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='TraceFlags.cpp' object='libtrace_la-TraceFlags.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpicorv32_la_CPPFLAGS) $(CPPFLAGS) $(libpicorv32_la_CXXFLAGS) $(CXXFLAGS) -c -o libpicorv32_la-Picorv32.lo `test -f 'Picorv32.cpp' || echo '$(srcdir)/'`Picorv32.cpp
-
-libpicorv32_la-Picorv32Impl.lo: Picorv32Impl.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpicorv32_la_CPPFLAGS) $(CPPFLAGS) $(libpicorv32_la_CXXFLAGS) $(CXXFLAGS) -MT libpicorv32_la-Picorv32Impl.lo -MD -MP -MF $(DEPDIR)/libpicorv32_la-Picorv32Impl.Tpo -c -o libpicorv32_la-Picorv32Impl.lo `test -f 'Picorv32Impl.cpp' || echo '$(srcdir)/'`Picorv32Impl.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libpicorv32_la-Picorv32Impl.Tpo $(DEPDIR)/libpicorv32_la-Picorv32Impl.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Picorv32Impl.cpp' object='libpicorv32_la-Picorv32Impl.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpicorv32_la_CPPFLAGS) $(CPPFLAGS) $(libpicorv32_la_CXXFLAGS) $(CXXFLAGS) -c -o libpicorv32_la-Picorv32Impl.lo `test -f 'Picorv32Impl.cpp' || echo '$(srcdir)/'`Picorv32Impl.cpp
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtrace_la_CXXFLAGS) $(CXXFLAGS) -c -o libtrace_la-TraceFlags.lo `test -f 'TraceFlags.cpp' || echo '$(srcdir)/'`TraceFlags.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

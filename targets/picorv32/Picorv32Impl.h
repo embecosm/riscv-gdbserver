@@ -20,11 +20,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CPU__H
-#define CPU__H
+#ifndef CPU_H
+#define CPU_H
 
 #include <cstdint>
 
+#include "GdbServer.h"
+#include "TraceFlags.h"
 #include "Vtestbench.h"
 #include "verilated_vcd_c.h"
 
@@ -34,7 +36,7 @@ class Picorv32Impl final
 
   // Constructor and destructor
 
-  Picorv32Impl (bool  wantVcd);
+  Picorv32Impl (TraceFlags * flags);
   ~Picorv32Impl ();
 
   // Accessors

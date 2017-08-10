@@ -139,7 +139,8 @@ AC_CONFIG_FILES([Makefile                  \
 		 targets/Makefile          \
 		 targets/common/Makefile   \
 		 targets/picorv32/Makefile \
-		 targets/ri5cy/Makefile])
+		 targets/ri5cy/Makefile    \
+		 trace/Makefile])
 
 # Put it all out.
 AC_OUTPUT

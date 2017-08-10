@@ -20,15 +20,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RI5CY_IMPL__H
-#define RI5CY_IMPL__H
+#ifndef RI5CY_IMPL_H
+#define RI5CY_IMPL_H
 
 #include <cstdint>
 
 #include "ITarget.h"
 #include "Vtop.h"
 
-class Disassembler;
 
 //! The RI5CY implementation class.
 
@@ -38,7 +37,7 @@ class Ri5cyImpl final
 {
  public:
 
-  Ri5cyImpl (bool  wantVcd);
+  Ri5cyImpl (TraceFlags * flags);
   ~Ri5cyImpl ();
 
   ITarget::ResumeRes  resume (ITarget::ResumeType step,
@@ -87,6 +86,10 @@ class Ri5cyImpl final
 
   bool command (const std::string  cmd,
 		std::ostream & stream);
+
+  // Identify the server
+
+  void gdbServer (GdbServer *server);
 
   // Verilog support functions
 
@@ -138,13 +141,17 @@ private:
   const int REG_R31 = 31;		//!< GDB R31 regnum
   const int REG_PC  = 32;		//!< GDB PC regnum
 
+  //! Our invoking server
+
+  GdbServer * mServer;
+
+  //! The trace flags with which we were called.
+
+  TraceFlags * mFlags;
+
   //! Top level Verilator model.
 
   Vtop * mCpu;
-
-  //! Disassembler for tracing of instructions executed
-
-  Disassembler * disasm;
 
   //! Is the core halted?
 
@@ -157,10 +164,6 @@ private:
   //! Instruction count
 
   uint64_t  mInstrCnt;
-
-  //! Do we want a VCD trace?
-
-  bool  mWantVcd;
 
   //! VCD trace file pointer
 
@@ -185,7 +188,7 @@ private:
 				  SyscallInfo * syscallInfo = nullptr);
 };
 
-#endif	// RI5CY_IMPL__H
+#endif	// RI5CY_IMPL_H
 
 
 // Local Variables:

@@ -19,49 +19,45 @@
 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// ----------------------------------------------------------------------------
 
-#ifndef GDB_SERVER__H
-#define GDB_SERVER__H
-
-#include <chrono>
-#include <cstdio>
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
-
-// General interface to targets
-
-#include "ITarget.h"
-
-// Class headers
-
-#include "MpHash.h"
-#include "RspConnection.h"
-#include "RspPacket.h"
-#include "TraceFlags.h"
+#ifndef GDB_SERVER_H
+#define GDB_SERVER_H
 
 
-//-----------------------------------------------------------------------------
+// Headers
+
+#include <string>
+
+// Classes needed for the declaration
+
+class AbstractConnection;
+class GdbServerImpl;
+class ITarget;
+class TraceFlags;
+
+
 //! Module implementing a GDB RSP server.
 
-//! A loop listens for RSP requests, which are converted to requests to read
-//! and write registers, read and write memory, or control the CPU
-//-----------------------------------------------------------------------------
+//! This is the public interface, with the detailed implementation in
+//! GdbServerImpl.
+
 class GdbServer
 {
 public:
 
-  /* How should we behave when GDB sends a kill (k) packet?  */
+  //! How should we behave when GDB sends a kill (k) packet?
+
   enum KillBehaviour
     {
-      /* Reset the target, but remain alive.  */
+      //! Reset the target, but remain alive.
       RESET_ON_KILL,
 
-      /* Stop the target, close the connection and return.  */
+      //! Stop the target, close the connection and return.
       EXIT_ON_KILL
     };
 
   // Constructor and destructor
+
   GdbServer (AbstractConnection * _conn,
 	     ITarget * _cpu,
 	     TraceFlags * _traceFlags,
@@ -69,93 +65,22 @@ public:
   ~GdbServer ();
 
   // Main loop to listen for and service RSP requests.
+
   void  rspServer ();
+
+  // Callback for target to use
+
+  bool command (const std::string  cmd,
+		std::ostream & stream);
 
 
 private:
 
-  //! Definition of GDB target signals.
-
-  enum class TargetSignal : int {
-    NONE    =   0,
-    INT     =   2,
-    TRAP    =   5,
-    XCPU    =  24,
-    UNKNOWN = 143
-  };
-
-  // stream operator has to be a friend to access private members
-
-  friend std::ostream & operator<< (std::ostream & s,
-				    GdbServer::TargetSignal  p);
-
-  //! Constant for a thread id
-
-  static const int  DUMMY_TID = 1;
-
-  //! Constant for a breakpoint (EBREAK). Remember we are little-endian.
-
-  static const uint32_t  BREAK_INSTR = 0x100073;
-
-  //! Constant which is the sample period (in instruction steps) during
-  //! "continue" etc.
-
-  static const int RUN_SAMPLE_PERIOD = 10000;
-
-  //! Our associated simulated CPU
-  ITarget * cpu;
-
-  //! Our trace flags
-  TraceFlags *traceFlags;
-
-  //! Our associated RSP interface
-  AbstractConnection *rsp;
-
-  //! The packet pointer. There is only ever one packet in use at one time, so
-  //! there is no need to repeatedly allocate and delete it.
-  RspPacket *pkt;
-
-  //! We track the last type of packet for when we have to create an F request
-  //! and later need to either continue or step after receiving the F reply.
-  char lastPacketType;
-
-  //! Hash table for matchpoints
-  MpHash *mpHash;
-
-  //! Timeout for continue.
-  std::chrono::duration<double>  timeout;
-
-  //! How to behave when we get a kill (k) packet.
-  KillBehaviour killBehaviour;
-
-  // Main RSP request handler
-  void  rspClientRequest ();
-
-  // Handle the various RSP requests
-  int   stringLength (uint32_t addr);
-  void  rspSyscallRequest ();
-  void  rspSyscallReply ();
-  void  rspReportException (TargetSignal  sig = TargetSignal::TRAP);
-  void  rspReadAllRegs ();
-  void  rspWriteAllRegs ();
-  void  rspReadMem ();
-  void  rspWriteMem ();
-  void  rspReadReg ();
-  void  rspWriteReg ();
-  void  rspQuery ();
-  void  rspCommand ();
-  void  rspSetCommand (const char* cmd);
-  void  rspShowCommand (const char* cmd);
-  void  rspSet ();
-  void  rspRestart ();
-  void  rspVpkt ();
-  void  rspWriteMemBin ();
-  void  rspRemoveMatchpoint ();
-  void  rspInsertMatchpoint ();
+  GdbServerImpl * mServerImpl;		// The actual implementation
 
 };	// GdbServer ()
 
-#endif	// GDB_SERVER__H
+#endif	// GDB_SERVER_H
 
 
 // Local Variables:

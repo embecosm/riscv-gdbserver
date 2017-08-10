@@ -33,8 +33,8 @@
 
 //! @param[in] wantVcd  TRUE if we want a VCD generated, false otherwise.
 
-Picorv32Impl::Picorv32Impl (bool  wantVcd) :
-  mWantVcd (wantVcd),
+Picorv32Impl::Picorv32Impl (TraceFlags * flags) :
+  mWantVcd (flags->traceVcd ()),
   mCpuTime (0),
   mClk (0),
   mInstr (0)
