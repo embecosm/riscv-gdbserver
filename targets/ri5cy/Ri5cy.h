@@ -20,8 +20,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RI5CY__H
-#define RI5CY__H
+#ifndef RI5CY_H
+#define RI5CY_H
 
 #include "ITarget.h"
 
@@ -40,7 +40,7 @@ class Ri5cy final : public ITarget
 
   // Constructor and destructor
 
-  Ri5cy (bool  wantVcd);
+  Ri5cy (TraceFlags * flags);
   ~Ri5cy ();
 
   virtual ResumeRes  resume (ResumeType step,
@@ -90,6 +90,10 @@ class Ri5cy final : public ITarget
   virtual bool command (const std::string  cmd,
 			std::ostream & stream);
 
+  // Identify the server
+
+  void gdbServer (GdbServer *server);
+
   // Verilator support
 
   virtual double timeStamp ();
@@ -104,7 +108,7 @@ class Ri5cy final : public ITarget
 };	// class Picorv232
 
 
-#endif	// RI5CY__H
+#endif	// RI5CY_H
 
 // Local Variables:
 // mode: C++

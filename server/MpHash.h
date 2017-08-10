@@ -21,8 +21,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#ifndef MP_HASH__H
-#define MP_HASH__H
+#ifndef MP_HASH_H
+#define MP_HASH_H
 
 #include <stdint.h>
 
@@ -97,4 +97,4 @@ private:
 
 };
 
-#endif	// MP_HASH__H
+#endif	// MP_HASH_H

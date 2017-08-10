@@ -20,8 +20,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "GdbServer.h"
 #include "Ri5cy.h"
 #include "Ri5cyImpl.h"
+#include "TraceFlags.h"
 
 
 //! Constructor.
@@ -30,9 +32,10 @@
 
 //! @param[in] wantVcd  TRUE if we want a VCD generated, false otherwise.
 
-Ri5cy::Ri5cy (bool  wantVcd)
+Ri5cy::Ri5cy (TraceFlags * flags) :
+  ITarget (flags)
 {
-  mRi5cyImpl = new Ri5cyImpl (wantVcd);
+  mRi5cyImpl = new Ri5cyImpl (flags);
 
 }	// Ri5cy::Ri5cy ()
 
@@ -261,6 +264,18 @@ Ri5cy::command (const std::string  cmd,
   return  mRi5cyImpl->command (cmd, stream);
 
 }	// Ri5cy::command ()
+
+
+//! Wrapper for the implementation class
+
+//! @param[in] server  The server to use
+
+void
+Ri5cy::gdbServer (GdbServer * server)
+{
+  mRi5cyImpl->gdbServer (server);
+
+}	// Ri5cy::gdbServer ()
 
 
 //! Return a timestamp.

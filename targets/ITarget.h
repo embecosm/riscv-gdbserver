@@ -19,15 +19,21 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ITARGET__H
-#define ITARGET__H
+#ifndef ITARGET_H
+#define ITARGET_H
 
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
 
-#include <SyscallInfo.h>
+#include "SyscallInfo.h"
+
+
+// Classes to which we refer.
+
+class TraceFlags;
+class GdbServer;
 
 
 //! Generic interface class for GDB RSP server targets.
@@ -80,8 +86,7 @@ class ITarget
 
   // Virtual destructor has implementation for defined behavior
 
-  ITarget () {};
-  ITarget (bool  wantVcd __attribute__ ((unused)) ) {};
+  explicit ITarget (TraceFlags * flags  __attribute__ ((unused)) ) {};
   virtual ~ITarget () {};
 
   virtual ResumeRes  resume (ResumeType step,
@@ -131,9 +136,21 @@ class ITarget
   virtual bool command (const std::string  cmd,
 			std::ostream & stream) = 0;
 
+  // Tell the target about the server using it
+
+  virtual void gdbServer (GdbServer *server) = 0;
+
   // Verilator support
 
   virtual double timeStamp () = 0;
+
+private:
+
+  // Don't allow the default constructors
+
+  ITarget () {};
+  ITarget (const ITarget &) {};
+
 
 };	// class ITarget
 

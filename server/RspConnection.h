@@ -19,8 +19,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RSP_CONNECTION__H
-#define RSP_CONNECTION__H
+#ifndef RSP_CONNECTION_H
+#define RSP_CONNECTION_H
 
 #include "AbstractConnection.h"
 #include "RspPacket.h"
@@ -64,7 +64,7 @@ private:
 
 };	// RspConnection ()
 
-#endif	// RSP_CONNECTION__H
+#endif	// RSP_CONNECTION_H
 
 
 // Local Variables:

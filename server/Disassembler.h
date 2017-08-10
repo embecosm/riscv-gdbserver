@@ -1,4 +1,4 @@
-// GDB RSP server RI5CY CPU model: definition
+// GDB RSP server RISC-V disassembler class: definition
 
 // Copyright (C) 2017  Embecosm Limited <info@embecosm.com>
 
@@ -19,29 +19,58 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "Disassembler.h"
-#include "config.h"
-#include <cstring>
-#include "dis-asm.h"
-//#include "disassemble.h"
-#include "bfd.h"
+
+#ifndef DISASSEMBLER_H
+#define DISASSEMBLER_H
+
+// Standard headers
+
 #include <cstdint>
-#include <cstdio>
+
+// Binutils headers, which need config header info
+
+#include "config.h"
+#include "bfd.h"
+#include "dis-asm.h"
 
 
-Disassembler::Disassembler ()
+// Wrapper class for the binutils disassembler
+
+class Disassembler
 {
-  init_disassemble_info (&disasm_info, stdout, (fprintf_ftype) fprintf);
-  disassemble_init_for_target (& disasm_info);
 
-  disasm_info.buffer = vals;
-  disasm_info.buffer_vma = (bfd_vma) vals;
-  disasm_info.buffer_length = 4;    
-}
+public:
+
+  // Constructor and destructor
+
+  Disassembler ();
+  ~Disassembler ();
+
+  // The operation to disassemble.
+
+  void disassemble (uint32_t       insn,
+		    std::ostream & stream);
+
+private:
+
+  //! Buffer for instruction to be disassembled.
+
+  bfd_byte mVals[sizeof (uint32_t)];
+
+  //! Structure providing all the info needed by the disassembler.
+
+  disassemble_info mDisasmInfo;
+
+  //! Large string for printing to using sprintf
+
+  char mDisasStr [256];
+
+};	// class Disassembler
+
+#endif	// DISASSEMBLER_H
 
 
-void Disassembler::disassemble_riscv (uint32_t insn)
-{
-  memcpy (vals, &insn, 4);
-  print_insn_riscv ((bfd_vma) vals, (disassemble_info*) &disasm_info);
-}
+// Local Variables:
+// mode: C++
+// c-file-style: "gnu"
+// End:

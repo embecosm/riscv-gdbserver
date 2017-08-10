@@ -30,6 +30,8 @@ libtargets_la_LIBADD = common/libcommon.la     \
                        picorv32/libpicorv32.la \
                        ri5cy/libri5cy.la
 
-libtargets_la_CPPFLAGS = -I$(srcdir)/common
+libtargets_la_CPPFLAGS = -I$(srcdir)/common     \
+                         -I$(top_srcdir)/server \
+                         -I$(top_srcdir)/trace
 
 libtargets_la_CXXFLAGS = -Werror -Wall -Wextra

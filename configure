@@ -16108,7 +16108,7 @@ fi
 
 
 # We want to create a Makefile
-ac_config_files="$ac_config_files Makefile server/Makefile targets/Makefile targets/common/Makefile targets/picorv32/Makefile targets/ri5cy/Makefile"
+ac_config_files="$ac_config_files Makefile server/Makefile targets/Makefile targets/common/Makefile targets/picorv32/Makefile targets/ri5cy/Makefile trace/Makefile"
 
 
 # Put it all out.
@@ -17231,6 +17231,7 @@ do
     "targets/common/Makefile") CONFIG_FILES="$CONFIG_FILES targets/common/Makefile" ;;
     "targets/picorv32/Makefile") CONFIG_FILES="$CONFIG_FILES targets/picorv32/Makefile" ;;
     "targets/ri5cy/Makefile") CONFIG_FILES="$CONFIG_FILES targets/ri5cy/Makefile" ;;
+    "trace/Makefile") CONFIG_FILES="$CONFIG_FILES trace/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

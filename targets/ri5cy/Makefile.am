@@ -21,15 +21,16 @@
 
 noinst_LTLIBRARIES = libri5cy.la
 
-libri5cy_la_SOURCES = Disassembler.h   \
-                      Disassembler.cpp \
-                      Ri5cy.cpp        \
+libri5cy_la_SOURCES = Ri5cy.cpp        \
                       Ri5cy.h          \
                       Ri5cyImpl.cpp    \
                       Ri5cyImpl.h
 
-libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra    \
-                          -I$(srcdir)/..        \
-                          -I$(srcdir)/../common \
-                          -I$(BINUTILS_INCDIR)  \
-			  -I@MDIR_RI5CY@
+libri5cy_la_CPPFLAGS = -I$(srcdir)/..         \
+                       -I$(srcdir)/../common  \
+                       -I$(top_srcdir)/server \
+                       -I$(top_srcdir)/trace  \
+                       -I@MDIR_RI5CY@
+
+libri5cy_la_CXXFLAGS = -Werror -Wall -Wextra
+

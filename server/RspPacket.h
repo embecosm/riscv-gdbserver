@@ -20,8 +20,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#ifndef RSP_PACKET__H
-#define RSP_PACKET__H
+#ifndef RSP_PACKET_H
+#define RSP_PACKET_H
 
 #include <iostream>
 
@@ -70,4 +70,4 @@ std::ostream &operator<< (std::ostream &s,
 			  RspPacket    &p);
 
 
-#endif	// RSP_PACKET_SC__H
+#endif	// RSP_PACKET_SC_H

@@ -19,8 +19,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef TRACE_FLAGS__H
-#define TRACE_FLAGS__H
+#ifndef TRACE_FLAGS_H
+#define TRACE_FLAGS_H
 
 #include <iterator>
 #include <vector>
@@ -122,7 +122,7 @@ private:
 
 };	// TraceFlags ()
 
-#endif	// TRACE_FLAGS__H
+#endif	// TRACE_FLAGS_H
 
 
 // Local Variables:

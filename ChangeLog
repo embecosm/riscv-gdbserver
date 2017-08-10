@@ -1,3 +1,103 @@
+2017-08-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Break out trace as a library in its own right to be shared by
+	targets and GdbServer. Make targets aware of their associated
+	server and provide an interface for them to access server
+	functionality. Use this to move disassembly to be generic.
+
+	* Makefile.am: Break out trace into its own library.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+	* configure.ac: Create Makefile for trace.
+	* server/AbstractConnection.h: Use standards compliant header
+	guard.
+	* server/Disassembler.cpp: Moved from targets/ri5cy.
+	(Disassembler::Disassembler): Use sprintf as the output function
+	and replace C-style casts.
+	(Disassembler::~Disassembler): Moved here from header.
+	(Disassembler::disassemble): Remove C style casts
+	* server/Disassembler.h: Moved from targets/ri5cy, use standards
+	compliant header guard.
+	(class Disassembler): Move to consistent camel case variable
+	naming and allow disassemble to return via a stream.
+	* server/GdbServer.cpp: Created after moving old version to
+	GdbServerImpl.cpp.
+	* server/GdbServer.h Created after moving old version to
+	GdbServerImpl.h.
+	* server/GdbServerImpl.cpp: Moved from GdbServer.cpp, class
+	renamed throughout and constants moved into class in header file.
+	(GdbServerImpl::GdbServerImpl): Create disassembler
+	(GdbServerImpl::~GdbServerImpl): Delete disassembler
+	(GdbServerImpl::command): Created.
+	* server/GdbServerImpl.h: Moved from GdbServer.h and class renamed
+	throughout.
+	(class GdbServerImpl): Constants moved into class, new member
+	function, command, added.
+	* server/Makefile.am: Add Disassembler.h and Disassember.cpp and
+	add binutils include directory to CPPFLAGS.
+	* server/Makefile.in: Regenerated.
+	* server/MpHash.h: Use standards compliant header guard.
+	* server/RspConnection.h: Likewise.
+	* server/RspPacket.h: Likewise.
+	* server/StreamConnection.h: Likewise.
+	* server/TraceFlags.cpp: Moved to trace directory.
+	* server/TraceFlags.h: Moved to trace directory.
+	* server/main.cpp (main): Use new ITarget interface for
+	constructor, passing in flag structure, rather than just the VCD
+	flag, pass gdbServer to target after instantiation.
+	* targets/ITarget.h (class ITarget): Add gdbServer method.
+	* targets/Makefile.am: Add server and trace include directories.
+	* targets/Makefile.in: Regenerated.
+	* targets/common/SyscallInfo.h: Use standards compliant header
+	guard.
+	* targets/picorv32/Makefile.am: Add server and trace include
+	directories and break out CPPFLAGS from CXXFLAGS
+	* targets/picorv32/Makefile.in: Regenerated.
+	* targets/picorv32/Picorv32.cpp (Picorv32::Picorv32): Take all
+	flags as argument.
+	(Picorv32::reset): Pass flags to new instantiation.
+	(Picorv32::gdbServer): Created.
+	* targets/picorv32/Picorv32.h: Use standards compliant header
+	guard.
+	(class Picorv32): Change prototype of constructor, add gdbserver
+	method, remove mWantVcd and replace with mFlags.
+	* targets/picorv32/Picorv32Impl.cpp: Take flags as argument to
+	constructor and use to initialize mWantVcd.
+	* targets/picorv32/Picorv32Impl.h: Use standards compliant header
+	guard, add GdbServer.h and TraceFlags.h headers.
+	(class Picorv32Impl): Change prototype of constructor.
+	* targets/ri5cy/Disassembler.cpp: Moved to server directory.
+	* targets/ri5cy/Disassembler.h: Likewise.
+	* targets/ri5cy/Makefile.am: Remove Disassembler.cpp and
+	Disassemler.h, break out CPPFLAGS from CXXFLAGS and remove
+	binutils include directory.
+	* targets/ri5cy/Makefile.in: Regenerated.
+	* targets/ri5cy/Ri5cy.cpp: Include GdbServer.h and TraceFlags.h
+	(Ri5cy::Ri5cy): Use new prototype of constructor and for calling
+	Ri5cyImpl constructor.
+	(Ri5cy::gdbServer): Created.
+	* targets/ri5cy/Ri5cy.h: Use standards compliant header guard.
+	(class Ri5cy): Change prototype of constructor, add gdbServer
+	method.
+	* targets/ri5cy/Ri5cyImpl.cpp: Remove include of Disassembler.h
+	and add GdbServer.h and TraceFlags.h, include sstream and add
+	using for std:cout and std::ostringstream.
+	(Ri5cyImpl::Ri5cyImpl): Change prototype, initialize mFlags and
+	mServer members, remove initialization of mWantVcd, do not
+	initialize disasembler.
+	(Ri5cyImpl::~Ri5cyImpl): Do not delete diassembler.
+	(Ri5cyImpl::gdbServer): Created.
+	(Ri5cyImpl::clockModel): Use mFlags->traceVcd () instead of
+	mWantVcd, call out to mServer to do diassembly.
+	* targets/ri5cy/Ri5cyImpl.h: Use standards compliant header guard.
+	(class Ri5cyImpl): Change prototype of constructor, add gdbsrever
+	method, add members mFlags and mServer and remove mWantVcd.
+	* trace/Makefile.am: Created.
+	* trace/Makefile.in: Generated.
+	* trace/TraceFlags.cpp: Moved from server directory.
+	* trace/TraceFlags.h: Moved from server directory and use
+	standards compliant header guard.
+
 -2017-08-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	Use symbolic names for trace flags.

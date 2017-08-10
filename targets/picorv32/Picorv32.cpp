@@ -44,10 +44,12 @@ static const size_t RUN_SAMPLE_PERIOD = 10000;
 
 //! @param[in] wantVcd  TRUE if we want a VCD generated, false otherwise.
 
-Picorv32::Picorv32 (bool  wantVcd) :
-  mWantVcd (wantVcd)
+Picorv32::Picorv32 (TraceFlags * flags) :
+  ITarget (flags),
+  mServer (nullptr),
+  mFlags (flags)
 {
-  mPicorv32Impl = new Picorv32Impl (wantVcd);
+  mPicorv32Impl = new Picorv32Impl (flags);
 
 }	// Picorv32::Picorv32 ()
 
@@ -116,7 +118,7 @@ ITarget::ResumeRes
 Picorv32::reset (ITarget::ResetType  type  __attribute__ ((unused)) )
 {
   delete mPicorv32Impl;
-  mPicorv32Impl = new Picorv32Impl (mWantVcd);
+  mPicorv32Impl = new Picorv32Impl (mFlags);
 
   if (mPicorv32Impl)
   {
@@ -202,6 +204,13 @@ Picorv32::command (const std::string cmd, std::ostream & stream)
 {
   std::cerr << "command NOT IMPLEMENTED" << std::endl;
   return false;
+}
+
+
+void
+Picorv32::gdbServer (GdbServer *server)
+{
+  mServer = server;
 }
 
 

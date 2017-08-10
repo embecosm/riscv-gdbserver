@@ -20,8 +20,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef PICORV32__H
-#define PICORV32__H
+#ifndef PICORV32_H
+#define PICORV32_H
 
 #include "ITarget.h"
 
@@ -40,7 +40,7 @@ class Picorv32 final : public ITarget
 
   // Constructor and destructor
 
-  Picorv32 (bool  wantVcd);
+  Picorv32 (TraceFlags * flags);
   ~Picorv32 ();
 
   virtual ResumeRes  resume (ResumeType step,
@@ -90,16 +90,24 @@ class Picorv32 final : public ITarget
   virtual bool command (const std::string  cmd,
 			std::ostream & stream);
 
-  // Verilator support
+  // Identify the server
+
+  void gdbServer (GdbServer *server);
+
+// Verilator support
 
   virtual double timeStamp ();
 
 
  private:
 
-  //! Do we want a VCD trace? @todo Should not have this in this class.
+  //! The server using us. @todo Should not have this in this class.
 
-  bool  mWantVcd;
+  GdbServer *mServer;
+
+  //! The traceflags we were given. @todo Should not have this in this class.
+
+  TraceFlags *mFlags;
 
   //! The implementation class for PicoRV32
 
@@ -108,7 +116,7 @@ class Picorv32 final : public ITarget
 };	// class Picorv232
 
 
-#endif	// PICORV32__H
+#endif	// PICORV32_H
 
 // Local Variables:
 // mode: C++
