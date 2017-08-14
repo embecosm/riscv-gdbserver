@@ -55,12 +55,12 @@ class Ri5cyImpl final
   // Read contents of a target register.
 
   std::size_t  readRegister (const int  reg,
-			     uint32_t & value);
+			     uint64_t & value);
 
   // Write data to a target register.
 
   std::size_t  writeRegister (const int  reg,
-			      const uint32_t  value);
+			      const uint64_t  value);
 
   // Read data from memory.
 

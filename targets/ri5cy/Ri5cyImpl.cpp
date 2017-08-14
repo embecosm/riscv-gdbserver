@@ -234,7 +234,7 @@ Ri5cyImpl::getInstrCount () const
 
 std::size_t
 Ri5cyImpl::readRegister (const int  reg,
-			 uint32_t & value)
+			 uint64_t & value)
 {
   if (!mCoreHalted)
     {
@@ -246,7 +246,7 @@ Ri5cyImpl::readRegister (const int  reg,
   uint16_t dbg_addr;
 
   if ((REG_R0 <= reg) && (reg <= REG_R31))
-      dbg_addr = DBG_GPR0 + reg * 4;	// General register
+      dbg_addr = DBG_GPR0 + reg * 8;	// General register
   else if (REG_PC == reg)
       dbg_addr = DBG_NPC;		// Next PC
   else if (CSR_MISA == reg)
@@ -257,13 +257,13 @@ Ri5cyImpl::readRegister (const int  reg,
            << reg << ": zero returned."
 	   << endl;
       value = 0;
-      return 4;
+      return 8;
     }
 
   // Read via debug
 
   value = readDebugReg (dbg_addr);
-  return 4;
+  return 8;
 
 }	// Ri5cyImpl::readRegister ()
 
@@ -280,7 +280,7 @@ Ri5cyImpl::readRegister (const int  reg,
 
 std::size_t
 Ri5cyImpl::writeRegister (const int  reg,
-			  const uint32_t  value)
+			  const uint64_t  value)
 {
   if (!mCoreHalted)
     {
@@ -292,7 +292,7 @@ Ri5cyImpl::writeRegister (const int  reg,
   uint16_t dbg_addr;
 
   if ((REG_R0 <= reg) && (reg <= REG_R31))
-    dbg_addr = DBG_GPR0 + reg * 4;    // General register
+    dbg_addr = DBG_GPR0 + reg * 8;    // General register
   else if (REG_PC == reg)
     dbg_addr = DBG_NPC;               // Next PC
   else if (CSR_MISA == reg)
@@ -302,13 +302,13 @@ Ri5cyImpl::writeRegister (const int  reg,
     cerr << "Warning: Attempt to write non-existent register "
          << reg << ": zero returned."
          << endl;
-    return 4;
+    return 8;
   }
 
   // Write via debug
 
   writeDebugReg (dbg_addr, value);
-  return 4;
+  return 8;
 
 }	// Ri5cyImpl::writeRegister ()
 

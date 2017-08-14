@@ -153,7 +153,7 @@ Ri5cy::getInstrCount (void) const
 
 std::size_t
 Ri5cy::readRegister (const int  reg,
-		     uint32_t & value) const
+		     uint64_t & value) const
 {
   return mRi5cyImpl->readRegister (reg, value);
 
@@ -170,7 +170,7 @@ Ri5cy::readRegister (const int  reg,
 
 std::size_t
 Ri5cy::writeRegister (const int  reg,
-		      const uint32_t  value)
+		      const uint64_t  value)
 {
   return mRi5cyImpl->writeRegister (reg, value);
 

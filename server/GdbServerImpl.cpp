@@ -164,7 +164,7 @@ GdbServerImpl::rspSyscallRequest ()
   lastPacketType = pkt->data[0];
 
   // Get the args from the appropriate regs and send an F packet
-  uint32_t a0, a1, a2, a3, a7;
+  uint64_t a0, a1, a2, a3, a7;
   cpu->readRegister (10, a0);
   cpu->readRegister (11, a1);
   cpu->readRegister (12, a2);
@@ -586,7 +586,7 @@ GdbServerImpl::rspReadAllRegs ()
   // endianness.
   for (int  regNum = 0; regNum < RISCV_NUM_REGS; regNum++)
     {
-      uint32_t  val;		// Enough for even the PC
+      uint64_t  val;		// Enough for even the PC
       int       byteSize;	// Size of reg in bytes
 
       byteSize = cpu->readRegister (regNum, val);
@@ -767,7 +767,7 @@ GdbServerImpl::rspReadReg ()
 
   // Get the relevant register. GDB client expects them to be packed according
   // to target endianness.
-  uint32_t  val;
+  uint64_t  val;
   int       byteSize;
 
   byteSize = cpu->readRegister (regNum, val);
@@ -803,8 +803,8 @@ GdbServerImpl::rspWriteReg ()
       return;
     }
 
-  int      byteSize = 4;	// @todo automate this. Size of reg in bytes
-  uint32_t val = Utils::hex2Val (valstr, byteSize, true /* little endian */);
+  int      byteSize = 8;	// @todo automate this. Size of reg in bytes
+  uint64_t val = Utils::hex2Val (valstr, byteSize, true /* little endian */);
 
   if (byteSize != cpu->writeRegister (regNum, val))
     cerr << "Warning: Size != " << byteSize << " when writing reg " << regNum

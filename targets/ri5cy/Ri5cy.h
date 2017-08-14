@@ -58,12 +58,12 @@ class Ri5cy final : public ITarget
   // Read contents of a target register.
 
   virtual std::size_t  readRegister (const int  reg,
-				     uint32_t & value) const;
+				     uint64_t & value) const;
 
   // Write data to a target register.
 
   virtual std::size_t  writeRegister (const int  reg,
-				      const uint32_t  value);
+				      const uint64_t  value);
 
   // Read data from memory.
 

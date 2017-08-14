@@ -104,12 +104,12 @@ class ITarget
   // Read contents of a target register.
 
   virtual std::size_t  readRegister (const int  reg,
-				     uint32_t & value) const = 0;
+				     uint64_t & value) const = 0;
 
   // Write data to a target register.
 
   virtual std::size_t  writeRegister (const int  reg,
-				      const uint32_t  value) = 0;
+				      const uint64_t  value) = 0;
 
   // Read data from memory.
 
