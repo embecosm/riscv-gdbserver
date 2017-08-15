@@ -66,11 +66,11 @@ GdbServerImpl::GdbServerImpl (AbstractConnection * _conn,
 			      GdbServer::KillBehaviour _killBehaviour) :
   cpu (_cpu),
   traceFlags (_traceFlags),
+  rsp (_conn),
   timeout (duration <double>::zero ()),
   killBehaviour (_killBehaviour)
 {
   pkt           = new RspPacket (RSP_PKT_SIZE);
-  rsp           = _conn;
   mpHash        = new MpHash ();
   mDisassembler = new Disassembler ();
 
@@ -83,7 +83,6 @@ GdbServerImpl::~GdbServerImpl ()
 {
   delete  mDisassembler;
   delete  mpHash;
-  delete  rsp;
   delete  pkt;
 
 }	// ~GdbServerImpl

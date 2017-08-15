@@ -1,3 +1,10 @@
+2017-08-15  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* server/GdbServerImpl.cpp (GdbServerImpl::GdbServerImpl):
+	Initialise rsp member using initialisation list, not within
+	method body.
+	(GdbServerImpl::~GdbServerImpl): Don't delete rsp member.
+
 2017-08-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	Break out trace as a library in its own right to be shared by
