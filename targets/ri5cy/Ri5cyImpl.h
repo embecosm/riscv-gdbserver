@@ -173,6 +173,10 @@ private:
 
   vluint64_t  mCpuTime;
 
+  //! Last program counter. Used for disassembly tracing.
+
+  uint64_t mLastPc;
+
   // Helper methods
 
   void clockModel ();

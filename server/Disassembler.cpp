@@ -22,9 +22,26 @@
 #include <cstring>
 #include <cstdio>
 #include <iostream>
+#include <sstream>
 
 #include "Disassembler.h"
 
+// disass_fprintf is called multiple times for one insn by print_insn_riscv -
+// once for each token printed. We hold on to disass_str for the duration of one
+// print_insn_riscv call to accumulate all the tokens.
+
+std::stringstream *disass_str;
+
+extern "C" int disass_fprintf(char* stream, const char* format, ...)
+{
+  va_list args;
+
+  va_start(args, format);
+  int result = vsprintf(stream, format, args);
+  va_end(args);
+  (*disass_str) << stream;
+  return result;
+}
 
 //! Constructor
 
@@ -33,7 +50,7 @@
 Disassembler::Disassembler ()
 {
   init_disassemble_info (&mDisasmInfo, mDisasStr,
-			 reinterpret_cast <fprintf_ftype> (sprintf));
+			 reinterpret_cast <fprintf_ftype> (disass_fprintf));
   disassemble_init_for_target (&mDisasmInfo);
 
   mDisasmInfo.buffer        = mVals;
@@ -59,9 +76,11 @@ Disassembler::disassemble (uint32_t       insn,
 			   std::ostream & stream)
 {
   memcpy (mVals, &insn, sizeof (insn));
+  disass_str = new std::stringstream();
   print_insn_riscv (reinterpret_cast<bfd_vma> (mVals),
 		    static_cast<disassemble_info *> (&mDisasmInfo));
-  stream << mDisasStr;
+  stream << disass_str->str();
+  delete disass_str;
 
 }	// Disassembler::disassemble ()
 

@@ -21,6 +21,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
+#include <iomanip>
 #include <cstdint>
 #include <cstdlib>
 #include <sstream>
@@ -53,7 +54,8 @@ Ri5cyImpl::Ri5cyImpl (TraceFlags * flags) :
   mCoreHalted (false),
   mCycleCnt (0),
   mInstrCnt (0),
-  mCpuTime (0)
+  mCpuTime (0),
+  mLastPc (0)
 {
   mCpu = new Vtop;
 
@@ -474,24 +476,35 @@ Ri5cyImpl::clockModel ()
 
   mCycleCnt++;
 
-  if (mFlags->traceDisas ())
+  // Disassembly trace.
+  //
+  // We can only do this once we have the server available to do
+  // disassembly. This means it can't be done during the reset
+  // sequence, since that is part of the constructor.
+  //
+  // Instruction decode must be valid at the point we read the instruction.
+
+  Vtop_riscv_id_stage* id_stage = mCpu->top->riscv_core_i->id_stage_i;
+
+  if ((mFlags->traceDisas ())
+   && (nullptr != mServer)
+   && (id_stage->id_valid_o))
     {
-      // Optionally disassemble an instruction.  This is Ian Bolton's code,
-      // moved to the server to be generic.
+      uint64_t currentPc = id_stage->pc_id_i;
 
-      // @todo We need to be able to extract the actual instruction from the
-      //       Verilator model.  For now we hard code NOP (0x00000013).
+      if (mLastPc != currentPc)
+        {
+          stringstream iss;
+          ostringstream oss;
+          iss << "disas 0x" << std::hex << id_stage->instr;
+          mServer->command (iss.str(), oss);
 
-      // @todo We can only do this once we have the server available to do
-      //       disassembly. This means it can't be done during the reset
-      //       sequence, since that is part of the constructor.
+          cerr << std::hex << std::setfill('0') << std::setw(8) << currentPc;
+          cerr << " " << std::setw(8) << id_stage->instr << "  " << oss.str ();
+          cerr << std::dec << endl;
 
-      if (nullptr != mServer)
-	{
-	  ostringstream oss;
-	  mServer->command ("disas 0x00000013", oss);
-	  cout << oss.str () << endl;
-	}
+          mLastPc = currentPc;
+        }
     }
 }	// Ri5cyImpl::clockModel ()
 

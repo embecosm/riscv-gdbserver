@@ -4,3 +4,5 @@
 autom4te.cache/
 # Build directory
 bd/
+# GDB files
+.gdb_history
