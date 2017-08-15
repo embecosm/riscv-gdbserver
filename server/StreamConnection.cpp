@@ -94,11 +94,11 @@ StreamConnection::rspConnect ()
 }	// rspConnect ()
 
 
-//! Close a client connection if it is open
+//! Close a client connection if it is open. Nothing to do with stdin or
+//! stdout.
 void
 StreamConnection::rspClose ()
 {
-  abort ();
 }	// rspClose ()
 
 

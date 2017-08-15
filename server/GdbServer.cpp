@@ -57,10 +57,10 @@ GdbServer::~GdbServer ()
 
 //! Wrap the implementation class
 
-void
+int
 GdbServer::rspServer ()
 {
-  mServerImpl->rspServer ();
+  return mServerImpl->rspServer ();
 
 }	// GdbServer::rspServer ()
 

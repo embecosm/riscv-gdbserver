@@ -66,7 +66,7 @@ public:
 
   // Main loop to listen for and service RSP requests.
 
-  void  rspServer ();
+  int rspServer ();
 
   // Callback for target to use
 

@@ -195,9 +195,9 @@ main (int   argc,
   GdbServer *gdbServer = new GdbServer (conn, cpu, traceFlags, killBehaviour);
   cpu->gdbServer (gdbServer);
 
-  // Run the GDB server. If we return, then we have hit some sort of problem.
+  // Run the GDB server.
 
-  gdbServer->rspServer ();
+  int ret = gdbServer->rspServer ();
 
   // Free memory
 
@@ -207,7 +207,7 @@ main (int   argc,
   delete  cpu;
   free (coreName);
 
-  return EXIT_FAILURE;			// If we return it's a failure!
+  return ret;
 
 }	/* sc_main() */
 

@@ -62,7 +62,7 @@ public:
 
   // Main loop to listen for and service RSP requests.
 
-  void  rspServer ();
+  int  rspServer ();
 
   // Callback for target to use
 
@@ -143,6 +143,10 @@ private:
 
   //! How to behave when we get a kill (k) packet.
   GdbServer::KillBehaviour killBehaviour;
+
+  //! Whether some cause for exit from the server has arisen
+
+  bool mExitServer;
 
   // Main RSP request handler
   void  rspClientRequest ();
