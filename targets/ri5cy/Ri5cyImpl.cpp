@@ -557,7 +557,7 @@ Ri5cyImpl::waitForHalt ()
 //! @param[in] dbg_reg  The debug register to read.
 //! @return  The value read.
 
-uint32_t
+uint64_t
 Ri5cyImpl::readDebugReg (const uint16_t  dbg_reg)
 {
   // Set up the register to read
@@ -595,7 +595,7 @@ Ri5cyImpl::readDebugReg (const uint16_t  dbg_reg)
 
 void
 Ri5cyImpl::writeDebugReg (const uint16_t  dbg_reg,
-			  const uint32_t  dbg_val)
+			  const uint64_t  dbg_val)
 {
   mCpu->debug_req_i   = 1;
   mCpu->debug_addr_i  = dbg_reg;
@@ -682,7 +682,7 @@ Ri5cyImpl::runToBreak (duration <double>  timeout,
 
   // Find out where we stopped, so we can look for our Syscall pattern planted
   // within newlib/libgloss.
-  uint32_t stoppedAddress = readDebugReg (DBG_PPC);
+  uint64_t stoppedAddress = readDebugReg (DBG_PPC);
 
   // The pattern we've used in newlib/libgloss for each supported syscall
   // is an ebreak with a nop before and after it. (It would ordinarily have

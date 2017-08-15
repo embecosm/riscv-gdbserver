@@ -187,9 +187,9 @@ private:
   void resetModel ();
   void haltModel ();
   void waitForHalt ();
-  uint32_t readDebugReg (const uint16_t  dbg_reg);
+  uint64_t readDebugReg (const uint16_t  dbg_reg);
   void writeDebugReg (const uint16_t  dbg_reg,
-		      const uint32_t  dbg_val);
+		      const uint64_t  dbg_val);
   ITarget::ResumeRes  stepInstr (std::chrono::duration <double>  timeout,
 				 SyscallInfo * syscallInfo = nullptr);
   ITarget::ResumeRes  runToBreak (std::chrono::duration <double>  timeout,
