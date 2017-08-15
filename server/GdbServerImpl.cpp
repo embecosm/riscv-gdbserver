@@ -68,7 +68,8 @@ GdbServerImpl::GdbServerImpl (AbstractConnection * _conn,
   traceFlags (_traceFlags),
   rsp (_conn),
   timeout (duration <double>::zero ()),
-  killBehaviour (_killBehaviour)
+  killBehaviour (_killBehaviour),
+  mExitServer (false)
 {
   pkt           = new RspPacket (RSP_PKT_SIZE);
   mpHash        = new MpHash ();
@@ -92,11 +93,11 @@ GdbServerImpl::~GdbServerImpl ()
 
 //! This only terminates if there was an error.
 
-void
+int
 GdbServerImpl::rspServer ()
 {
   // Loop processing commands forever
-  while (true)
+  while (!mExitServer)
     {
       // Make sure we are still connected.
       while (!rsp->isConnected ())
@@ -106,13 +107,15 @@ GdbServerImpl::rspServer ()
 	    {
 	      // Serious failure. Must abort execution.
 	      cerr << "*** Unable to continue: ABORTING" << endl;
-	      return;
+	      return EXIT_FAILURE;
 	    }
 	}
 
       // Get a RSP client request
       rspClientRequest ();
     }
+
+  return EXIT_SUCCESS;
 }	// rspServer ()
 
 
@@ -427,10 +430,7 @@ GdbServerImpl::rspClientRequest ()
       switch (killBehaviour)
 	{
 	case GdbServer::KillBehaviour::EXIT_ON_KILL:
-	  // Like the 'monitor exit' command this is a bit grotty.  Would
-	  // be better if we could return from gdbserver and have main
-	  // delete everything and exit cleanly that way.
-	  exit (EXIT_SUCCESS);
+          mExitServer = true;
 	  break;
 
 	case GdbServer::KillBehaviour::RESET_ON_KILL:

@@ -63,7 +63,7 @@ public:
 
   // Main loop to listen for and service RSP requests.
 
-  void  rspServer ();
+  int  rspServer ();
 
   // Callback for target to use
 
@@ -148,6 +148,10 @@ private:
   //! The diassembler
 
   Disassembler *mDisassembler;
+
+  //! Whether some cause for exit from the server has arisen
+
+  bool mExitServer;
 
   // Main RSP request handler
   void  rspClientRequest ();
