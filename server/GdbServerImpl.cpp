@@ -1014,11 +1014,7 @@ GdbServerImpl::rspCommand ()
     }
   else if (0 == strcmp (cmd, "exit"))
     {
-      // This is a bit of a kludge. It would be much better to be deleted
-      // cleanly from the top.
-
-      delete cpu;
-      exit (EXIT_SUCCESS);
+      mExitServer = true;
     }
   else if (1 == sscanf (cmd, "timeout %d", &timeout))
     {
