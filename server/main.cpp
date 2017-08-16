@@ -204,8 +204,8 @@ main (int   argc,
 
   delete  conn;
   delete  gdbServer;
-  delete  traceFlags;
   delete  cpu;
+  delete  traceFlags;
   free (coreName);
 
   return ret;
