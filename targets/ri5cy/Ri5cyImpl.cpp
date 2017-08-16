@@ -69,6 +69,11 @@ Ri5cyImpl::Ri5cyImpl (TraceFlags * flags) :
       mTfp->open ("gdbserver.vcd");
     }
 
+  if (mFlags->traceDisas ())
+    {
+      mDisasFile.open("trace-disas.txt");
+    }
+
   // Reset and halt the model
 
   resetModel ();
@@ -86,6 +91,9 @@ Ri5cyImpl::~Ri5cyImpl ()
 
   if (mFlags->traceVcd ())
     mTfp->close ();
+
+  if (mFlags->traceDisas ())
+    mDisasFile.close ();
 
   delete mCpu;
 
@@ -499,9 +507,9 @@ Ri5cyImpl::clockModel ()
           iss << "disas 0x" << std::hex << id_stage->instr;
           mServer->command (iss.str(), oss);
 
-          cerr << std::hex << std::setfill('0') << std::setw(8) << currentPc;
-          cerr << " " << std::setw(8) << id_stage->instr << "  " << oss.str ();
-          cerr << std::dec << endl;
+          mDisasFile << std::hex << std::setfill('0') << std::setw(8) << currentPc;
+          mDisasFile << " " << std::setw(8) << id_stage->instr << "  " << oss.str ();
+          mDisasFile << std::dec << endl;
 
           mLastPc = currentPc;
         }

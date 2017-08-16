@@ -24,6 +24,7 @@
 #define RI5CY_IMPL_H
 
 #include <cstdint>
+#include <fstream>
 
 #include "ITarget.h"
 #include "Vtop.h"
@@ -176,6 +177,10 @@ private:
   //! Last program counter. Used for disassembly tracing.
 
   uint64_t mLastPc;
+
+  //! Disassembly trace file pointer
+
+  ofstream mDisasFile;
 
   // Helper methods
 
