@@ -507,6 +507,7 @@ Ri5cyImpl::clockModel ()
           iss << "disas 0x" << std::hex << id_stage->instr;
           mServer->command (iss.str(), oss);
 
+          mDisasFile << std::setfill(' ') << std::setw(9) << mCpuTime << "  ";
           mDisasFile << std::hex << std::setfill('0') << std::setw(8) << currentPc;
           mDisasFile << " " << std::setw(8) << id_stage->instr << "  " << oss.str ();
           mDisasFile << std::dec << endl;
