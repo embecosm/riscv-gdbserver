@@ -118,6 +118,8 @@ private:
   const uint16_t DBG_NPC     = 0x2000;	//!< Next PC
   const uint16_t DBG_PPC     = 0x2004;	//!< Prev PC
 
+  const uint32_t DBG_CSR_MISA = 0x4301; //!< CSR MISA
+
   // Debug register flags
 
   const uint32_t DBG_CTRL_HALT = 0x00010000;	//!< Halt core
@@ -141,6 +143,12 @@ private:
   const int REG_R0  = 0;		//!< GDB R0 regnum
   const int REG_R31 = 31;		//!< GDB R31 regnum
   const int REG_PC  = 32;		//!< GDB PC regnum
+
+  // CSRs. CSRs start at register 65, which offsets the CSR numbers
+  // specified in the privileged specification:
+  // https://riscv.org/specifications/privileged-isa/
+
+  const int CSR_MISA    = 0x342;
 
   //! Our invoking server
 

@@ -259,9 +259,12 @@ Ri5cyImpl::readRegister (const int  reg,
       dbg_addr = DBG_GPR0 + reg * 4;	// General register
   else if (REG_PC == reg)
       dbg_addr = DBG_NPC;		// Next PC
+  else if (CSR_MISA == reg)
+      dbg_addr = DBG_CSR_MISA;          // MISA
   else
     {
-      cerr << "Warning: Attempt to read non-existent register: zero returned."
+      cerr << "Warning: Attempt to read non-existent register "
+           << reg << ": zero returned."
 	   << endl;
       value = 0;
       return 4;
@@ -302,9 +305,13 @@ Ri5cyImpl::writeRegister (const int  reg,
     dbg_addr = DBG_GPR0 + reg * 4;    // General register
   else if (REG_PC == reg)
     dbg_addr = DBG_NPC;               // Next PC
+  else if (CSR_MISA == reg)
+      dbg_addr = DBG_CSR_MISA;        // MISA.
   else
   {
-    cerr << "Warning: Attempt to write non-existent register: ignored." << endl;
+    cerr << "Warning: Attempt to write non-existent register "
+         << reg << ": zero returned."
+         << endl;
     return 4;
   }
 
