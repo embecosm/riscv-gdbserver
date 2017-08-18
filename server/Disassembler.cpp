@@ -54,7 +54,7 @@ Disassembler::Disassembler ()
   disassemble_init_for_target (&mDisasmInfo);
 
   mDisasmInfo.buffer        = mVals;
-  mDisasmInfo.buffer_vma    = reinterpret_cast<bfd_vma> (mVals);
+  mDisasmInfo.buffer_vma    = 0;
   mDisasmInfo.buffer_length = sizeof (uint32_t);
 
 }	// Disassembler::Disassembler ()
@@ -77,7 +77,7 @@ Disassembler::disassemble (uint32_t       insn,
 {
   memcpy (mVals, &insn, sizeof (insn));
   disass_str = new std::stringstream();
-  print_insn_riscv (reinterpret_cast<bfd_vma> (mVals),
+  print_insn_riscv (0,
 		    static_cast<disassemble_info *> (&mDisasmInfo));
   stream << disass_str->str();
   delete disass_str;
