@@ -1,3 +1,7 @@
+2017-08-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* README.md: Do not suggested SSH connection for model by default.
+
 2017-08-15  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/GdbServerImpl.cpp (GdbServerImpl::GdbServerImpl):
