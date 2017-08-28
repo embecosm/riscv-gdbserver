@@ -16,7 +16,8 @@ required to build our RISCV model.
 To create a riscv-gdbserver binary after a fresh checkout of this repo:
 
 ```
-git clone ssh://git@github.com/embecosm/picorv32
+
+git clone https://github.com/embecosm/picorv32.git
 cd picorv32/scripts/gdbserver
 make
 cd ../../..
@@ -26,6 +27,9 @@ autoreconf --install
            VTESTBENCH=`pwd`/picorv32/scripts/gdbserver/obj_dir
 make
 ```
+
+(if you have write permission to this repo you could clone with
+`git clone ssh://git@github.com/embecosm/picorv32`).
 
 If you wish to build outside the source tree, that also works, but be sure
 to amend VTESTBENCH in the configure command.
