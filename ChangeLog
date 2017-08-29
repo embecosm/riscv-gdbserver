@@ -1,3 +1,9 @@
+2017-08-29  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* server/Makefile.am: Rename final target to riscv32-gdbserver.
+	* server/Makefile.in: Regenerated.
+	* server/main.cpp: Use riscv32-gdbserver in usage message.
+
 2017-08-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* README.md: Bring build instructions up to date for latest code
