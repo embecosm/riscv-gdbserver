@@ -60,12 +60,12 @@ static ITarget * cpu;
 static void
 usage (ostream & s)
 {
-  s << "Usage: riscv-gdbserver --core | -c <corename>" << endl
-    << "                       [ --trace | -t <traceflag> ]" << endl
-    << "                       [ --silent | -q ]" << endl
-    << "                       [ --stdin | -s ]" << endl
-    << "                       [ --help | -h ]" << endl
-    << "                       <rsp-port>" << endl
+  s << "Usage: riscv32-gdbserver --core | -c <corename>" << endl
+    << "                         [ --trace | -t <traceflag> ]" << endl
+    << "                         [ --silent | -q ]" << endl
+    << "                         [ --stdin | -s ]" << endl
+    << "                         [ --help | -h ]" << endl
+    << "                         <rsp-port>" << endl
     << endl
     << "The trace option may appear multiple times. Trace flags are:" << endl
     << "  rsp     Trace RSP packets" << endl
