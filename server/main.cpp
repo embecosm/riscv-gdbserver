@@ -72,8 +72,9 @@ usage (ostream & s)
     << "  conn    Trace RSP connection handling" << endl
     << "  break   Trace breakpoint handling" << endl
     << "  vcd     Generate a Verilog Change Dump" << endl
-    << "  disass  Disassemble each instruction executed" << endl
-    << "  silent  Minimize informative messages (synonym for -q)" << endl;
+    << "  silent  Minimize informative messages (synonym for -q)" << endl
+    << "  disas   Disassemble each instruction executed" << endl
+    << "  dflush  Flush disassembly to file after each step" << endl;
 
 }	// usage ()
 

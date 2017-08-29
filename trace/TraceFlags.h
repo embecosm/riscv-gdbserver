@@ -73,6 +73,7 @@ public:
   bool traceVcd () const;
   bool traceSilent () const;
   bool traceDisas () const;
+  bool traceDflush () const;
   bool isFlag (const char *flagName) const;
   void flag (const char *flagName,
 	     const bool  val);
@@ -93,7 +94,8 @@ private:
   static const unsigned int TRACE_BREAK  = 0x00000004;	//!< Trace breakpoints
   static const unsigned int TRACE_VCD    = 0x00000008;	//!< Generate VCD
   static const unsigned int TRACE_SILENT = 0x00000010;  //!< Reduce messages
-  static const unsigned int TRACE_DISAS  = 0x00000020;  //!< Reduce messages
+  static const unsigned int TRACE_DISAS  = 0x00000020;  //!< Disassemble
+  static const unsigned int TRACE_DFLUSH = 0x00000040;  //!< Flush disas each step
 
   static const unsigned int TRACE_NONE   = 0x00000000;	//!< Trace nothing
   static const unsigned int TRACE_BAD    = 0xffffffff;	//!< Invalid flag bit

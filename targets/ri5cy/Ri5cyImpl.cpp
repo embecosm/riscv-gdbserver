@@ -519,6 +519,9 @@ Ri5cyImpl::clockModel ()
           mDisasFile << " " << std::setw(8) << id_stage->instr << "  " << oss.str ();
           mDisasFile << std::dec << endl;
 
+	  if (mFlags->traceDflush ())
+	    mDisasFile.flush ();
+
           mLastPc = currentPc;
         }
     }

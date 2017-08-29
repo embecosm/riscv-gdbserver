@@ -1,5 +1,16 @@
 2017-08-29  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	* server/main.cpp (usage): Add dflush flag.
+	* targets/ri5cy/Ri5cyImpl.cpp: Flush disassembly if dflush flag is
+	set.
+	* trace/TraceFlags.cpp (TraceFlags): Initialize flags table for
+	dflush.
+	(dflush): Created.
+	* trace/TraceFlags.h (class TraceFlags): Add dflush method and
+	TRACE_DFLUSH constant.
+
+2017-08-29  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* server/Makefile.am: Rename final target to riscv32-gdbserver.
 	* server/Makefile.in: Regenerated.
 	* server/main.cpp: Use riscv32-gdbserver in usage message.

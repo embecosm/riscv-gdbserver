@@ -141,6 +141,7 @@ TraceFlags::TraceFlags () :
       sFlagInfo.push_back ({ TRACE_VCD,    "vcd"    });
       sFlagInfo.push_back ({ TRACE_SILENT, "silent" });
       sFlagInfo.push_back ({ TRACE_DISAS,  "disas"  });
+      sFlagInfo.push_back ({ TRACE_DISAS,  "dflush" });
     }
 }	// TraceFlags::TraceFlags ()
 
@@ -223,6 +224,17 @@ TraceFlags::traceDisas () const
   return (mFlags & TRACE_DISAS) == TRACE_DISAS;
 
 }	// TraceFlags::traceDisas ()
+
+
+//! Is per step disassembly flushing enabled?
+//! @return  TRUE if the DFLUSH tracing flag is set, FALSE otherwise
+
+bool
+TraceFlags::traceDflush () const
+{
+  return (mFlags & TRACE_DFLUSH) == TRACE_DFLUSH;
+
+}	// TraceFlags::traceDflush ()
 
 
 //! Is this a real flag
