@@ -60,7 +60,7 @@ static ITarget * cpu;
 static void
 usage (ostream & s)
 {
-  s << "Usage: riscv32-gdbserver --core | -c <corename>" << endl
+  s << "Usage: riscv64-gdbserver --core | -c <corename>" << endl
     << "                         [ --trace | -t <traceflag> ]" << endl
     << "                         [ --silent | -q ]" << endl
     << "                         [ --stdin | -s ]" << endl
