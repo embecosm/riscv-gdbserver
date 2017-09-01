@@ -1,3 +1,8 @@
+2017-09-01  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* targets/ri5cy/Ri5cyImpl.h (Ri5cyImpl::DBG_PPC): Adjust for
+	64-bit register width.
+
 2017-08-29  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* server/Makefile.am: Rename final target to riscv64-gdbserver.

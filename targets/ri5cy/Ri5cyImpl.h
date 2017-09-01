@@ -115,7 +115,7 @@ private:
   const uint16_t DBG_GPR0    = 0x0400;	//!< General purpose register 0
   const uint16_t DBG_GPR31   = 0x047c;	//!< General purpose register 41
   const uint16_t DBG_NPC     = 0x2000;	//!< Next PC
-  const uint16_t DBG_PPC     = 0x2004;	//!< Prev PC
+  const uint16_t DBG_PPC     = 0x2008;	//!< Prev PC (adjusted for 64-bit)
 
   const uint32_t DBG_CSR_MISA = 0x4301; //!< CSR MISA
 
