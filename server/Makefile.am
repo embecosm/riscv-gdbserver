@@ -51,6 +51,7 @@ riscv32_gdbserver_LDADD = ../targets/libtargets.la             \
                           @MDIR_RI5CY@/verilated_vcd_c.o       \
                           @MDIR_RI5CY@/verilated_dpi.o         \
                           @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a \
+			  @MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a \
                           -L$(BINUTILS_LIBDIR) -lopcodes -lbfd
 
 riscv32_gdbserver_CPPFLAGS = -I$(top_srcdir)/targets          \
