@@ -1,3 +1,8 @@
+2017-09-12  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* Makefile.in: Regenerate with official automake 1.15 rather than
+	a patched version.
+
 2017-09-01  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* targets/ri5cy/Ri5cyImpl.h (Ri5cyImpl::DBG_PPC): Adjust for
