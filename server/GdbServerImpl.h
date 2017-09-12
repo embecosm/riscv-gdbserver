@@ -40,7 +40,7 @@
 #include "RspConnection.h"
 #include "RspPacket.h"
 #include "TraceFlags.h"
-
+#include "RegisterSizes.h"
 
 
 //! Module implementing a GDB RSP server.
@@ -96,7 +96,7 @@ private:
 
   //! Total bytes taken by regs. 4 bytes for each
 
-  static const int RISCV_NUM_REG_BYTES = RISCV_NUM_REGS * 8;
+  static const int RISCV_NUM_REG_BYTES = RISCV_NUM_REGS * sizeof (uint_reg_t);
 
   //! Minimum packet size for RSP. Must be large enough for any initial
   //! dialogue. Should at least allow all the registers ASCII encloded + end of

@@ -1,3 +1,49 @@
+2017-09-13  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config.h.in: Regenerate.
+	* configure: Regenerate.
+	* configure.ac: Add --with-xlen configure switch.
+	* server/Disassembler.cpp: Add config.h include.
+	(Disassembler::Disassembler): Set correct mach depending on if
+	we're building 32 or 64 bit.
+	* server/main.cpp: Add config.h include.
+	(usage): Select correct program name based on whether we're
+	building 32 or 64 bit.
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallRequest):
+	Change to use register type.
+	(GdbServerImpl::rspReadAllRegs): Likewise.
+	(GdbServerImpl::rspWriteAllRegs): Likewise.
+	(GdbServerImpl::rspReadReg): Likewise.
+	(GdbServerImpl::rspWriteReg): Likewise.
+	* server/GdbServerImpl.h: Add RegisterSizes.h include.
+	(GdbServerImpl::RISCV_NUM_REG_BYTES): Depend on register size.
+	* server/Makefile.am: Make program name switchable at configure
+	time.
+	* server/Makefile.in: Regenerate.
+	* targets/ITarget.h: Add RegisterSizes.h include.
+	(ITarget::readRegister): Update parameter types to use register
+	size types.
+	(ITarget::writeRegister): Likewise.
+	* targets/common/RegisterSizes.h: New file.
+	* targets/ri5cy/Ri5cy.cpp (Ri5cy::readRegister): Update parameter
+	types to use register size types.
+	(Ri5cy::::writeRegister): Likewise.
+	* targets/ri5cy/Ri5cy.h (Ri5cy::readRegister): Update parameter
+	types to use register size types.
+	(Ri5cy::::writeRegister): Likewise.
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::readRegister): Update to
+	use register size types.
+	(Ri5cyImpl::writeRegister): Likewise.
+	(Ri5cyImpl::readDebugReg): Likewise.
+	(Ri5cyImpl::writeDebugReg): Likewise.
+	(Ri5cyImpl::runToBreak): Likewise.
+	* targets/ri5cy/Ri5cyImpl.h (Ri5cyImpl::readRegister): Update
+	parameters to use register size types.
+	(Ri5cyImpl::writeRegister): Likewise.
+	(Ri5cyImpl::readDebugReg): Likewise.
+	(Ri5cyImpl::writeDebugReg): Likewise.
+	(Ri5cyImpl::DBG_PPC): Define using register size.
+
 2017-09-12  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* Makefile.in: Regenerate with official automake 1.15 rather than

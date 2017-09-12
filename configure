@@ -638,6 +638,8 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 VTESTBENCH
+BUILD_64_BIT_FALSE
+BUILD_64_BIT_TRUE
 BINUTILS_INCDIR
 MODNAME_RI5CY
 MDIR_RI5CY
@@ -782,6 +784,7 @@ with_picorv32_topmodule
 with_ri5cy_modeldir
 with_ri5cy_topmodule
 with_binutils_incdir
+with_xlen
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1447,6 +1450,7 @@ Optional Packages:
   --with-ri5cy-modeldir   directory containing the RI5CY model & headers
   --with-ri5cy-topmodule  Name of the top module in the RI5CY Verilog
   --with-binutils-incdir  include directory for binutils utilities
+  --with-xlen=XLEN        Set XLEN as the register bit width (default 32)
 
 Some influential environment variables:
   CC          C compiler command
@@ -15949,6 +15953,34 @@ fi
 
 
 
+# Register size for this target (32 or 64 bits)
+
+# Check whether --with-xlen was given.
+if test "${with_xlen+set}" = set; then :
+  withval=$with_xlen; if test $withval -ne 32 -a $withval -ne 64; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Invalid --with-xlen value, should be 32 or 64
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+else
+  with_xlen=32
+fi
+
+ if test $with_xlen = 64; then
+  BUILD_64_BIT_TRUE=
+  BUILD_64_BIT_FALSE='#'
+else
+  BUILD_64_BIT_TRUE='#'
+  BUILD_64_BIT_FALSE=
+fi
+
+if test $with_xlen = 64; then :
+
+$as_echo "#define BUILD_64_BIT 1" >>confdefs.h
+
+fi
+
 # This is GNU compliant source and uses GNU libraries
 
 $as_echo "#define _GNU_SOURCE 1" >>confdefs.h
@@ -16232,6 +16264,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BUILD_64_BIT_TRUE}" && test -z "${BUILD_64_BIT_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_64_BIT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

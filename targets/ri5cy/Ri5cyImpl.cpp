@@ -234,7 +234,7 @@ Ri5cyImpl::getInstrCount () const
 
 std::size_t
 Ri5cyImpl::readRegister (const int  reg,
-			 uint64_t & value)
+			 uint_reg_t & value)
 {
   if (!mCoreHalted)
     {
@@ -246,7 +246,7 @@ Ri5cyImpl::readRegister (const int  reg,
   uint16_t dbg_addr;
 
   if ((REG_R0 <= reg) && (reg <= REG_R31))
-      dbg_addr = DBG_GPR0 + reg * 8;	// General register
+      dbg_addr = DBG_GPR0 + reg * sizeof (uint_reg_t);	// General register
   else if (REG_PC == reg)
       dbg_addr = DBG_NPC;		// Next PC
   else if (CSR_MISA == reg)
@@ -257,13 +257,13 @@ Ri5cyImpl::readRegister (const int  reg,
            << reg << ": zero returned."
 	   << endl;
       value = 0;
-      return 8;
+      return sizeof (uint_reg_t);
     }
 
   // Read via debug
 
   value = readDebugReg (dbg_addr);
-  return 8;
+  return sizeof (uint_reg_t);
 
 }	// Ri5cyImpl::readRegister ()
 
@@ -280,7 +280,7 @@ Ri5cyImpl::readRegister (const int  reg,
 
 std::size_t
 Ri5cyImpl::writeRegister (const int  reg,
-			  const uint64_t  value)
+			  const uint_reg_t  value)
 {
   if (!mCoreHalted)
     {
@@ -292,7 +292,7 @@ Ri5cyImpl::writeRegister (const int  reg,
   uint16_t dbg_addr;
 
   if ((REG_R0 <= reg) && (reg <= REG_R31))
-    dbg_addr = DBG_GPR0 + reg * 8;    // General register
+    dbg_addr = DBG_GPR0 + reg * sizeof (uint_reg_t);    // General register
   else if (REG_PC == reg)
     dbg_addr = DBG_NPC;               // Next PC
   else if (CSR_MISA == reg)
@@ -302,13 +302,13 @@ Ri5cyImpl::writeRegister (const int  reg,
     cerr << "Warning: Attempt to write non-existent register "
          << reg << ": zero returned."
          << endl;
-    return 8;
+    return sizeof (value);
   }
 
   // Write via debug
 
   writeDebugReg (dbg_addr, value);
-  return 8;
+  return sizeof (value);
 
 }	// Ri5cyImpl::writeRegister ()
 
@@ -557,7 +557,7 @@ Ri5cyImpl::waitForHalt ()
 //! @param[in] dbg_reg  The debug register to read.
 //! @return  The value read.
 
-uint64_t
+uint_reg_t
 Ri5cyImpl::readDebugReg (const uint16_t  dbg_reg)
 {
   // Set up the register to read
@@ -595,7 +595,7 @@ Ri5cyImpl::readDebugReg (const uint16_t  dbg_reg)
 
 void
 Ri5cyImpl::writeDebugReg (const uint16_t  dbg_reg,
-			  const uint64_t  dbg_val)
+			  const uint_reg_t  dbg_val)
 {
   mCpu->debug_req_i   = 1;
   mCpu->debug_addr_i  = dbg_reg;
@@ -682,7 +682,7 @@ Ri5cyImpl::runToBreak (duration <double>  timeout,
 
   // Find out where we stopped, so we can look for our Syscall pattern planted
   // within newlib/libgloss.
-  uint64_t stoppedAddress = readDebugReg (DBG_PPC);
+  uint_reg_t stoppedAddress = readDebugReg (DBG_PPC);
 
   // The pattern we've used in newlib/libgloss for each supported syscall
   // is an ebreak with a nop before and after it. (It would ordinarily have

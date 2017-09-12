@@ -164,7 +164,7 @@ GdbServerImpl::rspSyscallRequest ()
   lastPacketType = pkt->data[0];
 
   // Get the args from the appropriate regs and send an F packet
-  uint64_t a0, a1, a2, a3, a7;
+  uint_reg_t a0, a1, a2, a3, a7;
   cpu->readRegister (10, a0);
   cpu->readRegister (11, a1);
   cpu->readRegister (12, a2);
@@ -586,7 +586,7 @@ GdbServerImpl::rspReadAllRegs ()
   // endianness.
   for (int  regNum = 0; regNum < RISCV_NUM_REGS; regNum++)
     {
-      uint64_t  val;		// Enough for even the PC
+      uint_reg_t val;		// Enough for even the PC
       int       byteSize;	// Size of reg in bytes
 
       byteSize = cpu->readRegister (regNum, val);
@@ -615,7 +615,7 @@ GdbServerImpl::rspWriteAllRegs ()
   // The registers
   for (int  regNum = 0; regNum < RISCV_NUM_REGS; regNum++)
     {
-      int       byteSize = 4;	// @todo automate this. Size of reg in bytes
+      int byteSize = sizeof (uint_reg_t);
 
       uint32_t val = Utils::hex2Val (&(pkt->data[pktSize]), byteSize,
 				     true /* little endian */);
@@ -767,8 +767,8 @@ GdbServerImpl::rspReadReg ()
 
   // Get the relevant register. GDB client expects them to be packed according
   // to target endianness.
-  uint64_t  val;
-  int       byteSize;
+  uint_reg_t val;
+  int byteSize;
 
   byteSize = cpu->readRegister (regNum, val);
   Utils::val2Hex (val, pkt->data, byteSize, true /* little endian */);
@@ -790,11 +790,16 @@ GdbServerImpl::rspReadReg ()
 void
 GdbServerImpl::rspWriteReg ()
 {
-  unsigned int  regNum;
-  char          valstr[2 * sizeof (uint64_t) + 1];	// Allow for EOS
+  int regByteSize = sizeof (uint_reg_t);
+  unsigned int regNum;
+  const int valstr_len = 2 * sizeof (uint_reg_t);
+  char valstr[valstr_len + 1];	// Allow for EOS
 
   // Break out the fields from the data
-  if (2 != sscanf (pkt->data, "P%x=%s", &regNum, valstr))
+  std::ostringstream fmt_stream;
+  fmt_stream << "P%x=%" << valstr_len << "s";
+  string fmt = fmt_stream.str ();
+  if (2 != sscanf (pkt->data, fmt.c_str (), &regNum, valstr))
     {
       cerr << "Warning: Failed to recognize RSP write register command "
 	   << pkt->data << endl;
@@ -802,12 +807,13 @@ GdbServerImpl::rspWriteReg ()
       rsp->putPkt (pkt);
       return;
     }
+  valstr[valstr_len] = '\0';
 
-  int      byteSize = 8;	// @todo automate this. Size of reg in bytes
-  uint64_t val = Utils::hex2Val (valstr, byteSize, true /* little endian */);
+  uint_reg_t val
+    = Utils::hex2Val (valstr, regByteSize, true /* little endian */);
 
-  if (byteSize != cpu->writeRegister (regNum, val))
-    cerr << "Warning: Size != " << byteSize << " when writing reg " << regNum
+  if (regByteSize != cpu->writeRegister (regNum, val))
+    cerr << "Warning: Size != " << regByteSize << " when writing reg " << regNum
 	 << "." << endl;
 
   pkt->packStr ("OK");

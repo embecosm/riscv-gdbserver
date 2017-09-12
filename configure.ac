@@ -96,6 +96,18 @@ AC_ARG_WITH(
        [AC_MSG_FAILURE(Binutils include directory not specified)])
 AC_SUBST(BINUTILS_INCDIR)
 
+# Register size for this target (32 or 64 bits)
+AC_ARG_WITH(
+	[xlen],
+	AC_HELP_STRING([--with-xlen=XLEN],
+	               [Set XLEN as the register bit width (default 32)]),
+	[AS_IF([test $withval -ne 32 -a $withval -ne 64],
+           [AC_MSG_FAILURE([Invalid --with-xlen value, should be 32 or 64])])],
+	[with_xlen=32])
+AM_CONDITIONAL([BUILD_64_BIT], [test $with_xlen = 64])
+AS_IF([test $with_xlen = 64],
+      [AC_DEFINE([BUILD_64_BIT], [1], [Build 64-bit gdbserver])])
+
 # This is GNU compliant source and uses GNU libraries
 AC_DEFINE(_GNU_SOURCE, 1, "The source code uses the GNU libraries)
 

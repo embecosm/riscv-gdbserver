@@ -21,6 +21,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include "config.h"
+
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
@@ -60,7 +62,15 @@ static ITarget * cpu;
 static void
 usage (ostream & s)
 {
-  s << "Usage: riscv64-gdbserver --core | -c <corename>" << endl
+  const std::string gdbserver_name =
+#ifdef BUILD_64_BIT
+    "riscv64-gdbserver"
+#else
+    "riscv32-gdbserver"
+#endif
+    ;
+
+  s << "Usage: " << gdbserver_name << " --core | -c <corename>" << endl
     << "                         [ --trace | -t <traceflag> ]" << endl
     << "                         [ --silent | -q ]" << endl
     << "                         [ --stdin | -s ]" << endl

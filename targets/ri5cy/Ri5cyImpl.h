@@ -55,12 +55,12 @@ class Ri5cyImpl final
   // Read contents of a target register.
 
   std::size_t  readRegister (const int  reg,
-			     uint64_t & value);
+			     uint_reg_t & value);
 
   // Write data to a target register.
 
   std::size_t  writeRegister (const int  reg,
-			      const uint64_t  value);
+			      const uint_reg_t  value);
 
   // Read data from memory.
 
@@ -115,7 +115,7 @@ private:
   const uint16_t DBG_GPR0    = 0x0400;	//!< General purpose register 0
   const uint16_t DBG_GPR31   = 0x047c;	//!< General purpose register 41
   const uint16_t DBG_NPC     = 0x2000;	//!< Next PC
-  const uint16_t DBG_PPC     = 0x2008;	//!< Prev PC (adjusted for 64-bit)
+  const uint16_t DBG_PPC     = DBG_NPC + (sizeof (uint_reg_t) * 1);	//!< Prev PC
 
   const uint32_t DBG_CSR_MISA = 0x4301; //!< CSR MISA
 
@@ -187,9 +187,9 @@ private:
   void resetModel ();
   void haltModel ();
   void waitForHalt ();
-  uint64_t readDebugReg (const uint16_t  dbg_reg);
+  uint_reg_t readDebugReg (const uint16_t  dbg_reg);
   void writeDebugReg (const uint16_t  dbg_reg,
-		      const uint64_t  dbg_val);
+		      const uint_reg_t  dbg_val);
   ITarget::ResumeRes  stepInstr (std::chrono::duration <double>  timeout,
 				 SyscallInfo * syscallInfo = nullptr);
   ITarget::ResumeRes  runToBreak (std::chrono::duration <double>  timeout,
