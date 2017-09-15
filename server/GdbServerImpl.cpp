@@ -183,6 +183,8 @@ GdbServerImpl::rspSyscallRequest ()
                 break;
     case 80   : sprintf (pkt->data, "Ffstat,%x,%x", a0, a1);
                 break;
+    case 93   : sprintf (pkt->data, "W%x", a0);
+                break;
     case 169  : sprintf (pkt->data, "Fgettimeofday,%x,%x", a0, a1);
                 break;
     case 1024 : sprintf (pkt->data, "Fopen,%x/%x,%x,%x", a0, stringLength (a0), a1, a2);
