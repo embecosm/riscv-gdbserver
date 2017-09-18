@@ -1450,7 +1450,8 @@ Optional Packages:
   --with-picorv32-topmodule
                           Name of the top module in the PicoRV32 Verilog
   --with-ri5cy-modeldir   directory containing the RI5CY model & headers
-  --with-ri5cy-topmodule  Name of the top module in the RI5CY Verilog
+  --with-ri5cy-topmodule  Name of the top module in the RI5CY Verilog (default
+                          "top")
   --with-gdbsim-builddir  directory containing the GDBSIM build (of GDB)
   --with-binutils-incdir  include directory for binutils utilities
   --with-xlen=XLEN        Set XLEN as the register bit width (default 32)
@@ -15933,10 +15934,7 @@ fi
 if test "${with_ri5cy_topmodule+set}" = set; then :
   withval=$with_ri5cy_topmodule; MODNAME_RI5CY="$withval"
 else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "RI5CY top module not specified
-See \`config.log' for more details" "$LINENO" 5; }
+  MODNAME_RI5CY="top"
 fi
 
 

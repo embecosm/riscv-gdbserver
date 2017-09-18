@@ -81,9 +81,9 @@ AC_ARG_WITH(
 AC_ARG_WITH(
 	[ri5cy-topmodule],
 	AC_HELP_STRING([--with-ri5cy-topmodule],
-	               [Name of the top module in the RI5CY Verilog]),
+	               [Name of the top module in the RI5CY Verilog (default "top")]),
 	[MODNAME_RI5CY="$withval"],
-	[AC_MSG_FAILURE(RI5CY top module not specified)])
+	[MODNAME_RI5CY="top"])
 AC_SUBST(MDIR_RI5CY)
 AC_SUBST(MODNAME_RI5CY)
 
