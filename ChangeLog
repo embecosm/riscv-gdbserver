@@ -1,5 +1,9 @@
 2017-09-22  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* targets/ri5cy/Ri5cy.h: Fix comment.
+
+2017-09-22  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/main.cpp (main): Use new local variable instead of global
 	optind where possible.
 

@@ -103,7 +103,7 @@ class Ri5cy final : public ITarget
 
   Ri5cyImpl * mRi5cyImpl;
 
-};	// class Picorv232
+};	// class Ri5cy
 
 
 #endif	// RI5CY_H
