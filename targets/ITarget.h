@@ -27,7 +27,6 @@
 #include <cstdint>
 #include <iostream>
 
-#include "SyscallInfo.h"
 #include "RegisterSizes.h"
 
 // Classes to which we refer.
@@ -89,11 +88,9 @@ class ITarget
   explicit ITarget (const TraceFlags * flags  __attribute__ ((unused)) ) {};
   virtual ~ITarget () {};
 
+  virtual ResumeRes  resume (ResumeType step) = 0;
   virtual ResumeRes  resume (ResumeType step,
-			     SyscallInfo *syscall_info = nullptr) = 0;
-  virtual ResumeRes  resume (ResumeType step,
-                             std::chrono::duration <double>  timeout,
-                             SyscallInfo *syscall_info = nullptr) = 0;
+                             std::chrono::duration <double>  timeout) = 0;
 
   virtual ResumeRes  terminate () = 0;
   virtual ResumeRes  reset (ResetType  type) = 0;

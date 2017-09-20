@@ -43,11 +43,9 @@ class Picorv32 final : public ITarget
   Picorv32 (TraceFlags * flags);
   ~Picorv32 ();
 
+  virtual ResumeRes  resume (ResumeType step);
   virtual ResumeRes  resume (ResumeType step,
-			     SyscallInfo *syscall_info = nullptr);
-  virtual ResumeRes  resume (ResumeType step,
-                             std::chrono::duration <double>  timeout,
-                             SyscallInfo *syscall_info = nullptr);
+                             std::chrono::duration <double>  timeout);
 
   virtual ResumeRes  terminate ();
   virtual ResumeRes  reset (ITarget::ResetType  type);

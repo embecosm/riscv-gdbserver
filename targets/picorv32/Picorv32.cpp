@@ -60,15 +60,14 @@ Picorv32::~Picorv32()
 }
 
 ITarget::ResumeRes
-Picorv32::resume (ResumeType step, SyscallInfo *syscall_info)
+Picorv32::resume (ResumeType step)
 {
-  return resume(step, duration <double>::zero (), syscall_info);
+  return resume(step, duration <double>::zero ());
 }
 
 ITarget::ResumeRes
 Picorv32::resume (ResumeType step,
-        std::chrono::duration <double> timeout,
-        SyscallInfo *syscall_info)
+        std::chrono::duration <double> timeout)
 {
   time_point <system_clock, duration <double> > timeout_end =
     system_clock::now () + timeout;

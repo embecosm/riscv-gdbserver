@@ -293,7 +293,6 @@ GdbServerImpl::rspClientRequest ()
 
       // @todo For now we use indentical code for 'C' (continue with signal)
       //       and just ignore the signal.
-      // @todo We do not yet use the SyscallInfo arcgument when resuming.
 
       {
 	// @todo We ought to have a constant for this.
@@ -315,7 +314,7 @@ GdbServerImpl::rspClientRequest ()
 	  {
 	    ITarget::ResumeRes resType =
 	      cpu->resume (ITarget::ResumeType::CONTINUE,
-			   interruptTimeout, nullptr);
+			   interruptTimeout);
 
 	    switch (resType)
 	      {
@@ -475,15 +474,14 @@ GdbServerImpl::rspClientRequest ()
 
 	if (rsp->haveBreak ())
 	  {
-	    (void) cpu->resume (ITarget::ResumeType::STOP, nullptr);
+	    (void) cpu->resume (ITarget::ResumeType::STOP);
 	    rspReportException (TargetSignal::INT);
 	    return;
 	  }
 
 	// @todo No syscall for now.
 
-	ITarget::ResumeRes resType = cpu->resume (ITarget::ResumeType::STEP,
-						  nullptr);
+	ITarget::ResumeRes resType = cpu->resume (ITarget::ResumeType::STEP);
 
 	if (resType == ITarget::ResumeRes::SYSCALL)
 	  {
@@ -501,7 +499,7 @@ GdbServerImpl::rspClientRequest ()
 
 	if (rsp->haveBreak ())
 	  {
-	    (void) cpu->resume (ITarget::ResumeType::STOP, nullptr);
+	    (void) cpu->resume (ITarget::ResumeType::STOP);
 	    rspReportException (TargetSignal::INT);
 	    return;
 	  }

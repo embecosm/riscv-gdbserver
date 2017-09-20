@@ -96,15 +96,12 @@ Ri5cyImpl::~Ri5cyImpl ()
 
 //! @param[in]  step         The type of resume to carry out. Initially just
 //!                          STEP and CONTINUE should suffice.
-//! @param[out] syscallInfo  Used to return details of a syscall to be
-//!                          handled. Not currently supported.
 //! @return Why the target stopped.
 
 ITarget::ResumeRes
-Ri5cyImpl::resume (ITarget::ResumeType step,
-		   SyscallInfo * syscallInfo)
+Ri5cyImpl::resume (ITarget::ResumeType step)
 {
-  return resume (step, duration <double>::zero(), syscallInfo);
+  return resume (step, duration <double>::zero());
 
 }	// Ri5cyImpl::resume ()
 
@@ -116,24 +113,21 @@ Ri5cyImpl::resume (ITarget::ResumeType step,
 //! @param[in]  step         The type of resume to carry out. Initially just
 //!                          STEP and CONTINUE should suffice.
 //! @param[in]  timeout      Maximum time for execution to continue.
-//! @param[out] syscallInfo  Used to return details of a syscall to be
-//!                          handled. Not currently supported.
 //! @return Why the target stopped.
 
 ITarget::ResumeRes
 Ri5cyImpl::resume (ITarget::ResumeType step,
-		   duration <double>  timeout,
-		   SyscallInfo * syscallInfo)
+		   duration <double>  timeout)
 {
   switch (step)
     {
     case ITarget::ResumeType::STEP:
 
-      return stepInstr (timeout, syscallInfo);
+      return stepInstr (timeout);
 
     case ITarget::ResumeType::CONTINUE:
 
-      return runToBreak (timeout, syscallInfo);
+      return runToBreak (timeout);
 
     case ITarget::ResumeType::STOP:
 
@@ -619,12 +613,8 @@ Ri5cyImpl::writeDebugReg (const uint16_t  dbg_reg,
 
 
 ITarget::ResumeRes
-Ri5cyImpl::stepInstr (duration <double>  timeout,
-		      SyscallInfo * syscallInfo)
+Ri5cyImpl::stepInstr (duration <double>  timeout)
 {
-  if (nullptr != syscallInfo)
-    cerr << "Warning: syscalls not supported when stepping" << endl;
-
   bool haveTimeout = duration <double>::zero() != timeout;
   time_point <system_clock, duration <double> > timeout_end;
 
@@ -650,12 +640,8 @@ Ri5cyImpl::stepInstr (duration <double>  timeout,
 
 
 ITarget::ResumeRes
-Ri5cyImpl::runToBreak (duration <double>  timeout,
-		       SyscallInfo * syscallInfo)
+Ri5cyImpl::runToBreak (duration <double>  timeout)
 {
-  if (nullptr != syscallInfo)
-    cerr << "Warning: syscalls not supported when continuing" << endl;
-
   bool haveTimeout = duration <double>::zero() != timeout;
   time_point <system_clock, duration <double> > timeout_end;
 

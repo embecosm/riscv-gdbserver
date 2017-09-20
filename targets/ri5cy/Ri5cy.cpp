@@ -56,14 +56,12 @@ Ri5cy::~Ri5cy ()
 //! Wrapper for the implementation class
 
 //! @param[in] step         Type of resumption required
-//! @param[in] syscallInfo  Info structure for syscalls.
 //! @return The type of termination encountered.
 
 ITarget::ResumeRes
-Ri5cy::resume (ResumeType  step,
-	       SyscallInfo * syscallInfo)
+Ri5cy::resume (ResumeType  step)
 {
-  return mRi5cyImpl->resume (step, syscallInfo);
+  return mRi5cyImpl->resume (step);
 
 }	// Ri5cy::resume ()
 
@@ -74,15 +72,13 @@ Ri5cy::resume (ResumeType  step,
 
 //! @param[in] step         Type of resumption required
 //! @param[in] timeout      Timeout requested
-//! @param[in] syscallInfo  Info structure for syscalls.
 //! @return The type of termination encountered.
 
 ITarget::ResumeRes
 Ri5cy::resume (ResumeType  step,
-	       std::chrono::duration <double>  timeout,
-	       SyscallInfo * syscallInfo)
+	       std::chrono::duration <double>  timeout)
 {
-  return mRi5cyImpl->resume (step, timeout, syscallInfo);
+  return mRi5cyImpl->resume (step, timeout);
 
 }	// Ri5cy::resume ()
 

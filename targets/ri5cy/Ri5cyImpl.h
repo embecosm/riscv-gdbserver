@@ -40,11 +40,9 @@ class Ri5cyImpl final
   Ri5cyImpl (const TraceFlags * flags);
   ~Ri5cyImpl ();
 
+  ITarget::ResumeRes  resume (ITarget::ResumeType step);
   ITarget::ResumeRes  resume (ITarget::ResumeType step,
-			      SyscallInfo * syscallInfo = nullptr);
-  ITarget::ResumeRes  resume (ITarget::ResumeType step,
-			      std::chrono::duration <double>  timeout,
-			      SyscallInfo * syscallInfo = nullptr);
+			      std::chrono::duration <double>  timeout);
 
   ITarget::ResumeRes  terminate ();
   ITarget::ResumeRes  reset (ITarget::ResetType  type);
@@ -190,10 +188,8 @@ private:
   uint_reg_t readDebugReg (const uint16_t  dbg_reg);
   void writeDebugReg (const uint16_t  dbg_reg,
 		      const uint_reg_t  dbg_val);
-  ITarget::ResumeRes  stepInstr (std::chrono::duration <double>  timeout,
-				 SyscallInfo * syscallInfo = nullptr);
-  ITarget::ResumeRes  runToBreak (std::chrono::duration <double>  timeout,
-				  SyscallInfo * syscallInfo = nullptr);
+  ITarget::ResumeRes  stepInstr (std::chrono::duration <double>  timeout);
+  ITarget::ResumeRes  runToBreak (std::chrono::duration <double>  timeout);
 };
 
 #endif	// RI5CY_IMPL_H

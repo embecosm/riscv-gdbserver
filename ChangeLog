@@ -1,5 +1,33 @@
 2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspClientRequest): No
+	longer pass SyscallInfo parameter.
+	* targets/ITarget.cpp: Update header comment.
+	* targets/ITarget.h (ITarget::resume): Remove SyscallInfo
+	parameter from both versions of this method.
+	* targets/common/Makefile.am: Remove references to deleted files.
+	* targets/common/Makefile.in: Regenerate.
+	* targets/common/SyscallInfo.cpp: Deleted.
+	* targets/common/SyscallInfo.h: Deleted.
+	* targets/ri5cy/Ri5cy.cpp (Ri5cy::resume): Remove SyscallInfo
+	parameter from both versions of this function.
+	* targets/ri5cy/Ri5cy.h (Ri5cy::resume): Remove SyscallInfo
+	parameter from both versions of this function.
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::resume): Remove
+	SyscallInfo parameter from both versions of this function.
+	(Ri5cyImpl::stepInstr): Likewise.
+	(Ri5cyImpl::runToBreak): Likewise.
+	* targets/ri5cy/Ri5cyImpl.h (Ri5cyImpl::resume): Remove
+	SyscallInfo parameter from both versions of this function.
+	(Ri5cyImpl::stepInstr): Likewise.
+	(Ri5cyImpl::runToBreak): Likewise.
+	* targets/picorv32/Picorv32.cpp (Picorv32::resume): Remove
+	SyscallInfo parameter.
+	* targets/picorv32/Picorv32.h (Picorv32::resume): Remove
+	SyscallInfo parameter.
+
+2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/main.cpp (createCpu): New function.
 	(main): Move creation of cpu object into new function.
 

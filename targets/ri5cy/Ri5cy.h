@@ -43,11 +43,9 @@ class Ri5cy final : public ITarget
   Ri5cy (const TraceFlags * flags);
   ~Ri5cy ();
 
+  virtual ResumeRes  resume (ResumeType step);
   virtual ResumeRes  resume (ResumeType step,
-			     SyscallInfo * syscallInfo = nullptr);
-  virtual ResumeRes  resume (ResumeType step,
-                             std::chrono::duration <double>  timeout,
-                             SyscallInfo * syscallInfo = nullptr);
+                             std::chrono::duration <double>  timeout);
 
   virtual ResumeRes  terminate (void);
   virtual ResumeRes  reset (ITarget::ResetType  type);

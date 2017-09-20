@@ -21,8 +21,7 @@
 
 
 // Even though ITarget is an abstract class, it requires implementation of the
-// stream operators to allow its public scoped enumerations to be output.  It
-// also requires implementation of the concrete SyscallInfo class.
+// stream operators to allow its public scoped enumerations to be output.
 
 #include "ITarget.h"
 

@@ -21,7 +21,6 @@
 
 noinst_LTLIBRARIES = libcommon.la
 
-libcommon_la_SOURCES = SyscallInfo.cpp \
-                       SyscallInfo.h
+libcommon_la_SOURCES = 
 
 libcommon_la_CXXFLAGS = -Werror -Wall -Wextra
