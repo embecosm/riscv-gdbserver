@@ -87,6 +87,34 @@ usage (ostream & s)
 }	// usage ()
 
 
+//! Create a new ITarget instance from a cpu name, or return NULL
+//! if not matching target is known.
+
+//! @param[in] name  C string containing cpu model name.
+//! @param[in] traceFlags  Pointer to TraceFlags used to create model.
+//! @return  Pointer to new ITarget instance, or nullptr.
+
+static ITarget *
+createCpu (const char *name, TraceFlags *traceFlags)
+{
+  ITarget *cpu;
+
+  // The RISC-V model
+  if (0 == strcasecmp ("RI5CY", name))
+    cpu = new Ri5cy (traceFlags);
+  else if (0 == strcasecmp ("PicoRV32", name))
+    cpu = new Picorv32 (traceFlags);
+  else
+    {
+      cerr << "ERROR: Unrecognized core: " << name << ": exiting" << endl;
+      return  nullptr;
+    }
+
+  return cpu;
+}	// createCpu
+
+
+
 //! Main function
 
 //! @see usage () for information on the parameters.  Instantiates the core
@@ -174,17 +202,10 @@ main (int   argc,
       return  EXIT_FAILURE;
     }
 
-  // The RISC-V model
-
-  if (0 == strcasecmp ("PicoRV32", coreName))
-    cpu = new Picorv32 (traceFlags);
-  else if (0 == strcasecmp ("RI5CY", coreName))
-    globalCpu = new Ri5cy (traceFlags);
-  else
-    {
-      cerr << "ERROR: Unrecognized core: " << coreName << ": exiting" << endl;
-      return  EXIT_FAILURE;
-    }
+  // Create the cpu model.
+  globalCpu = createCpu (coreName, traceFlags);
+  if (globalCpu == nullptr)
+    return  EXIT_FAILURE;
 
   AbstractConnection *conn;
   GdbServer::KillBehaviour killBehaviour;
