@@ -52,7 +52,7 @@ using std::strcmp;
 
 //! The RISC-V model
 
-static ITarget * cpu;
+static ITarget *globalCpu = nullptr;
 
 
 //! Convenience function to output the usage to a specified stream.
@@ -179,7 +179,7 @@ main (int   argc,
   if (0 == strcasecmp ("PicoRV32", coreName))
     cpu = new Picorv32 (traceFlags);
   else if (0 == strcasecmp ("RI5CY", coreName))
-    cpu = new Ri5cy (traceFlags);
+    globalCpu = new Ri5cy (traceFlags);
   else
     {
       cerr << "ERROR: Unrecognized core: " << coreName << ": exiting" << endl;
@@ -202,8 +202,9 @@ main (int   argc,
 
   // The RSP server, connecting it to its CPU.
 
-  GdbServer *gdbServer = new GdbServer (conn, cpu, traceFlags, killBehaviour);
-  cpu->gdbServer (gdbServer);
+  GdbServer *gdbServer = new GdbServer (conn, globalCpu, traceFlags,
+                                        killBehaviour);
+  globalCpu->gdbServer (gdbServer);
 
   // Run the GDB server.
 
@@ -213,7 +214,7 @@ main (int   argc,
 
   delete  conn;
   delete  gdbServer;
-  delete  cpu;
+  delete  globalCpu;
   delete  traceFlags;
   free (coreName);
 
@@ -228,8 +229,8 @@ double
 sc_time_stamp ()
 {
   // If we are called before cpu has been constructed, return 0.0
-  if (cpu != 0)
-    return cpu->timeStamp ();
+  if (globalCpu != nullptr)
+    return globalCpu->timeStamp ();
   else
     return 0.0;
 }

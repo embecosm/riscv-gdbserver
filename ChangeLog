@@ -1,5 +1,12 @@
 2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/main.cpp (cpu): Renamed to...
+	(globalCpu): ...this, and initialise to nullptr.
+	(main): Update references to 'cpu' to 'globalCpu'.
+	(sc_time_stamp): Likewise.
+
+2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* targets/ITarget.h (ITarget::ITarget): Make TraceFlags const.
 	* targets/ri5cy/Ri5cy.cpp (Ri5cy::Ri5cy): Likewise.
 	* targets/ri5cy/Ri5cy.h (Ri5cy::Ri5cy): Likewise.
