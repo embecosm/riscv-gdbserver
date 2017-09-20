@@ -40,7 +40,7 @@ class Ri5cy final : public ITarget
 
   // Constructor and destructor
 
-  Ri5cy (TraceFlags * flags);
+  Ri5cy (const TraceFlags * flags);
   ~Ri5cy ();
 
   virtual ResumeRes  resume (ResumeType step,

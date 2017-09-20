@@ -37,7 +37,7 @@ class Ri5cyImpl final
 {
  public:
 
-  Ri5cyImpl (TraceFlags * flags);
+  Ri5cyImpl (const TraceFlags * flags);
   ~Ri5cyImpl ();
 
   ITarget::ResumeRes  resume (ITarget::ResumeType step,
@@ -155,7 +155,7 @@ private:
 
   //! The trace flags with which we were called.
 
-  TraceFlags * mFlags;
+  const TraceFlags * mFlags;
 
   //! Top level Verilator model.
 

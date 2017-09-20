@@ -86,7 +86,7 @@ class ITarget
 
   // Virtual destructor has implementation for defined behavior
 
-  explicit ITarget (TraceFlags * flags  __attribute__ ((unused)) ) {};
+  explicit ITarget (const TraceFlags * flags  __attribute__ ((unused)) ) {};
   virtual ~ITarget () {};
 
   virtual ResumeRes  resume (ResumeType step,

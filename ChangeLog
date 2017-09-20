@@ -1,3 +1,11 @@
+2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* targets/ITarget.h (ITarget::ITarget): Make TraceFlags const.
+	* targets/ri5cy/Ri5cy.cpp (Ri5cy::Ri5cy): Likewise.
+	* targets/ri5cy/Ri5cy.h (Ri5cy::Ri5cy): Likewise.
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::Ri5cyImpl): Likewise.
+	* targets/ri5cy/Ri5cyImpl.h (Ri5cyImpl::Ri5cyImpl): Likewise.
+
 2017-09-13  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* config.h.in: Regenerate.

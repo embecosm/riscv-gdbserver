@@ -32,7 +32,7 @@
 
 //! @param[in] wantVcd  TRUE if we want a VCD generated, false otherwise.
 
-Ri5cy::Ri5cy (TraceFlags * flags) :
+Ri5cy::Ri5cy (const TraceFlags * flags) :
   ITarget (flags)
 {
   mRi5cyImpl = new Ri5cyImpl (flags);

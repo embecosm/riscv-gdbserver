@@ -47,7 +47,7 @@ using std::ostringstream;
 
 //! @param[in] flags  The trace flags
 
-Ri5cyImpl::Ri5cyImpl (TraceFlags * flags) :
+Ri5cyImpl::Ri5cyImpl (const TraceFlags * flags) :
   mServer (nullptr),
   mFlags (flags),
   mCoreHalted (false),
