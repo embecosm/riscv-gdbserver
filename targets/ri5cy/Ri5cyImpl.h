@@ -190,6 +190,8 @@ private:
 		      const uint_reg_t  dbg_val);
   ITarget::ResumeRes  stepInstr (std::chrono::duration <double>  timeout);
   ITarget::ResumeRes  runToBreak (std::chrono::duration <double>  timeout);
+
+  bool stoppedAtSyscall ();
 };
 
 #endif	// RI5CY_IMPL_H

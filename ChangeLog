@@ -1,5 +1,14 @@
 2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* targets/ri5cy/Ri5cyImpl.h (Ri5cyImpl::stoppedAtSyscall): Declare
+	new member function.
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::stoppedAtSyscall):
+	Define new member function.
+	(Ri5cyImpl::stepInstr): Use new member function.
+	(Ri5cyImpl::runToBreak): Likewise.
+
+2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspClientRequest): No
 	longer pass SyscallInfo parameter.
 	* targets/ITarget.cpp: Update header comment.
