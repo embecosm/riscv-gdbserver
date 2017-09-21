@@ -1,3 +1,13 @@
+2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspClientRequest):
+	Handle new ITarget::ResumeRes::STEPPED.
+	* targets/ITarget.cpp (operator<<): Handle printing for new
+	ITarget::ResumeRes::STEPPED.
+	* targets/ITarget.h (ITarget::ResumeRes): Add STEPPED.
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::stepInstr): Return
+	ITarget::ResumeRes::STEPPED when appropriate.
+
 2017-09-22  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* targets/ri5cy/Ri5cy.h: Fix comment.

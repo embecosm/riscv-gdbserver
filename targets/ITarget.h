@@ -65,6 +65,7 @@ class ITarget
     INTERRUPTED = 3,            //!< Execution interrupted (e.g. breakpoint).
     TIMEOUT     = 4,		//!< Execution hit time limit.
     SYSCALL     = 5,		//!< Target needs some host I/O.
+    STEPPED     = 6,		//!< Single step was completed.
   };
 
   //! Type of reset

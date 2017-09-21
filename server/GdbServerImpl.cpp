@@ -326,6 +326,7 @@ GdbServerImpl::rspClientRequest ()
  		rspSyscallRequest ();
 		return;
 
+	      case ITarget::ResumeRes::STEPPED:
 	      case ITarget::ResumeRes::INTERRUPTED:
 
 		// At breakpoint

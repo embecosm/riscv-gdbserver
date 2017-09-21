@@ -633,11 +633,24 @@ Ri5cyImpl::stepInstr (duration <double>  timeout)
 
   if (haveTimeout && (system_clock::now () > timeout_end))
     return ITarget::ResumeRes::TIMEOUT;
-  else if (stoppedAtSyscall ())
-    return ITarget::ResumeRes::SYSCALL;
-  else
-    return ITarget::ResumeRes::INTERRUPTED;
 
+  uint32_t stoppedAddress = readDebugReg (DBG_PPC);
+
+  // If the instruction that we were just at was an EBREAK then we either
+  // just hit a breakpoint, or we're at the syscall point.
+  if (mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress + 0) == 0x73 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress + 1) == 0x00 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress + 2) == 0x10 &&
+      mCpu->top->ram_i->dp_ram_i->readByte (stoppedAddress + 3) == 0x00)
+    {
+      if (stoppedAtSyscall ())
+        return ITarget::ResumeRes::SYSCALL;
+      else
+        // Guess we hit a breakpoint while stepping.
+        return ITarget::ResumeRes::INTERRUPTED;
+    }
+
+  return  ITarget::ResumeRes::STEPPED;
 }	// Ri5cyImpl::stepInstr ()
 
 //! When the core has just stopped, did we stop at the magic syscall

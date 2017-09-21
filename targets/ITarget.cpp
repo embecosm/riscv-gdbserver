@@ -71,6 +71,7 @@ operator<< (std::ostream & s,
     case ITarget::ResumeRes::INTERRUPTED: name = "interrupted"; break;
     case ITarget::ResumeRes::TIMEOUT:     name = "timeout";     break;
     case ITarget::ResumeRes::SYSCALL:     name = "syscall";     break;
+    case ITarget::ResumeRes::STEPPED:     name = "stepped";     break;
     default:                              name = "unknown";     break;
     }
 
