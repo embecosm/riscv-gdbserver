@@ -1,5 +1,13 @@
 2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/main.cpp (usage): Mention 'version' new options, move
+	gdbserver_name into file scope.
+	(gdbserver_name): New file scope variable.
+	(show_version): New function.
+	(main): Check for and handle new 'version' options.
+
+2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* targets/ri5cy/Ri5cyImpl.h (Ri5cyImpl::stoppedAtSyscall): Declare
 	new member function.
 	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::stoppedAtSyscall):

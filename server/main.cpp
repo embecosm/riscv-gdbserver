@@ -54,6 +54,13 @@ using std::strcmp;
 
 static ITarget *globalCpu = nullptr;
 
+static const std::string gdbserver_name =
+#ifdef BUILD_64_BIT
+    "riscv64-gdbserver"
+#else
+    "riscv32-gdbserver"
+#endif
+    ;
 
 //! Convenience function to output the usage to a specified stream.
 
@@ -62,19 +69,12 @@ static ITarget *globalCpu = nullptr;
 static void
 usage (ostream & s)
 {
-  const std::string gdbserver_name =
-#ifdef BUILD_64_BIT
-    "riscv64-gdbserver"
-#else
-    "riscv32-gdbserver"
-#endif
-    ;
-
   s << "Usage: " << gdbserver_name << " --core | -c <corename>" << endl
     << "                         [ --trace | -t <traceflag> ]" << endl
     << "                         [ --silent | -q ]" << endl
     << "                         [ --stdin | -s ]" << endl
     << "                         [ --help | -h ]" << endl
+    << "                         [ --version | -v ]" << endl
     << "                         <rsp-port>" << endl
     << endl
     << "The trace option may appear multiple times. Trace flags are:" << endl
@@ -86,6 +86,18 @@ usage (ostream & s)
 
 }	// usage ()
 
+
+//! Convenience function to output the version information
+
+//! @param[in] s  Output stream to use.
+
+static void
+show_version (ostream &s)
+{
+  // @todo maybe include git information, and possibly pull version number
+  // from some other source rather than hard-coding it here.
+  s << gdbserver_name << " version 0.1" << endl;
+}	// show_version ()
 
 //! Create a new ITarget instance from a cpu name, or return NULL
 //! if not matching target is known.
@@ -146,10 +158,11 @@ main (int   argc,
       {"silent", no_argument,       nullptr,  'q' },
       {"trace",  required_argument, nullptr,  't' },
       {"stdin",  no_argument,       nullptr,  's' },
+      {"version", no_argument,      nullptr,  'v' },
       {0,       0,                 0,  0 }
     };
 
-    if ((c = getopt_long (argc, argv, "c:hqt:s", longOptions, &longOptind)) == -1)
+    if ((c = getopt_long (argc, argv, "c:hqt:sv", longOptions, &longOptind)) == -1)
       break;
 
     switch (c) {
@@ -186,6 +199,10 @@ main (int   argc,
     case ':':
       usage (cerr);
       return  EXIT_FAILURE;
+
+    case 'v':
+      show_version (cout);
+      return EXIT_SUCCESS;
 
     default:
       cerr << "ERROR: getopt_long returned character code " << c << endl;
