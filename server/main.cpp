@@ -148,6 +148,7 @@ main (int   argc,
   bool          from_stdin = false;
   int           port = -1;
   TraceFlags *  traceFlags = new TraceFlags ();
+  int           nextArg;
 
   while (true) {
     int c;
@@ -210,9 +211,11 @@ main (int   argc,
     }
   }
 
-  // 1 positional arg
-
-  if (((argc - optind) != 1 && !from_stdin)
+  // Check for 1 positional arg (sometimes).  Also, stop using OPTIND, this
+  // is a global and can be modified if we ever invoke the getopt framework
+  // again (for example in starting a target).
+  nextArg = optind;
+  if (((argc - nextArg) != 1 && !from_stdin)
       || coreName == nullptr)
     {
       usage (cerr);
@@ -233,7 +236,7 @@ main (int   argc,
     }
   else
     {
-      port = atoi (argv[optind]);
+      port = atoi (argv[nextArg]);
       conn = new RspConnection (port, traceFlags);
       killBehaviour = GdbServer::KillBehaviour::RESET_ON_KILL;
     }

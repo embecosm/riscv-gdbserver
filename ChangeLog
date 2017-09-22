@@ -1,3 +1,8 @@
+2017-09-22  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* server/main.cpp (main): Use new local variable instead of global
+	optind where possible.
+
 2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/main.cpp (usage): Mention 'version' new options, move
