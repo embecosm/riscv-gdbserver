@@ -1,3 +1,25 @@
+2017-09-26  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* Makefile.in: Regenerate.
+	* configure:  Regenerate.
+	* configure.ac: Add support for new --with-gdbsim-modeldir
+	configure option.  Add gdbsim target makefile to list of makefiles
+	to generate.
+	* server/Makefile.am: Add suport for linking gdbsim in.
+	* server/Makefile.in: Regenerate.
+	* server/main.cpp: Support for creating gdbsim targets.
+	* targets/Makefile.am: Add support for building gdbsim target.
+	* targets/Makefile.in: Regenerate.
+	* targets/common/Makefile.in: Regenerate.
+	* targets/gdbsim/GdbSim.cpp: New file.
+	* targets/gdbsim/GdbSim.h:New file.
+	* targets/gdbsim/GdbSimImpl.cpp: New file.
+	* targets/gdbsim/GdbSimImpl.h: New file.
+	* targets/gdbsim/Makefile.am: New file.
+	* targets/gdbsim/Makefile.in: New file.
+	* targets/ri5cy/Makefile.in: Regenerate.
+	* trace/Makefile.in: Regenerate.
+
 2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspClientRequest):

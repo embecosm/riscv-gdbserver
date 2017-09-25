@@ -33,6 +33,7 @@
 #include "ITarget.h"
 #include "Picorv32.h"
 #include "Ri5cy.h"
+#include "GdbSim.h"
 
 // Class headers
 
@@ -116,6 +117,8 @@ createCpu (const char *name, TraceFlags *traceFlags)
     cpu = new Ri5cy (traceFlags);
   else if (0 == strcasecmp ("PicoRV32", name))
     cpu = new Picorv32 (traceFlags);
+  else if (0 == strcasecmp ("GDBSIM", name))
+    cpu = new GdbSim (traceFlags);
   else
     {
       cerr << "ERROR: Unrecognized core: " << name << ": exiting" << endl;

@@ -87,6 +87,15 @@ AC_ARG_WITH(
 AC_SUBST(MDIR_RI5CY)
 AC_SUBST(MODNAME_RI5CY)
 
+# GDBSIM
+AC_ARG_WITH(
+	[gdbsim-builddir],
+	AC_HELP_STRING([--with-gdbsim-builddir],
+	               [directory containing the GDBSIM build (of GDB)]),
+	[MDIR_GDBSIM="$(cd $withval; pwd)"],
+	[AC_MSG_FAILURE(GDBSIM model directory not specified)])
+AC_SUBST(MDIR_GDBSIM)
+
 # We need to know where to find binutils headers
 AC_ARG_WITH(
        [binutils-incdir],
@@ -145,6 +154,7 @@ AC_CONFIG_FILES([Makefile                  \
 		 targets/common/Makefile   \
 		 targets/picorv32/Makefile \
 		 targets/ri5cy/Makefile    \
+		 targets/gdbsim/Makefile   \
 		 trace/Makefile])
 
 # Put it all out.

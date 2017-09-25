@@ -1,4 +1,4 @@
-# Makefile.am -- automake configuration file for top level targets directory
+# Makefile.am -- automake configuration file for the RI5CY target
 
 # Copyright (C) 2017 Embecosm Limited
 
@@ -19,20 +19,18 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = common gdbsim picorv32 ri5cy
+noinst_LTLIBRARIES = libgdbsim.la
 
-noinst_LTLIBRARIES = libtargets.la
+libgdbsim_la_SOURCES = GdbSim.cpp        \
+                       GdbSim.h          \
+                       GdbSimImpl.cpp    \
+                       GdbSimImpl.h
 
-libtargets_la_SOURCES = ITarget.cpp \
-                        ITarget.h
+libgdbsim_la_CPPFLAGS = -I$(srcdir)/..         \
+                        -I$(srcdir)/../common  \
+                        -I$(top_srcdir)/server \
+                        -I$(top_srcdir)/trace  \
+                        -I$(top_srcdir)/../gdb/include \
+                        -I$(BINUTILS_INCDIR)
 
-libtargets_la_LIBADD = common/libcommon.la     \
-                       gdbsim/libgdbsim.la     \
-                       picorv32/libpicorv32.la \
-                       ri5cy/libri5cy.la
-
-libtargets_la_CPPFLAGS = -I$(srcdir)/common     \
-                         -I$(top_srcdir)/server \
-                         -I$(top_srcdir)/trace
-
-libtargets_la_CXXFLAGS = -Werror -Wall -Wextra
+libgdbsim_la_CXXFLAGS = -Werror -Wall -Wextra

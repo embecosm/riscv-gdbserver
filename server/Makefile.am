@@ -62,11 +62,18 @@ ALL_LDADD = ../targets/libtargets.la                   \
             @MDIR_RI5CY@/verilated_vcd_c.o             \
             @MDIR_RI5CY@/verilated_dpi.o               \
             @MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a \
-            @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a
+            @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a       \
+            @MDIR_GDBSIM@/sim/riscv/libsim.a           \
+            @MDIR_GDBSIM@/bfd/libbfd.a                 \
+            @MDIR_GDBSIM@/opcodes/libopcodes.a         \
+            @MDIR_GDBSIM@/libiberty/libiberty.a        \
+            @MDIR_GDBSIM@/zlib/libz.a                  \
+            -ldl
 
 ALL_CPPFLAGS = -I$(top_srcdir)/targets          \
                -I$(top_srcdir)/targets/common   \
                -I$(top_srcdir)/targets/picorv32 \
                -I$(top_srcdir)/targets/ri5cy    \
+               -I$(top_srcdir)/targets/gdbsim   \
                -I$(top_srcdir)/trace            \
 	       -I$(BINUTILS_INCDIR)

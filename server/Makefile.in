@@ -140,7 +140,15 @@ am__objects_1 = riscv32_gdbserver-AbstractConnection.$(OBJEXT) \
 	riscv32_gdbserver-Utils.$(OBJEXT)
 am_riscv32_gdbserver_OBJECTS = $(am__objects_1)
 riscv32_gdbserver_OBJECTS = $(am_riscv32_gdbserver_OBJECTS)
-riscv32_gdbserver_DEPENDENCIES = $(ALL_LDADD)
+am__DEPENDENCIES_1 = ../targets/libtargets.la ../trace/libtrace.la \
+	@MDIR_RI5CY@/verilated.o @MDIR_RI5CY@/verilated_vcd_c.o \
+	@MDIR_RI5CY@/verilated_dpi.o \
+	@MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a \
+	@MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a \
+	@MDIR_GDBSIM@/sim/riscv/libsim.a @MDIR_GDBSIM@/bfd/libbfd.a \
+	@MDIR_GDBSIM@/opcodes/libopcodes.a \
+	@MDIR_GDBSIM@/libiberty/libiberty.a @MDIR_GDBSIM@/zlib/libz.a
+riscv32_gdbserver_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -156,7 +164,7 @@ am__objects_2 = riscv64_gdbserver-AbstractConnection.$(OBJEXT) \
 	riscv64_gdbserver-Utils.$(OBJEXT)
 am_riscv64_gdbserver_OBJECTS = $(am__objects_2)
 riscv64_gdbserver_OBJECTS = $(am_riscv64_gdbserver_OBJECTS)
-riscv64_gdbserver_DEPENDENCIES = $(ALL_LDADD)
+riscv64_gdbserver_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -285,6 +293,7 @@ LTLIBOBJS = @LTLIBOBJS@
 LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
+MDIR_GDBSIM = @MDIR_GDBSIM@
 MDIR_PICORV32 = @MDIR_PICORV32@
 MDIR_RI5CY = @MDIR_RI5CY@
 MKDIR_P = @MKDIR_P@
@@ -397,12 +406,19 @@ ALL_LDADD = ../targets/libtargets.la                   \
             @MDIR_RI5CY@/verilated_vcd_c.o             \
             @MDIR_RI5CY@/verilated_dpi.o               \
             @MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a \
-            @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a
+            @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a       \
+            @MDIR_GDBSIM@/sim/riscv/libsim.a           \
+            @MDIR_GDBSIM@/bfd/libbfd.a                 \
+            @MDIR_GDBSIM@/opcodes/libopcodes.a         \
+            @MDIR_GDBSIM@/libiberty/libiberty.a        \
+            @MDIR_GDBSIM@/zlib/libz.a                  \
+            -ldl
 
 ALL_CPPFLAGS = -I$(top_srcdir)/targets          \
                -I$(top_srcdir)/targets/common   \
                -I$(top_srcdir)/targets/picorv32 \
                -I$(top_srcdir)/targets/ri5cy    \
+               -I$(top_srcdir)/targets/gdbsim   \
                -I$(top_srcdir)/trace            \
 	       -I$(BINUTILS_INCDIR)
 
