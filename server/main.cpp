@@ -145,8 +145,6 @@ main (int   argc,
 {
   // Argument handling.
 
-  unsigned int  flags = 0;
-  bool          silent = false;
   char         *coreName = nullptr;
   bool          from_stdin = false;
   int           port = -1;

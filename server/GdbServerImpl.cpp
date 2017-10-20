@@ -246,8 +246,6 @@ GdbServerImpl::rspClientRequest ()
       return;
     }
 
-  clock_t timeout_start;
-
   switch (pkt->data[0])
     {
     case '!':
