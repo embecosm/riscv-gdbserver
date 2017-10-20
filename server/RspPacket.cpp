@@ -71,7 +71,7 @@ RspPacket::~RspPacket ()
 void
 RspPacket::packStr (const char *str)
 {
-  int  slen = strlen (str);
+  std::size_t slen = strlen (str);
 
   // Construct the packet to send, so long as string is not too big, otherwise
   // truncate. Add EOS at the end for convenient debug printout
@@ -97,7 +97,7 @@ RspPacket::packStr (const char *str)
 void
 RspPacket::packHexstr (const char *str)
 {
-  int  slen = strlen (str);
+  std::size_t slen = strlen (str);
 
   // Construct the packet to send, so long as string is not too big, otherwise
   // truncate. Add EOS at the end for convenient debug printout
@@ -110,7 +110,7 @@ RspPacket::packHexstr (const char *str)
 
   // Construct the string the hard way
   data[0] = 'O';
-  for (int i = 0; i < slen; i++)
+  for (std::size_t i = 0; i < slen; i++)
     {
       int nybble_hi = str[i] >> 4;
       int nybble_lo = str[i] & 0x0f;
@@ -138,7 +138,7 @@ void
 RspPacket::packRcmdStr (const char *str,
 			const bool toStdoutP)
 {
-  unsigned int  slen = strlen (str);
+  std::size_t slen = strlen (str);
 
   // Construct the packet to send, so long as string is not too big, otherwise
   // truncate. Add EOS at the end for convenient debug printout

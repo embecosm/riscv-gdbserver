@@ -612,7 +612,7 @@ GdbServerImpl::rspWriteAllRegs ()
   // The registers
   for (int  regNum = 0; regNum < RISCV_NUM_REGS; regNum++)
     {
-      int byteSize = sizeof (uint_reg_t);
+      std::size_t byteSize = sizeof (uint_reg_t);
 
       uint32_t val = Utils::hex2Val (&(pkt->data[pktSize]), byteSize,
 				     true /* little endian */);
@@ -787,7 +787,7 @@ GdbServerImpl::rspReadReg ()
 void
 GdbServerImpl::rspWriteReg ()
 {
-  int regByteSize = sizeof (uint_reg_t);
+  std::size_t regByteSize = sizeof (uint_reg_t);
   unsigned int regNum;
   const int valstr_len = 2 * sizeof (uint_reg_t);
   char valstr[valstr_len + 1];	// Allow for EOS
@@ -1348,9 +1348,9 @@ void
 GdbServerImpl::rspWriteMemBin ()
 {
   uint32_t  addr;			// Where to write the memory
-  int       len;			// Number of bytes to write
+  std::size_t len;			// Number of bytes to write
 
-  if (2 != sscanf (pkt->data, "X%x,%x:", &addr, &len))
+  if (2 != sscanf (pkt->data, "X%x,%lx:", &addr, &len))
     {
       cerr << "Warning: Failed to recognize RSP write memory command: %s"
 	   << pkt->data << endl;
@@ -1363,7 +1363,8 @@ GdbServerImpl::rspWriteMemBin ()
   uint8_t *bindat = (uint8_t *)(memchr (pkt->data, ':',
 					pkt->getBufSize ())) + 1;
   int   off       = (char *)bindat - pkt->data;
-  int   newLen    = Utils::rspUnescape ((char *)bindat, pkt->getLen () - off);
+  std::size_t newLen
+    = Utils::rspUnescape ((char *)bindat, pkt->getLen () - off);
 
   // Sanity check
   if (newLen != len)
@@ -1400,7 +1401,7 @@ GdbServerImpl::rspRemoveMatchpoint ()
   MpType    type;			// What sort of matchpoint
   uint32_t  addr;			// Address specified
   uint32_t  instr;			// Instruction value found
-  int       len;			// Matchpoint length
+  std::size_t len;			// Matchpoint length
   uint8_t  *instrVec;			// Instruction as byte vector
 
   pkt->packStr ("");
@@ -1580,7 +1581,7 @@ GdbServerImpl::rspInsertMatchpoint ()
   MpType    type;			// What sort of matchpoint
   uint32_t  addr;			// Address specified
   uint32_t  instr;			// Instruction value found
-  int       len;			// Matchpoint length
+  std::size_t len;			// Matchpoint length
   uint8_t  *instrVec;			// Instruction as byte vector
 
   pkt->packStr ("");

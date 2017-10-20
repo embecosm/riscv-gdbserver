@@ -1,5 +1,22 @@
 2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/RspPacket.cpp (RspPacket::packStr): Change type of some
+	locals.
+	(RspPacket::packHexstr): Likewise.
+	(RspPacket::packRcmdStr): Likewise.
+	* server/RspPacket.h (bufSize): Change type.
+	(len): Likewise.
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspWriteAllRegs):
+	Change type of some locals.
+	(GdbServerImpl::rspWriteReg): Likewise.
+	(GdbServerImpl::rspWriteMemBin): Likewise, also update sscanf
+	format to match.
+	(GdbServerImpl::rspWriteMemBin): Change type of some locals.
+	(GdbServerImpl::rspRemoveMatchpoint): Likewise.
+	(GdbServerImpl::rspInsertMatchpoint): Likewise.
+
+2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/main.cpp (main): Remove 'flags' and 'silent', unused
 	variables.
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspClientRequest):

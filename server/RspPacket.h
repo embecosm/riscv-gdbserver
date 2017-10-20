@@ -57,10 +57,10 @@ public:
 private:
 
   //! The data buffer size
-  int   bufSize;
+  std::size_t bufSize;
 
   //! Number of chars in the data buffer (<= bufSize)
-  int   len;
+  std::size_t len;
 
 };
 
