@@ -1,3 +1,9 @@
+2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* configure.ac: Add new options to enable or disable Wall, Wextra,
+	and Werror compiler flags.
+	* configure: Regenerate.
+
 2017-10-19  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* configure.ac: Provide a default value for the top module name of

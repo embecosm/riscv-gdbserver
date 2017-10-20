@@ -779,6 +779,9 @@ enable_dependency_tracking
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+with_werror
+with_wall
+with_wextra
 with_verilator_headers
 with_picorv32_modeldir
 with_picorv32_topmodule
@@ -1443,6 +1446,9 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-sysroot[=DIR]    Search for dependent libraries within DIR (or the
                           compiler's sysroot if not specified).
+  --without-werror        disable use of -Werror compiler flag
+  --with-wall             enable use of -Wall compiler flag
+  --with-wextra           enable use of -Wextra compile flag
   --with-verilator-headers
                           location of standard verilator headers
   --with-picorv32-modeldir
@@ -15873,8 +15879,41 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
-# Add -Werror to the CXXFLAGS. For now this is not configurable.
-CXXFLAGS="$CXXFLAGS -Werror -std=gnu++11"
+WERROR_FLAG=""
+
+# Check whether --with-werror was given.
+if test "${with_werror+set}" = set; then :
+  withval=$with_werror;
+fi
+
+if test "x$with_werror" != "xno"; then :
+  WERROR_FLAG="-Werror"
+fi
+
+WALL_FLAG=""
+
+# Check whether --with-wall was given.
+if test "${with_wall+set}" = set; then :
+  withval=$with_wall;
+fi
+
+if test "x$with_wall" = "xyes"; then :
+  WALL_FLAG="-Wall"
+fi
+
+WEXTRA_FLAG=""
+
+# Check whether --with-wextra was given.
+if test "${with_wextra+set}" = set; then :
+  withval=$with_wextra;
+fi
+
+if test "x$with_wextra" = "xyes"; then :
+  WEXTRA_FLAG="-Wextra"
+fi
+
+# Add to CXXFLAGS.
+CXXFLAGS="$CXXFLAGS -std=gnu++11 $WERROR_FLAG $WALL_FLAG $WEXTRA_FLAG"
 
 # We need to know where the generic verilator headers are
 

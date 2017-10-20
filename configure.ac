@@ -40,8 +40,26 @@ AC_LANG(C++)
 AC_PROG_CXX
 AC_PROG_INSTALL
 
-# Add -Werror to the CXXFLAGS. For now this is not configurable.
-CXXFLAGS="$CXXFLAGS -Werror -std=gnu++11"
+WERROR_FLAG=""
+AC_ARG_WITH([werror],
+	    AC_HELP_STRING([--without-werror],
+                           [disable use of -Werror compiler flag]))
+AS_IF([test "x$with_werror" != "xno"],[WERROR_FLAG="-Werror"])
+
+WALL_FLAG=""
+AC_ARG_WITH([wall],
+	    AC_HELP_STRING([--with-wall],
+                           [enable use of -Wall compiler flag]))
+AS_IF([test "x$with_wall" = "xyes"],[WALL_FLAG="-Wall"])
+
+WEXTRA_FLAG=""
+AC_ARG_WITH([wextra],
+	    AC_HELP_STRING([--with-wextra],
+                           [enable use of -Wextra compile flag]))
+AS_IF([test "x$with_wextra" = "xyes"], [WEXTRA_FLAG="-Wextra"])
+
+# Add to CXXFLAGS.
+CXXFLAGS="$CXXFLAGS -std=gnu++11 $WERROR_FLAG $WALL_FLAG $WEXTRA_FLAG"
 
 # We need to know where the generic verilator headers are
 AC_ARG_WITH(
