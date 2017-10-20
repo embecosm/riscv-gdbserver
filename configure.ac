@@ -48,9 +48,9 @@ AS_IF([test "x$with_werror" != "xno"],[WERROR_FLAG="-Werror"])
 
 WALL_FLAG=""
 AC_ARG_WITH([wall],
-	    AC_HELP_STRING([--with-wall],
-                           [enable use of -Wall compiler flag]))
-AS_IF([test "x$with_wall" = "xyes"],[WALL_FLAG="-Wall"])
+	    AC_HELP_STRING([--without-wall],
+                           [disable use of -Wall compiler flag]))
+AS_IF([test "x$with_wall" != "xno"],[WALL_FLAG="-Wall"])
 
 WEXTRA_FLAG=""
 AC_ARG_WITH([wextra],

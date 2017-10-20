@@ -1,5 +1,10 @@
 2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* configure.ac: Make -with-wall the default, turning on -Wall.
+	* configure: Regenerate.
+
+2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* targets/common/RegisterSizes.h (PRIuREG): Define base on whether
 	we're doing 32 or 64 bit build.
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallRequest):

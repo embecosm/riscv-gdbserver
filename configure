@@ -1447,7 +1447,7 @@ Optional Packages:
   --with-sysroot[=DIR]    Search for dependent libraries within DIR (or the
                           compiler's sysroot if not specified).
   --without-werror        disable use of -Werror compiler flag
-  --with-wall             enable use of -Wall compiler flag
+  --without-wall          disable use of -Wall compiler flag
   --with-wextra           enable use of -Wextra compile flag
   --with-verilator-headers
                           location of standard verilator headers
@@ -15897,7 +15897,7 @@ if test "${with_wall+set}" = set; then :
   withval=$with_wall;
 fi
 
-if test "x$with_wall" = "xyes"; then :
+if test "x$with_wall" != "xno"; then :
   WALL_FLAG="-Wall"
 fi
 
