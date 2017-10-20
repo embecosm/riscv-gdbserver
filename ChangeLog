@@ -1,5 +1,10 @@
 2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallReply): Don't
+	compare unsigned variable with signed immediate.
+
+2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/RspPacket.cpp (RspPacket::packStr): Change type of some
 	locals.
 	(RspPacket::packHexstr): Likewise.

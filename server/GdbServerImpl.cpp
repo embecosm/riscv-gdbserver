@@ -221,7 +221,7 @@ GdbServerImpl::rspSyscallReply ()
   //       single GDB session which causes GCC regression tests to fail, so we
   //       sidestep it here with a HACK.
 
-  if (retvalue != -1)
+  if (retvalue != ((uint32_t) -1))
     cpu->writeRegister (10, retvalue);
 }
 
