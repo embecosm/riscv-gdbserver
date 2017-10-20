@@ -1,5 +1,12 @@
 2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* targets/common/RegisterSizes.h (PRIuREG): Define base on whether
+	we're doing 32 or 64 bit build.
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallRequest):
+	Make use of PRIuREG format specifier.
+
+2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallReply): Don't
 	compare unsigned variable with signed immediate.
 
