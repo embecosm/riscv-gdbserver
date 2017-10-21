@@ -26,10 +26,10 @@
 
 #ifdef BUILD_64_BIT
 typedef uint64_t uint_reg_t;
-#define PRIuREG PRIu64
+#define PRIxREG PRIx64
 #else
 typedef uint32_t uint_reg_t;
-#define PRIuREG PRIu32
+#define PRIxREG PRIx32
 #endif
 
 #endif /* REGISTERSIZES_H */

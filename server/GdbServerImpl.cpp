@@ -173,33 +173,33 @@ GdbServerImpl::rspSyscallRequest ()
 
   // Work out which syscall we've got
   switch (a7) {
-    case 57   : sprintf (pkt->data, "Fclose,%" PRIuREG "x", a0);
+    case 57   : sprintf (pkt->data, "Fclose,%" PRIxREG, a0);
                 break;
-    case 62   : sprintf (pkt->data, "Flseek,%" PRIuREG "x,%" PRIuREG "x,%"
-                         PRIuREG "x", a0, a1, a2);
+    case 62   : sprintf (pkt->data, "Flseek,%" PRIxREG
+                         ",%" PRIxREG ",%" PRIxREG, a0, a1, a2);
                 break;
-    case 63   : sprintf (pkt->data, "Fread,%" PRIuREG "x,%" PRIuREG "x,%"
-                         PRIuREG "x", a0, a1, a2);
+    case 63   : sprintf (pkt->data, "Fread,%" PRIxREG
+                         ",%" PRIxREG ",%" PRIxREG, a0, a1, a2);
                 break;
-    case 64   : sprintf (pkt->data, "Fwrite,%" PRIuREG "x,%" PRIuREG "x,%"
-                         PRIuREG "x", a0, a1, a2);
+    case 64   : sprintf (pkt->data, "Fwrite,%" PRIxREG
+                         ",%" PRIxREG ",%" PRIxREG, a0, a1, a2);
                 break;
-    case 80   : sprintf (pkt->data, "Ffstat,%" PRIuREG "x,%" PRIuREG "x",
+    case 80   : sprintf (pkt->data, "Ffstat,%" PRIxREG ",%" PRIxREG,
                          a0, a1);
                 break;
-    case 93   : sprintf (pkt->data, "W%" PRIuREG "x", a0);
+    case 93   : sprintf (pkt->data, "W%" PRIxREG, a0);
                 break;
-    case 169  : sprintf (pkt->data, "Fgettimeofday,%" PRIuREG "x,%"
-                         PRIuREG "x", a0, a1);
+    case 169  : sprintf (pkt->data, "Fgettimeofday,%" PRIxREG
+                         ",%" PRIxREG, a0, a1);
                 break;
-    case 1024 : sprintf (pkt->data, "Fopen,%" PRIuREG "x/%x,%" PRIuREG
-                         "x,%" PRIuREG "x", a0, stringLength (a0), a1, a2);
+    case 1024 : sprintf (pkt->data, "Fopen,%" PRIxREG "/%x,%" PRIxREG
+                         ",%" PRIxREG, a0, stringLength (a0), a1, a2);
                 break;
-    case 1026 : sprintf (pkt->data, "Funlink,%" PRIuREG "x/%x",
+    case 1026 : sprintf (pkt->data, "Funlink,%" PRIxREG "/%x",
                          a0, stringLength (a0));
                 break;
-    case 1038 : sprintf (pkt->data, "Fstat,%" PRIuREG "x/%x,%"
-                         PRIuREG "x", a0, stringLength (a0), a1);
+    case 1038 : sprintf (pkt->data, "Fstat,%" PRIxREG "/%x,%"
+                         PRIxREG, a0, stringLength (a0), a1);
                 break;
     default   : rspReportException (TargetSignal::TRAP);
                 return;

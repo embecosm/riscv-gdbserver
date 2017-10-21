@@ -1,3 +1,10 @@
+2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallRequest): Fix
+	up usage of new PRIxREG.
+	* targets/common/RegisterSizes.h (PRIuREG): Changed to...
+	(PRIxREG): ...this.
+
 2017-10-20  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* configure.ac: Make -with-wall the default, turning on -Wall.
