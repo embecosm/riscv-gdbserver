@@ -1,5 +1,14 @@
 2017-10-22  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/GdbServerImpl.cpp (GdbServerImpl::GdbServerImpl): Update
+	member variable name.
+	(GdbServerImpl::rspContinue): Likewise.
+	(GdbServerImpl::rspCommand): Likewise.
+	* server/GdbServerImpl.h (GdbServerImpl::timeout): Renamed to...
+	(GdbServerImpl::mTimeout): ...this.
+
+2017-10-22  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspContinue): New definition.
 	(GdbServerImpl::rspSingleStep): New definition.
 	(GdbServerImpl::rspClientRequest): Move continue and step logic

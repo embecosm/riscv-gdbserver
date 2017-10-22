@@ -67,7 +67,7 @@ GdbServerImpl::GdbServerImpl (AbstractConnection * _conn,
   cpu (_cpu),
   traceFlags (_traceFlags),
   rsp (_conn),
-  timeout (duration <double>::zero ()),
+  mTimeout (duration <double>::zero ()),
   killBehaviour (_killBehaviour),
   mExitServer (false)
 {
@@ -246,7 +246,7 @@ GdbServerImpl::rspContinue ()
   // @todo We ought to have a constant for this.
   duration <double>  interruptTimeout (0.1);
   time_point <system_clock, duration <double> >  timeout_end =
-    system_clock::now () + timeout;
+    system_clock::now () + mTimeout;
 
   // Check for break before resuming the machine.
   if (rsp->haveBreak ())
@@ -282,7 +282,7 @@ GdbServerImpl::rspContinue ()
         case ITarget::ResumeRes::TIMEOUT:
 
           // Check for timeout, unless the timeout was zero
-          if ((duration <double>::zero () != timeout)
+          if ((duration <double>::zero () != mTimeout)
               && (timeout_end < system_clock::now ()))
             {
               // Force the target to stop. Ignore return value.
@@ -1034,8 +1034,8 @@ GdbServerImpl::rspCommand ()
     }
   else if (1 == sscanf (cmd, "timeout %d", &timeout))
     {
-      timeout = timeout * CLOCKS_PER_SEC;
-
+      mTimeout
+        = std::chrono::duration <double> (static_cast <double> (timeout));
       pkt->packStr ("OK");
       rsp->putPkt (pkt);
     }

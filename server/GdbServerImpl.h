@@ -139,7 +139,7 @@ private:
   MpHash *mpHash;
 
   //! Timeout for continue.
-  std::chrono::duration<double>  timeout;
+  std::chrono::duration<double> mTimeout;
 
   //! How to behave when we get a kill (k) packet.
   GdbServer::KillBehaviour killBehaviour;
