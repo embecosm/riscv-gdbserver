@@ -148,16 +148,16 @@ Utils::hex2Val (char *buf,
     {
       for (int  n = numBytes - 1; n >= 0; n--)
 	{
-	  val = val * 16 + char2Hex (buf[n * 2    ]);
-	  val = val * 16 + char2Hex (buf[n * 2 + 1]);
+	  val = (val << 4) | char2Hex (buf[n * 2    ]);
+	  val = (val << 4) | char2Hex (buf[n * 2 + 1]);
 	}
     }
   else
     {
       for (int  n = 0; n < numBytes; n++)
 	{
-	  val = val * 16 + char2Hex (buf[n * 2    ]);
-	  val = val * 16 + char2Hex (buf[n * 2 + 1]);
+	  val = (val << 4) | char2Hex (buf[n * 2    ]);
+	  val = (val << 4) | char2Hex (buf[n * 2 + 1]);
 	}
     }
 
