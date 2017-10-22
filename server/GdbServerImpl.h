@@ -172,6 +172,8 @@ private:
   void  rspWriteMemBin ();
   void  rspRemoveMatchpoint ();
   void  rspInsertMatchpoint ();
+  void  rspContinue ();
+  void  rspSingleStep ();
 
 };	// GdbServerImpl ()
 

@@ -1,3 +1,12 @@
+2017-10-22  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspContinue): New definition.
+	(GdbServerImpl::rspSingleStep): New definition.
+	(GdbServerImpl::rspClientRequest): Move continue and step logic
+	into separate functions.
+	* server/GdbServerImpl.h (GdbServerImpl::rspContinue): New declaration.
+	(GdbServerImpl::rspSingleStep): New declaration.
+
 2017-09-21  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallRequest): Fix

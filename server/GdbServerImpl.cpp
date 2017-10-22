@@ -234,6 +234,124 @@ GdbServerImpl::rspSyscallReply ()
 }
 
 
+// Implement a continue.
+
+void
+GdbServerImpl::rspContinue ()
+{
+  // We have two timeouts to worry about.  The first is any timeout set by
+  // the user (through "monitor timeout", the second is a timeout for
+  // checking for crtl-C.
+  //
+  // @todo We ought to have a constant for this.
+  duration <double>  interruptTimeout (0.1);
+  time_point <system_clock, duration <double> >  timeout_end =
+    system_clock::now () + timeout;
+
+  // Check for break before resuming the machine.
+  if (rsp->haveBreak ())
+    {
+      (void) cpu->resume (ITarget::ResumeType::STOP);
+      rspReportException (TargetSignal::INT);
+      return;
+    }
+
+  for (;;)
+    {
+      ITarget::ResumeRes resType =
+        cpu->resume (ITarget::ResumeType::CONTINUE,
+                     interruptTimeout);
+
+      switch (resType)
+        {
+        case ITarget::ResumeRes::SYSCALL:
+
+          // We have changed all support syscalls to have a
+          // nop,ebreak,nop which was caught in Ri5cyImpl.cc and then
+          // SYSCALL was returned (to get us to this point)
+          rspSyscallRequest ();
+          return;
+
+        case ITarget::ResumeRes::STEPPED:
+        case ITarget::ResumeRes::INTERRUPTED:
+
+          // At breakpoint
+          rspReportException (TargetSignal::TRAP);
+          return;
+
+        case ITarget::ResumeRes::TIMEOUT:
+
+          // Check for timeout, unless the timeout was zero
+          if ((duration <double>::zero () != timeout)
+              && (timeout_end < system_clock::now ()))
+            {
+              // Force the target to stop. Ignore return value.
+
+              (void) cpu->resume (ITarget::ResumeType::STOP);
+              rspReportException (TargetSignal::XCPU);	// Timeout
+              return;
+            }
+
+          // Check for break
+          if (rsp->haveBreak ())
+            {
+              // Force the target to stop. Ignore return value.
+              (void) cpu->resume (ITarget::ResumeType::STOP);
+              rspReportException (TargetSignal::INT);	// Interrupt
+              return;
+            }
+
+          break;
+
+        default:
+
+          // Should never occur.  We exit the gdbserver if this happens.
+          cerr << "*** ABORT: Unrecognized continue return from resume: "
+               << "terminating" << resType << endl;
+          exit (EXIT_FAILURE);
+        }
+    }
+}
+
+//! Single step one machine instruction.
+
+void
+GdbServerImpl::rspSingleStep ()
+{
+  // Check for break before resuming the machine.
+  if (rsp->haveBreak ())
+    {
+      (void) cpu->resume (ITarget::ResumeType::STOP);
+      rspReportException (TargetSignal::INT);
+      return;
+    }
+
+  ITarget::ResumeRes resType = cpu->resume (ITarget::ResumeType::STEP);
+
+  if (resType == ITarget::ResumeRes::SYSCALL)
+    {
+      // @todo We don't currently support syscalls during stepping, if we
+      //       do run into one, treat it like an interrupt.
+
+      cerr << "Warning: Unexpected SYSCALL return in 's' packet: "
+           << "treating as TRAP." << endl;
+
+      rspReportException (TargetSignal::INT);
+      return;
+    }
+
+  // Check for break now we've stopped.
+  if (rsp->haveBreak ())
+    {
+      (void) cpu->resume (ITarget::ResumeType::STOP);
+      rspReportException (TargetSignal::INT);
+      return;
+    }
+
+  rspReportException (TargetSignal::TRAP);
+  return;
+}
+
 //! Deal with a request from the GDB client session
 
 //! In general, apart from the simplest requests, this function replies on
@@ -293,88 +411,10 @@ GdbServerImpl::rspClientRequest ()
 
     case 'c':
     case 'C':
-      // Continue.  We have two timeouts to worry about.  The first is any
-      // timeout set by the user (through "monitor timeout", the second is a
-      // timeout for checking for crtl-C.
-
       // @todo For now we use indentical code for 'C' (continue with signal)
       //       and just ignore the signal.
-
-      {
-	// @todo We ought to have a constant for this.
-
-	duration <double>  interruptTimeout (0.1);
-	time_point <system_clock, duration <double> >  timeout_end =
-	  system_clock::now () + timeout;
-
-	// Check for break before resuming the machine.
-
-	if (rsp->haveBreak ())
-	  {
-	    (void) cpu->resume (ITarget::ResumeType::STOP);
-	    rspReportException (TargetSignal::INT);
-	    return;
-	  }
-
-	for (;;)
-	  {
-	    ITarget::ResumeRes resType =
-	      cpu->resume (ITarget::ResumeType::CONTINUE,
-			   interruptTimeout);
-
-	    switch (resType)
-	      {
-	      case ITarget::ResumeRes::SYSCALL:
-
-		// We have changed all support syscalls to have a
-		// nop,ebreak,nop which was caught in Ri5cyImpl.cc and then
-		// SYSCALL was returned (to get us to this point)
- 		rspSyscallRequest ();
-		return;
-
-	      case ITarget::ResumeRes::STEPPED:
-	      case ITarget::ResumeRes::INTERRUPTED:
-
-		// At breakpoint
-
-		rspReportException (TargetSignal::TRAP);
-		return;
-
-	      case ITarget::ResumeRes::TIMEOUT:
-
-		// Check for timeout, unless the timeout was zero
-		if ((duration <double>::zero () != timeout)
-		    && (timeout_end < system_clock::now ()))
-		  {
-		    // Force the target to stop. Ignore return value.
-
-		    (void) cpu->resume (ITarget::ResumeType::STOP);
-		    rspReportException (TargetSignal::XCPU);	// Timeout
-		    return;
-		  }
-
-		// Check for break
-		if (rsp->haveBreak ())
-		  {
-		    // Force the target to stop. Ignore return value.
-
-		    (void) cpu->resume (ITarget::ResumeType::STOP);
-		    rspReportException (TargetSignal::INT);	// Interrupt
-		    return;
-		  }
-
-		break;
-
-	      default:
-
-		// Should never occur.  We exit the gdbserver if this happens.
-
-		cerr << "*** ABORT: Unrecognized continue return from resume: "
-		     << "terminating" << resType << endl;
-		exit (EXIT_FAILURE);
-	      }
-	  }
-      }
+      rspContinue ();
+      return ;
 
     case 'd':
       // Disable debug using a general query
@@ -473,47 +513,10 @@ GdbServerImpl::rspClientRequest ()
 
     case 's':
     case 'S':
-      {
-	// Single step one machine instruction.
-	// @todo For 'S' we currently only handle Syscall requests
-
-	// Check for break before resuming the machine.
-
-	if (rsp->haveBreak ())
-	  {
-	    (void) cpu->resume (ITarget::ResumeType::STOP);
-	    rspReportException (TargetSignal::INT);
-	    return;
-	  }
-
-	// @todo No syscall for now.
-
-	ITarget::ResumeRes resType = cpu->resume (ITarget::ResumeType::STEP);
-
-	if (resType == ITarget::ResumeRes::SYSCALL)
-	  {
-	    // @todo Waiting for syscall. Should not occur, if it does, we
-	    // treat it as a trap.
-
-	    cerr << "Warning: Unexpected SYSCALL return in 's' packet: "
-		 << "treating as TRAP." << endl;
-
-	    rspReportException (TargetSignal::INT);
-	    return;
-	  }
-
-	// Check for break now we've stopped. No Syscall for now
-
-	if (rsp->haveBreak ())
-	  {
-	    (void) cpu->resume (ITarget::ResumeType::STOP);
-	    rspReportException (TargetSignal::INT);
-	    return;
-	  }
-
-	rspReportException (TargetSignal::TRAP);
-	return;
-      }
+      // @todo For now we use indentical code for 'S' (step with signal)
+      //       and just ignore the signal.
+      rspSingleStep ();
+      return;
 
     case 't':
       // Search. This is not well defined in the manual and for now we don't
