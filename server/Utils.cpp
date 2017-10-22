@@ -52,7 +52,7 @@ Utils::char2Hex (int  c)
 //! Utility mapping a value to hex character
 
 //! @param[in] d  A hexadecimal digit. Any non-hex digit returns a NULL char
-const char
+char
 Utils::hex2Char (uint8_t  d)
 {
   static const char map [] = "0123456789abcdef"

@@ -1,5 +1,11 @@
 2017-10-22  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/Utils.cpp (Utils::hex2Char): Remove 'const' qualifier
+	from return type.
+	* server/Utils.h (Utils::hex2Char): Likewise.
+
+2017-10-22  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/Utils.cpp (Utils::hex2RegVal): Use shift and bitwise or.
 	(Utils::hex2Val): Likewise.
 

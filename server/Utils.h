@@ -36,7 +36,7 @@ class  Utils
 public:
 
   static uint8_t     char2Hex (int  c);
-  static const char  hex2Char (uint8_t  d);
+  static char        hex2Char (uint8_t  d);
   static void        val2Hex (uint64_t  val,
 			      char     *buf,
 			      int       numBytes,
