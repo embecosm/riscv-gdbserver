@@ -1,5 +1,13 @@
 2017-10-22  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/GdbServerImpl.cpp (GdbServerImpl::interruptTimeout):
+	Initialise.
+	(GdbServerImpl::rspContinue): Remove interruptTimeout.
+	* server/GdbServerImpl.h (GdbServerImpl::interruptTimeout):
+	Declare.
+
+2017-10-22  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/GdbServerImpl.cpp (GdbServerImpl::GdbServerImpl): Update
 	member variable name.
 	(GdbServerImpl::rspContinue): Likewise.

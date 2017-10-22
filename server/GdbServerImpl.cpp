@@ -50,6 +50,14 @@ using std::string;
 using std::stringstream;
 using std::vector;
 
+//! This is the length of time we spend running before leaving the model
+//! to check for an interrupt from GDB.  This must always be less than one
+//! second, as that is the smallest timeout a user can set (using the
+//! monitor command) and if this timeout is greater than the user timeout
+//! then things will stop working.  But you want this pretty short anyway
+//! in order that GDB appear responsive.
+const std::chrono::duration <double> GdbServerImpl::interruptTimeout
+                                = std::chrono::duration <double> (0.1);
 
 //! Constructor for the GDB RSP server.
 
@@ -242,9 +250,6 @@ GdbServerImpl::rspContinue ()
   // We have two timeouts to worry about.  The first is any timeout set by
   // the user (through "monitor timeout", the second is a timeout for
   // checking for crtl-C.
-  //
-  // @todo We ought to have a constant for this.
-  duration <double>  interruptTimeout (0.1);
   time_point <system_clock, duration <double> >  timeout_end =
     system_clock::now () + mTimeout;
 

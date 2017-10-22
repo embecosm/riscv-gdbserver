@@ -141,6 +141,10 @@ private:
   //! Timeout for continue.
   std::chrono::duration<double> mTimeout;
 
+  //! The length of time to run before breaking out of the model to
+  //! check for an interrupt from GDB.
+  static const std::chrono::duration <double> interruptTimeout;
+
   //! How to behave when we get a kill (k) packet.
   GdbServer::KillBehaviour killBehaviour;
 
