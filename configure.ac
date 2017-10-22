@@ -54,9 +54,9 @@ AS_IF([test "x$with_wall" != "xno"],[WALL_FLAG="-Wall"])
 
 WEXTRA_FLAG=""
 AC_ARG_WITH([wextra],
-	    AC_HELP_STRING([--with-wextra],
-                           [enable use of -Wextra compile flag]))
-AS_IF([test "x$with_wextra" = "xyes"], [WEXTRA_FLAG="-Wextra"])
+	    AC_HELP_STRING([--without-wextra],
+                           [disable use of -Wextra compile flag]))
+AS_IF([test "x$with_wextra" != "xno"], [WEXTRA_FLAG="-Wextra"])
 
 # Add to CXXFLAGS.
 CXXFLAGS="$CXXFLAGS -std=gnu++11 $WERROR_FLAG $WALL_FLAG $WEXTRA_FLAG"

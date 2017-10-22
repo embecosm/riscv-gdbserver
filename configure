@@ -1448,7 +1448,7 @@ Optional Packages:
                           compiler's sysroot if not specified).
   --without-werror        disable use of -Werror compiler flag
   --without-wall          disable use of -Wall compiler flag
-  --with-wextra           enable use of -Wextra compile flag
+  --without-wextra        disable use of -Wextra compile flag
   --with-verilator-headers
                           location of standard verilator headers
   --with-picorv32-modeldir
@@ -15908,7 +15908,7 @@ if test "${with_wextra+set}" = set; then :
   withval=$with_wextra;
 fi
 
-if test "x$with_wextra" = "xyes"; then :
+if test "x$with_wextra" != "xno"; then :
   WEXTRA_FLAG="-Wextra"
 fi
 
