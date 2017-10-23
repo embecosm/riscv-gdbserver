@@ -79,7 +79,8 @@ GdbServerImpl::GdbServerImpl (AbstractConnection * _conn,
   rsp (_conn),
   mTimeout (duration <double>::zero ()),
   killBehaviour (_killBehaviour),
-  mExitServer (false)
+  mExitServer (false),
+  mSyscallContinuation (SYSCALL_NONE_PENDING)
 {
   pkt           = new RspPacket (RSP_PKT_SIZE);
   mpHash        = new MpHash ();
@@ -117,6 +118,10 @@ GdbServerImpl::rspServer ()
 	      cerr << "*** Unable to continue: ABORTING" << endl;
 	      return EXIT_FAILURE;
 	    }
+
+	  // Reset this after making a new connection as the last exit
+	  // will have left it set.
+	  mSyscallContinuation = SYSCALL_NONE_PENDING;
 	}
 
       // Get a RSP client request
@@ -168,10 +173,13 @@ GdbServerImpl::stringLength (uint32_t addr)
 //! put into registers via its newlib/libgloss implementation.
 
 void
-GdbServerImpl::rspSyscallRequest ()
+GdbServerImpl::rspSyscallRequest (SyscallContinuationType cType)
 {
   // Keep track of whether we were in the middle of a Continue or Step
-  lastPacketType = pkt->data[0];
+  if (mSyscallContinuation != SYSCALL_NONE_PENDING)
+    cerr << "Warning: There's already a syscall pending, first one lost?"
+         << endl;
+  mSyscallContinuation = cType;
 
   // Get the args from the appropriate regs and send an F packet
   uint_reg_t a0, a1, a2, a3, a7;
@@ -226,10 +234,18 @@ GdbServerImpl::rspSyscallRequest ()
 //! should resume execution, return false if the target has been
 //! interrupted.
 
-bool
+void
 GdbServerImpl::rspSyscallReply ()
 {
   SyscallReplyPacket p;
+
+  // Read and reset the continuation before we restart the target,
+  // otherwise we could get nested syscalls.
+  SyscallContinuationType sysCont = mSyscallContinuation;
+  mSyscallContinuation = SYSCALL_NONE_PENDING;
+
+  if (sysCont == SYSCALL_NONE_PENDING)
+    cerr << "Warning: Syscall 'F' reply received when none expected" << endl;
 
   p.parse (pkt->data);
 
@@ -246,13 +262,33 @@ GdbServerImpl::rspSyscallReply ()
       if (p.hasCtrlC ())
         {
           rspReportException (TargetSignal::INT);
-          return false;
+          return;
         }
+
+      switch (sysCont)
+        {
+        case SYSCALL_NONE_PENDING:
+          // We've already warned about this unexpected case.  Lets handle
+          // this like a completed step, seems like the least bad choice.
+
+          // Fall-through.
+        case SYSCALL_THEN_FINISH_STEPPING:
+          // Report a trap just like we would after a step.
+          rspReportException (TargetSignal::TRAP);
+          break;
+
+        case SYSCALL_THEN_FINISH_CONTINUE:
+          // Restart the continue command.
+          rspContinue ();
+          break;
+        }
+      return;
     }
 
-  return true;
+  // Gah! Invalid content from GDB.
+  pkt->packStr ("E01");
+  rsp->putPkt (pkt);
 }
-
 
 // Implement a continue.
 
@@ -286,7 +322,7 @@ GdbServerImpl::rspContinue ()
           // We have changed all support syscalls to have a
           // nop,ebreak,nop which was caught in Ri5cyImpl.cc and then
           // SYSCALL was returned (to get us to this point)
-          rspSyscallRequest ();
+          rspSyscallRequest (SYSCALL_THEN_FINISH_CONTINUE);
           return;
 
         case ITarget::ResumeRes::STEPPED:
@@ -347,13 +383,7 @@ GdbServerImpl::rspSingleStep ()
 
   if (resType == ITarget::ResumeRes::SYSCALL)
     {
-      // @todo We don't currently support syscalls during stepping, if we
-      //       do run into one, treat it like an interrupt.
-
-      cerr << "Warning: Unexpected SYSCALL return in 's' packet: "
-           << "treating as TRAP." << endl;
-
-      rspReportException (TargetSignal::INT);
+      rspSyscallRequest (SYSCALL_THEN_FINISH_STEPPING);
       return;
     }
 
@@ -423,9 +453,8 @@ GdbServerImpl::rspClientRequest ()
 
     case 'F':
       // Handle the syscall reply then continue
-      if (!rspSyscallReply ())
-        return;
-      // Fall-through
+      rspSyscallReply ();
+      return;
 
     case 'c':
     case 'C':

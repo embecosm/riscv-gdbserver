@@ -1,3 +1,24 @@
+2018-04-04  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* server/GdbServerImpl.cpp (GdbServerImpl::GdbServerImpl):
+	Initialise mSyscallContinuation.
+	(GdbServerImpl::rspServer): Reset mSyscallContinuation after each
+	new connection.
+	(GdbServerImpl::rspSyscallRequest): Take parameter, update
+	mSyscallContinuation.
+	(GdbServerImpl::rspSyscallReply): Hangle mSyscallContinuation,
+	don't return a bool.
+	(GdbServerImpl::rspContinue): Pass parameter to rspSyscallRequest.
+	(GdbServerImpl::rspSingleStep): Call rspSyscallRequest to handle
+	syscalls.
+	(GdbServerImpl::rspClientRequest): Return after processing syscall
+	reply.
+	* server/GdbServerImpl.h (GdbServerImpl::lastPacketType): Delete.
+	(GdbServerImpl::SyscallContinuationType): New enum type.
+	(GdbServerImpl::mSyscallContinuation): New member variable.
+	(GdbServerImpl::rspSyscallRequest): Update parameter list.
+	(GdbServerImpl::rspSyscallReply): Update return type.
+
 2018-04-01  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* targets/gdbsim/GdbSimImpl.cpp (GdbSimImpl::doOneStep): Use ECALL
