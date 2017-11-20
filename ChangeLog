@@ -1,3 +1,18 @@
+2017-11-20  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* configure.ac: Add check for -faligned-new, and add to CXXFLAGS.
+	* m4/cxx_flags_check.m4: New file.
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Regenerate.
+	* configure: Regenerate.
+	* server/Makefile.in: Regenerate.
+	* targets/Makefile.in: Regenerate.
+	* targets/common/Makefile.in: Regenerate.
+	* targets/gdbsim/Makefile.in: Regenerate.
+	* targets/pegasus/Makefile.in: Regenerate.
+	* targets/ri5cy/Makefile.in: Regenerate.
+	* trace/Makefile.in: Regenerate.
+
 2018-02-26  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspClientRequest):

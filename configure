@@ -15924,6 +15924,53 @@ fi
 # Add to CXXFLAGS.
 CXXFLAGS="$CXXFLAGS -std=gnu++11 $WERROR_FLAG $WALL_FLAG $WEXTRA_FLAG"
 
+# The -faligned-new flag is required in later 7.x compilers in order
+# to support c++ new for objects with large alignment requirements.
+# We add the flag only if its understood.
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if $CXX supports -faligned-new" >&5
+$as_echo_n "checking if $CXX supports -faligned-new... " >&6; }
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+  ac_saved_cxxflags="$CXXFLAGS"
+  CXXFLAGS="-Werror -faligned-new"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+    cxx_flag_supported=yes
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+    cxx_flag_supported=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CXXFLAGS="$ac_saved_cxxflags"
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+if test $cxx_flag_supported = yes; then :
+  CXXFLAGS="$CXXFLAGS -faligned-new"
+fi
+
 # We need to know where the generic verilator headers are
 
 # Check whether --with-verilator-headers was given.

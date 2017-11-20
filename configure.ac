@@ -61,6 +61,12 @@ AS_IF([test "x$with_wextra" != "xno"], [WEXTRA_FLAG="-Wextra"])
 # Add to CXXFLAGS.
 CXXFLAGS="$CXXFLAGS -std=gnu++11 $WERROR_FLAG $WALL_FLAG $WEXTRA_FLAG"
 
+# The -faligned-new flag is required in later 7.x compilers in order
+# to support c++ new for objects with large alignment requirements.
+# We add the flag only if its understood.
+CXX_FLAG_SUPPORTED([-faligned-new])
+AS_IF([test $cxx_flag_supported = yes], [CXXFLAGS="$CXXFLAGS -faligned-new"])
+
 # We need to know where the generic verilator headers are
 AC_ARG_WITH(
 	[verilator-headers],
