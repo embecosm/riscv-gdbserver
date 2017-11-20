@@ -206,6 +206,9 @@ GdbServerImpl::rspSyscallRequest (SyscallContinuationType cType)
                          a0, a1);
                 break;
     case 93   : sprintf (pkt->data, "W%" PRIxREG, a0);
+                /* We never get a reply from an exit syscall, so don't
+                   store a continuation state.  */
+                mSyscallContinuation = SYSCALL_NONE_PENDING;
                 break;
     case 169  : sprintf (pkt->data, "Fgettimeofday,%" PRIxREG
                          ",%" PRIxREG, a0, a1);

@@ -1,5 +1,10 @@
 2018-04-04  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallRequest):
+	Don't store a continuation state for exit syscall.
+
+2018-04-04  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/GdbServerImpl.cpp (GdbServerImpl::GdbServerImpl):
 	Initialise mSyscallContinuation.
 	(GdbServerImpl::rspServer): Reset mSyscallContinuation after each
