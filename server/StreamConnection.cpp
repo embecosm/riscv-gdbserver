@@ -48,7 +48,8 @@ using std::setw;
 //! @param[in] _portNum     the port number to connect to
 //! @param[in] _traceFlags  flags controlling tracing
 StreamConnection::StreamConnection (TraceFlags *_traceFlags) :
-  AbstractConnection (_traceFlags)
+  AbstractConnection (_traceFlags),
+  mIsConnected (true)
 {
   // Nothing.
 }	// StreamConnection ()
@@ -94,11 +95,12 @@ StreamConnection::rspConnect ()
 }	// rspConnect ()
 
 
-//! Close a client connection if it is open. Nothing to do with stdin or
-//! stdout.
+//! Close a client connection if it is open.  This is called once we detect
+//! that stdin might have closed.  Remember we're now in a closed state.
 void
 StreamConnection::rspClose ()
 {
+  mIsConnected = false;
 }	// rspClose ()
 
 
@@ -108,10 +110,7 @@ StreamConnection::rspClose ()
 bool
 StreamConnection::isConnected ()
 {
-  // TODO: We're only closed if stdin or stdout are closed.  Is this
-  // something we care about?  For now just say we're always connected.
-  return true;
-
+  return mIsConnected;
 }	// isConnected ()
 
 //! Put a single character out on the RSP connection
@@ -205,9 +204,17 @@ StreamConnection::getRspCharRaw (bool blocking)
   	  return  -1;
 
   	default:
-          if (read (STDIN_FILENO, &c, sizeof (c)) == -1)
-            return -1;
-  	  return  c & 0xff;	// Success, we can return (no sign extend!)
+	  {
+	    ssize_t count;
+
+	    if ((count = read (STDIN_FILENO, &c, sizeof (c))) == -1)
+	      return -1;
+
+	    if (count == 0)
+	      return -1;
+
+	    return  c & 0xff;	// Success, we can return (no sign extend!)
+	  }
   	}
     }
 }	// getRspCharRaw ()

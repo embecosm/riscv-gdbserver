@@ -50,6 +50,8 @@ private:
   virtual bool  putRspCharRaw (char  c);
   virtual int   getRspCharRaw (bool blocking);
 
+  // Track whether we are connected or not.
+  bool mIsConnected;
 };	// StreamConnection ()
 
 #endif	// STREAM_CONNECTION_H

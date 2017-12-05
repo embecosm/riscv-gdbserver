@@ -1,3 +1,15 @@
+2017-12-05  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* server/StreamConnection.cpp
+	(StreamConnection::StreamConnection): Initialise mIsConnected.
+	(StreamConnection::rspClose): Update header comment, set
+	mIsConnected.
+	(StreamConnection::isConnected): Return mIsConnected.
+	(StreamConnection::getRspCharRaw): Return -1 when zero bytes are
+	read, this should only happen when stdin is closed.
+	* server/StreamConnection.h (StreamConnection::mIsConnected):
+	Declare new member variable.
+
 2017-11-20  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* configure.ac: Add check for -faligned-new, and add to CXXFLAGS.
