@@ -158,7 +158,7 @@ private:
   // Handle the various RSP requests
   int   stringLength (uint32_t addr);
   void  rspSyscallRequest ();
-  void  rspSyscallReply ();
+  bool  rspSyscallReply ();
   void  rspReportException (TargetSignal  sig = TargetSignal::TRAP);
   void  rspReadAllRegs ();
   void  rspWriteAllRegs ();

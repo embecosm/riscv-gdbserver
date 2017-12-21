@@ -85,6 +85,7 @@ ALL_SOURCES = AbstractConnection.cpp \
               RspPacket.h            \
               StreamConnection.cpp   \
               StreamConnection.h     \
+              SyscallReplyPacket.h   \
               Utils.cpp              \
               Utils.h
 

@@ -1,3 +1,17 @@
+2017-12-21  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* server/SyscallReplyPacket.h: New file.
+	* server/GdbServerImpl.cpp: Add cassert, and SyscallReplyPacket.h
+	include.
+	(GdbServerImpl::rspSyscallReply): Rewrite using
+	SyscallReplyPacket.
+	(GdbServerImpl::rspClientRequest): Use return value from
+	rspSyscallReply.
+	* server/GdbServerImpl.h (GdbServerImpl::rspSyscallReply): Change
+	return type.
+	* server/Makefile.am (ALL_SOURCES): Add SyscallReplyPacket.h.
+	* server/Makefile.in: Regenerated.
+
 2017-12-05  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/StreamConnection.cpp

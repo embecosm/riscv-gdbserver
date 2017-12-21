@@ -30,9 +30,11 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <cassert>
 
 #include "GdbServerImpl.h"
 #include "Utils.h"
+#include "SyscallReplyPacket.h"
 
 using std::chrono::duration;
 using std::chrono::system_clock;
@@ -220,25 +222,35 @@ GdbServerImpl::rspSyscallRequest ()
 
 
 //! The F reply is sent by the GDB client to us after a syscall has been
-//! handled.
+//! handled.  Return true if the syscall reply has been handled and we
+//! should resume execution, return false if the target has been
+//! interrupted.
 
-void
+bool
 GdbServerImpl::rspSyscallReply ()
 {
-  uint32_t  retvalue;
+  SyscallReplyPacket p;
 
-  // Get the return value from the F reply
-  if (1 != sscanf (pkt->data, "F%x", &retvalue))
-  {
-    cerr << "Freply received unexpected amount of variables" << endl;
-  }
+  p.parse (pkt->data);
 
-  // @todo: fstat currently returns -1 after resetting and re-loading within a
-  //       single GDB session which causes GCC regression tests to fail, so we
-  //       sidestep it here with a HACK.
+  if (p.valid ())
+    {
+      int retcode = p.retcode ();
 
-  if (retvalue != ((uint32_t) -1))
-    cpu->writeRegister (10, retvalue);
+      // @todo: fstat currently returns -1 after resetting and re-loading
+      //        within a single GDB session which causes GCC regression
+      //        tests to fail, so we sidestep it here with a HACK.
+      if (retcode != -1)
+        cpu->writeRegister (10, retcode);
+
+      if (p.hasCtrlC ())
+        {
+          rspReportException (TargetSignal::INT);
+          return false;
+        }
+    }
+
+  return true;
 }
 
 
@@ -411,7 +423,8 @@ GdbServerImpl::rspClientRequest ()
 
     case 'F':
       // Handle the syscall reply then continue
-      rspSyscallReply ();
+      if (!rspSyscallReply ())
+        return;
       // Fall-through
 
     case 'c':
