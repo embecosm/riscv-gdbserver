@@ -72,7 +72,6 @@ public:
   bool traceBreak () const;
   bool traceVcd () const;
   bool traceSilent () const;
-  bool traceDisas () const;
   bool isFlag (const char *flagName) const;
   void flag (const char *flagName,
 	     const bool  val);

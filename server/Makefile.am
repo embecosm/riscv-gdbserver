@@ -24,8 +24,6 @@ bin_PROGRAMS = riscv-gdbserver
 
 riscv_gdbserver_SOURCES = AbstractConnection.cpp \
                           AbstractConnection.h   \
-                          Disassembler.h         \
-                          Disassembler.cpp       \
                           GdbServer.cpp          \
                           GdbServer.h            \
                           GdbServerImpl.cpp      \
@@ -51,12 +49,11 @@ riscv_gdbserver_LDADD = ../targets/libtargets.la                   \
                         @MDIR_RI5CY@/verilated_vcd_c.o             \
                         @MDIR_RI5CY@/verilated_dpi.o               \
                         @MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a \
-                        @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a       \
-                        -L$(BINUTILS_LIBDIR) -lopcodes -lbfd
+                        @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a
 
 riscv_gdbserver_CPPFLAGS = -I$(top_srcdir)/targets          \
                            -I$(top_srcdir)/targets/common   \
                            -I$(top_srcdir)/targets/picorv32 \
                            -I$(top_srcdir)/targets/ri5cy    \
                            -I$(top_srcdir)/trace            \
-                           -I$(BINUTILS_INCDIR)
+			   -I$(BINUTILS_INCDIR)

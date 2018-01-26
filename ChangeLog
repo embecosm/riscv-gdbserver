@@ -1,3 +1,33 @@
+2018-01-26  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
+	* configure.ac: Remove '--with-binutils-libdir'.
+	* server/Disassembler.cpp: Delete.
+	* server/Disassembler.h: Delete.
+	* server/GdbServerImpl.cpp (GdbServerImpl::GdbServerImpl): Remove
+	use of mDisassembler.
+	(GdbServerImpl::~GdbServerImpl): Likewise.
+	(GdbServerImpl::command): Remove 'disas' command.
+	* server/GdbServerImpl.h: Don't include disassembler header file.
+	(GdbServerImpl::mDisassembler): Delete.
+	* server/Makefile.am (riscv_gdbserver_SOURCES): Remove
+	disassembler source files.
+	(riscv_gdbserver_LDADD): Remove libopcodes, and libbfd from the
+	link.
+	* server/Makefile.in: Regenerate.
+	* server/main.cpp (usage): Remove reference to disas trace flag.
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::clockModel): Remove
+	disassembler trace.
+	* targets/Makefile.in: Regenerated.
+	* targets/common/Makefile.in: Regenerated.
+	* targets/picorv32/Makefile.in: Regenerated.
+	* targets/ri5cy/Makefile.in: Regenerated.
+	* trace/TraceFlags.cpp (TraceFlags::TraceFlags): Remove disas flag.
+	(TraceFlags::traceDisas): Delete.
+	* trace/TraceFlags.h (TraceFlags::traceDisas): Delete declaration.
+	* trace/Makefile.in: Regenerated.
+
 2017-08-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* README.md: Bring build instructions up to date for latest code

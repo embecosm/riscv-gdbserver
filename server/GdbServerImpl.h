@@ -35,7 +35,6 @@
 
 // Class headers
 
-#include "Disassembler.h"
 #include "GdbServer.h"
 #include "MpHash.h"
 #include "RspConnection.h"
@@ -144,10 +143,6 @@ private:
 
   //! How to behave when we get a kill (k) packet.
   GdbServer::KillBehaviour killBehaviour;
-
-  //! The diassembler
-
-  Disassembler *mDisassembler;
 
   // Main RSP request handler
   void  rspClientRequest ();

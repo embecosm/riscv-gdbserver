@@ -127,7 +127,6 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_riscv_gdbserver_OBJECTS =  \
 	riscv_gdbserver-AbstractConnection.$(OBJEXT) \
-	riscv_gdbserver-Disassembler.$(OBJEXT) \
 	riscv_gdbserver-GdbServer.$(OBJEXT) \
 	riscv_gdbserver-GdbServerImpl.$(OBJEXT) \
 	riscv_gdbserver-main.$(OBJEXT) \
@@ -235,7 +234,6 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BINUTILS_INCDIR = @BINUTILS_INCDIR@
-BINUTILS_LIBDIR = @BINUTILS_LIBDIR@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -355,8 +353,6 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 riscv_gdbserver_SOURCES = AbstractConnection.cpp \
                           AbstractConnection.h   \
-                          Disassembler.h         \
-                          Disassembler.cpp       \
                           GdbServer.cpp          \
                           GdbServer.h            \
                           GdbServerImpl.cpp      \
@@ -382,15 +378,14 @@ riscv_gdbserver_LDADD = ../targets/libtargets.la                   \
                         @MDIR_RI5CY@/verilated_vcd_c.o             \
                         @MDIR_RI5CY@/verilated_dpi.o               \
                         @MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a \
-                        @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a       \
-                        -L$(BINUTILS_LIBDIR) -lopcodes -lbfd
+                        @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a
 
 riscv_gdbserver_CPPFLAGS = -I$(top_srcdir)/targets          \
                            -I$(top_srcdir)/targets/common   \
                            -I$(top_srcdir)/targets/picorv32 \
                            -I$(top_srcdir)/targets/ri5cy    \
                            -I$(top_srcdir)/trace            \
-                           -I$(BINUTILS_INCDIR)
+			   -I$(BINUTILS_INCDIR)
 
 all: all-am
 
@@ -486,7 +481,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-AbstractConnection.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-Disassembler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-GdbServer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-GdbServerImpl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_gdbserver-MpHash.Po@am__quote@
@@ -530,20 +524,6 @@ riscv_gdbserver-AbstractConnection.obj: AbstractConnection.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='AbstractConnection.cpp' object='riscv_gdbserver-AbstractConnection.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-AbstractConnection.obj `if test -f 'AbstractConnection.cpp'; then $(CYGPATH_W) 'AbstractConnection.cpp'; else $(CYGPATH_W) '$(srcdir)/AbstractConnection.cpp'; fi`
-
-riscv_gdbserver-Disassembler.o: Disassembler.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-Disassembler.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-Disassembler.Tpo -c -o riscv_gdbserver-Disassembler.o `test -f 'Disassembler.cpp' || echo '$(srcdir)/'`Disassembler.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-Disassembler.Tpo $(DEPDIR)/riscv_gdbserver-Disassembler.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Disassembler.cpp' object='riscv_gdbserver-Disassembler.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-Disassembler.o `test -f 'Disassembler.cpp' || echo '$(srcdir)/'`Disassembler.cpp
-
-riscv_gdbserver-Disassembler.obj: Disassembler.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-Disassembler.obj -MD -MP -MF $(DEPDIR)/riscv_gdbserver-Disassembler.Tpo -c -o riscv_gdbserver-Disassembler.obj `if test -f 'Disassembler.cpp'; then $(CYGPATH_W) 'Disassembler.cpp'; else $(CYGPATH_W) '$(srcdir)/Disassembler.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/riscv_gdbserver-Disassembler.Tpo $(DEPDIR)/riscv_gdbserver-Disassembler.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Disassembler.cpp' object='riscv_gdbserver-Disassembler.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o riscv_gdbserver-Disassembler.obj `if test -f 'Disassembler.cpp'; then $(CYGPATH_W) 'Disassembler.cpp'; else $(CYGPATH_W) '$(srcdir)/Disassembler.cpp'; fi`
 
 riscv_gdbserver-GdbServer.o: GdbServer.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_gdbserver_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT riscv_gdbserver-GdbServer.o -MD -MP -MF $(DEPDIR)/riscv_gdbserver-GdbServer.Tpo -c -o riscv_gdbserver-GdbServer.o `test -f 'GdbServer.cpp' || echo '$(srcdir)/'`GdbServer.cpp

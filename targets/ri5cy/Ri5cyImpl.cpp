@@ -473,26 +473,6 @@ Ri5cyImpl::clockModel ()
     mTfp->dump (mCpuTime);
 
   mCycleCnt++;
-
-  if (mFlags->traceDisas ())
-    {
-      // Optionally disassemble an instruction.  This is Ian Bolton's code,
-      // moved to the server to be generic.
-
-      // @todo We need to be able to extract the actual instruction from the
-      //       Verilator model.  For now we hard code NOP (0x00000013).
-
-      // @todo We can only do this once we have the server available to do
-      //       disassembly. This means it can't be done during the reset
-      //       sequence, since that is part of the constructor.
-
-      if (nullptr != mServer)
-	{
-	  ostringstream oss;
-	  mServer->command ("disas 0x00000013", oss);
-	  cout << oss.str () << endl;
-	}
-    }
 }	// Ri5cyImpl::clockModel ()
 
 

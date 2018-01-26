@@ -140,7 +140,6 @@ TraceFlags::TraceFlags () :
       sFlagInfo.push_back ({ TRACE_BREAK,  "break"  });
       sFlagInfo.push_back ({ TRACE_VCD,    "vcd"    });
       sFlagInfo.push_back ({ TRACE_SILENT, "silent" });
-      sFlagInfo.push_back ({ TRACE_DISAS,  "disas"  });
     }
 }	// TraceFlags::TraceFlags ()
 
@@ -211,18 +210,6 @@ TraceFlags::traceSilent () const
   return (mFlags & TRACE_SILENT) == TRACE_SILENT;
 
 }	// TraceFlags::traceSilent ()
-
-
-//! Is disassembly enabled?
-
-//! @return  TRUE if the DISAS tracing flag is set, FALSE otherwise
-
-bool
-TraceFlags::traceDisas () const
-{
-  return (mFlags & TRACE_DISAS) == TRACE_DISAS;
-
-}	// TraceFlags::traceDisas ()
 
 
 //! Is this a real flag

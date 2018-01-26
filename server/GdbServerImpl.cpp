@@ -54,7 +54,7 @@ using std::vector;
 //! Constructor for the GDB RSP server.
 
 //! Allocate a packet data structure and a new RSP connection. By default no
-//! timeout for run/continue. Set up a disassembler in case we need it.
+//! timeout for run/continue.
 
 //! @param[in] rspPort      RSP port to use.
 //! @param[in] _cpu         The simulated CPU
@@ -72,7 +72,6 @@ GdbServerImpl::GdbServerImpl (AbstractConnection * _conn,
 {
   pkt           = new RspPacket (RSP_PKT_SIZE);
   mpHash        = new MpHash ();
-  mDisassembler = new Disassembler ();
 
 }	// GdbServerImpl ()
 
@@ -81,7 +80,6 @@ GdbServerImpl::GdbServerImpl (AbstractConnection * _conn,
 
 GdbServerImpl::~GdbServerImpl ()
 {
-  delete  mDisassembler;
   delete  mpHash;
   delete  pkt;
 
@@ -125,25 +123,11 @@ GdbServerImpl::rspServer ()
 //! @return  TRUE if the command was accepted, FALSE otherwise
 
 bool
-GdbServerImpl::command (const std::string  cmd,
-			std::ostream & stream)
+GdbServerImpl::command (const std::string  cmd __attribute__ ((unused)),
+			std::ostream & stream __attribute__ ((unused)))
 {
-  vector<string> tokens;
-  Utils::split (cmd.c_str (), " ", tokens);
-  int numTok = tokens.size ();
-
-  // Look for any commands we can handle
-
-  if ((numTok == 2) && (string ("disas") == tokens[0]))
-    {
-      // disas <addr>
-
-      uint32_t insn = strtol (tokens[1].c_str (), nullptr, 0);
-      mDisassembler->disassemble (insn, stream);
-      return true;
-    }
-  else
-    return  false;
+  // We don't handle any commands yet.
+  return  false;
 
 }	// GdbServerImpl::rspServer ()
 

@@ -638,7 +638,6 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 VTESTBENCH
-BINUTILS_LIBDIR
 BINUTILS_INCDIR
 MODNAME_RI5CY
 MDIR_RI5CY
@@ -783,7 +782,6 @@ with_picorv32_topmodule
 with_ri5cy_modeldir
 with_ri5cy_topmodule
 with_binutils_incdir
-with_binutils_libdir
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1449,7 +1447,6 @@ Optional Packages:
   --with-ri5cy-modeldir   directory containing the RI5CY model & headers
   --with-ri5cy-topmodule  Name of the top module in the RI5CY Verilog
   --with-binutils-incdir  include directory for binutils utilities
-  --with-binutils-libdir  installation directory for binutils libraries
 
 Some influential environment variables:
   CC          C compiler command
@@ -15938,7 +15935,7 @@ fi
 
 
 
-# We need to know where to find our binutils source and binutils libraries
+# We need to know where to find binutils headers
 
 # Check whether --with-binutils-incdir was given.
 if test "${with_binutils_incdir+set}" = set; then :
@@ -15949,18 +15946,6 @@ $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "Binutils include directory not specified
 See \`config.log' for more details" "$LINENO" 5; }
 fi
-
-
-# Check whether --with-binutils-libdir was given.
-if test "${with_binutils_libdir+set}" = set; then :
-  withval=$with_binutils_libdir; BINUTILS_LIBDIR="$(cd $withval; pwd)"
-else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "Binutils library directory not specified
-See \`config.log' for more details" "$LINENO" 5; }
-fi
-
 
 
 
