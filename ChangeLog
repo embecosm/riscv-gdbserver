@@ -1,5 +1,10 @@
 2018-02-26  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspClientRequest):
+	Rephrase comment so GCC's fall-through warning doesn't trigger.
+
+2018-02-26  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* Makefile.in: Regenerate.
 	* aclocal.m4: Regenerate.
 	* config.h.in: Regenerate.

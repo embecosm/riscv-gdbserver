@@ -412,7 +412,7 @@ GdbServerImpl::rspClientRequest ()
     case 'F':
       // Handle the syscall reply then continue
       rspSyscallReply ();
-      // intentionally carry on here rather than break
+      // Fall-through
 
     case 'c':
     case 'C':
