@@ -31,9 +31,19 @@
 // RISC-V headers in general and for each target
 
 #include "ITarget.h"
-#include "Picorv32.h"
-#include "Ri5cy.h"
+
+#ifdef BUILD_GDBSIM_MODEL
 #include "GdbSim.h"
+#endif /* BUILD_GDBSIM_MODEL */
+
+#ifdef BUILD_PICORV32_MODEL
+#include "Picorv32.h"
+#endif /* BUILD_PICORV32_MODEL */
+
+#ifdef BUILD_RI5CY_MODEL
+#include "Ri5cy.h"
+#endif /* BUILD_RI5CY_MODEL */
+
 
 // Class headers
 
@@ -113,12 +123,20 @@ createCpu (const char *name, TraceFlags *traceFlags)
   ITarget *cpu;
 
   // The RISC-V model
-  if (0 == strcasecmp ("RI5CY", name))
-    cpu = new Ri5cy (traceFlags);
-  else if (0 == strcasecmp ("PicoRV32", name))
-    cpu = new Picorv32 (traceFlags);
+  if (0)
+    /* Nothing.  */;
+#ifdef BUILD_GDBSIM_MODEL
   else if (0 == strcasecmp ("GDBSIM", name))
     cpu = new GdbSim (traceFlags);
+#endif /* BUILD_GDBSIM_MODEL */
+#ifdef BUILD_PICORV32_MODEL
+  else if (0 == strcasecmp ("PicoRV32", name))
+    cpu = new Picorv32 (traceFlags);
+#endif /* BUILD_PICORV32_MODEL */
+#ifdef BUILD_RI5CY_MODEL
+  else if (0 == strcasecmp ("RI5CY", name))
+    cpu = new Ri5cy (traceFlags);
+#endif /* BUILD_RI5CY_MODEL */
   else
     {
       cerr << "ERROR: Unrecognized core: " << name << ": exiting" << endl;

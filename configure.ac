@@ -79,15 +79,17 @@ AC_ARG_WITH(
 	AC_HELP_STRING([--with-picorv32-modeldir],
 	               [directory containing the PicoRV32 model & headers]),
 	[MDIR_PICORV32="$(cd $withval; pwd)"],
-	[AC_MSG_FAILURE(PicoRV32 model directory not specified)])
+	[MDIR_PICORV32=""])
 AC_ARG_WITH(
 	[picorv32-topmodule],
 	AC_HELP_STRING([--with-picorv32-topmodule],
 	               [Name of the top module in the PicoRV32 Verilog]),
 	[MODNAME_PICORV32="$withval"],
-	[AC_MSG_FAILURE(PicoRV32 top module not specified)])
+	[MODNAME_PICORV32="testbench"])
 AC_SUBST(MDIR_PICORV32)
 AC_SUBST(MODNAME_PICORV32)
+AM_CONDITIONAL([BUILD_PICORV32_MODEL], [test -n "${MDIR_PICORV32}"])
+AM_COND_IF([BUILD_PICORV32_MODEL], [AC_DEFINE([BUILD_PICORV32_MODEL], [1], [Build the PicoRV32 model])])
 
 # RI5CY
 AC_ARG_WITH(
@@ -95,7 +97,7 @@ AC_ARG_WITH(
 	AC_HELP_STRING([--with-ri5cy-modeldir],
 	               [directory containing the RI5CY model & headers]),
 	[MDIR_RI5CY="$(cd $withval; pwd)"],
-	[AC_MSG_FAILURE(RI5CY model directory not specified)])
+        [MDIR_RI5CY=""])
 AC_ARG_WITH(
 	[ri5cy-topmodule],
 	AC_HELP_STRING([--with-ri5cy-topmodule],
@@ -104,6 +106,8 @@ AC_ARG_WITH(
 	[MODNAME_RI5CY="top"])
 AC_SUBST(MDIR_RI5CY)
 AC_SUBST(MODNAME_RI5CY)
+AM_CONDITIONAL([BUILD_RI5CY_MODEL], [test -n "${MDIR_RI5CY}"])
+AM_COND_IF([BUILD_RI5CY_MODEL], [AC_DEFINE([BUILD_RI5CY_MODEL], [1], [Build the Ri5cy model])])
 
 # GDBSIM
 AC_ARG_WITH(
@@ -111,8 +115,21 @@ AC_ARG_WITH(
 	AC_HELP_STRING([--with-gdbsim-builddir],
 	               [directory containing the GDBSIM build (of GDB)]),
 	[MDIR_GDBSIM="$(cd $withval; pwd)"],
-	[AC_MSG_FAILURE(GDBSIM model directory not specified)])
+	[MDIR_GDBSIM=""])
 AC_SUBST(MDIR_GDBSIM)
+AM_CONDITIONAL([BUILD_GDBSIM_MODEL], [test -n "${MDIR_GDBSIM}"])
+AM_COND_IF([BUILD_GDBSIM_MODEL], [AC_DEFINE([BUILD_GDBSIM_MODEL], [1], [Build the GDB simulator model])])
+
+AC_ARG_WITH(
+       [gdbsim-incdir],
+       AC_HELP_STRING([--with-gdbsim-incdir],
+		      [include directory for gdbsim headers]),
+       [GDBSIM_INCDIR="$(cd $withval; pwd)"],
+       [GDBSIM_INCDIR="$srcdir/../gdb/include"
+	 AS_IF([test -d $GDBSIM_INCDIR],
+	       [GDBSIM_INCDIR="$(cd $GDBSIM_INCDIR; pwd)"],
+	       [AC_MSG_FAILURE([Couldn't find gdbsim header files, use --with-gdbsim-incdir])])])
+AC_SUBST(GDBSIM_INCDIR)
 
 # We need to know where to find binutils headers
 AC_ARG_WITH(

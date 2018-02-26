@@ -641,9 +641,16 @@ VTESTBENCH
 BUILD_64_BIT_FALSE
 BUILD_64_BIT_TRUE
 BINUTILS_INCDIR
+GDBSIM_INCDIR
+BUILD_GDBSIM_MODEL_FALSE
+BUILD_GDBSIM_MODEL_TRUE
 MDIR_GDBSIM
+BUILD_RI5CY_MODEL_FALSE
+BUILD_RI5CY_MODEL_TRUE
 MODNAME_RI5CY
 MDIR_RI5CY
+BUILD_PICORV32_MODEL_FALSE
+BUILD_PICORV32_MODEL_TRUE
 MODNAME_PICORV32
 MDIR_PICORV32
 CXXCPP
@@ -788,6 +795,7 @@ with_picorv32_topmodule
 with_ri5cy_modeldir
 with_ri5cy_topmodule
 with_gdbsim_builddir
+with_gdbsim_incdir
 with_binutils_incdir
 with_xlen
 '
@@ -1459,6 +1467,7 @@ Optional Packages:
   --with-ri5cy-topmodule  Name of the top module in the RI5CY Verilog (default
                           "top")
   --with-gdbsim-builddir  directory containing the GDBSIM build (of GDB)
+  --with-gdbsim-incdir    include directory for gdbsim headers
   --with-binutils-incdir  include directory for binutils utilities
   --with-xlen=XLEN        Set XLEN as the register bit width (default 32)
 
@@ -15936,10 +15945,7 @@ CPPFLAGS="$CPPFLAGS -I$VINCDIR -I$VINCDIR/vltstd"
 if test "${with_picorv32_modeldir+set}" = set; then :
   withval=$with_picorv32_modeldir; MDIR_PICORV32="$(cd $withval; pwd)"
 else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "PicoRV32 model directory not specified
-See \`config.log' for more details" "$LINENO" 5; }
+  MDIR_PICORV32=""
 fi
 
 
@@ -15947,14 +15953,24 @@ fi
 if test "${with_picorv32_topmodule+set}" = set; then :
   withval=$with_picorv32_topmodule; MODNAME_PICORV32="$withval"
 else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "PicoRV32 top module not specified
-See \`config.log' for more details" "$LINENO" 5; }
+  MODNAME_PICORV32="testbench"
 fi
 
 
 
+ if test -n "${MDIR_PICORV32}"; then
+  BUILD_PICORV32_MODEL_TRUE=
+  BUILD_PICORV32_MODEL_FALSE='#'
+else
+  BUILD_PICORV32_MODEL_TRUE='#'
+  BUILD_PICORV32_MODEL_FALSE=
+fi
+
+if test -z "$BUILD_PICORV32_MODEL_TRUE"; then :
+
+$as_echo "#define BUILD_PICORV32_MODEL 1" >>confdefs.h
+
+fi
 
 # RI5CY
 
@@ -15962,10 +15978,7 @@ fi
 if test "${with_ri5cy_modeldir+set}" = set; then :
   withval=$with_ri5cy_modeldir; MDIR_RI5CY="$(cd $withval; pwd)"
 else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "RI5CY model directory not specified
-See \`config.log' for more details" "$LINENO" 5; }
+  MDIR_RI5CY=""
 fi
 
 
@@ -15978,6 +15991,19 @@ fi
 
 
 
+ if test -n "${MDIR_RI5CY}"; then
+  BUILD_RI5CY_MODEL_TRUE=
+  BUILD_RI5CY_MODEL_FALSE='#'
+else
+  BUILD_RI5CY_MODEL_TRUE='#'
+  BUILD_RI5CY_MODEL_FALSE=
+fi
+
+if test -z "$BUILD_RI5CY_MODEL_TRUE"; then :
+
+$as_echo "#define BUILD_RI5CY_MODEL 1" >>confdefs.h
+
+fi
 
 # GDBSIM
 
@@ -15985,10 +16011,38 @@ fi
 if test "${with_gdbsim_builddir+set}" = set; then :
   withval=$with_gdbsim_builddir; MDIR_GDBSIM="$(cd $withval; pwd)"
 else
+  MDIR_GDBSIM=""
+fi
+
+
+ if test -n "${MDIR_GDBSIM}"; then
+  BUILD_GDBSIM_MODEL_TRUE=
+  BUILD_GDBSIM_MODEL_FALSE='#'
+else
+  BUILD_GDBSIM_MODEL_TRUE='#'
+  BUILD_GDBSIM_MODEL_FALSE=
+fi
+
+if test -z "$BUILD_GDBSIM_MODEL_TRUE"; then :
+
+$as_echo "#define BUILD_GDBSIM_MODEL 1" >>confdefs.h
+
+fi
+
+
+# Check whether --with-gdbsim-incdir was given.
+if test "${with_gdbsim_incdir+set}" = set; then :
+  withval=$with_gdbsim_incdir; GDBSIM_INCDIR="$(cd $withval; pwd)"
+else
+  GDBSIM_INCDIR="$srcdir/../gdb/include"
+	 if test -d $GDBSIM_INCDIR; then :
+  GDBSIM_INCDIR="$(cd $GDBSIM_INCDIR; pwd)"
+else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "GDBSIM model directory not specified
+as_fn_error $? "Couldn't find gdbsim header files, use --with-gdbsim-incdir
 See \`config.log' for more details" "$LINENO" 5; }
+fi
 fi
 
 
@@ -16318,6 +16372,18 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BUILD_PICORV32_MODEL_TRUE}" && test -z "${BUILD_PICORV32_MODEL_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_PICORV32_MODEL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BUILD_RI5CY_MODEL_TRUE}" && test -z "${BUILD_RI5CY_MODEL_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_RI5CY_MODEL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BUILD_GDBSIM_MODEL_TRUE}" && test -z "${BUILD_GDBSIM_MODEL_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_GDBSIM_MODEL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BUILD_64_BIT_TRUE}" && test -z "${BUILD_64_BIT_FALSE}"; then

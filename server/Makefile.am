@@ -26,6 +26,41 @@ else
   bin_PROGRAMS += riscv32-gdbserver
 endif
 
+if BUILD_GDBSIM_MODEL
+  MAYBE_GDBSIM_LDADD=@MDIR_GDBSIM@/sim/riscv/libsim.a           \
+		     @MDIR_GDBSIM@/bfd/libbfd.a                 \
+		     @MDIR_GDBSIM@/opcodes/libopcodes.a         \
+		     @MDIR_GDBSIM@/libiberty/libiberty.a        \
+		     @MDIR_GDBSIM@/zlib/libz.a                  \
+		     -ldl
+  MAYBE_GDBSIM_CPPFLAGS=-I$(top_srcdir)/targets/gdbsim
+endif
+
+if BUILD_PICORV32_MODEL
+  MAYBE_PICORV32_LDADD=@MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a
+  MAYBE_PICORV32_CPPFLAGS=-I$(top_srcdir)/targets/picorv32
+endif
+
+if BUILD_RI5CY_MODEL
+  MAYBE_RI5CY_LDADD=@MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a
+  MAYBE_RI5CY_CPPFLAGS=-I$(top_srcdir)/targets/ri5cy
+endif
+
+if BUILD_RI5CY_MODEL
+  MAYBE_VERILATOR_RI5CY_LDADD=@MDIR_RI5CY@/verilated.o        \
+			      @MDIR_RI5CY@/verilated_vcd_c.o  \
+			      @MDIR_RI5CY@/verilated_dpi.o
+else
+if BUILD_PICORV32_MODEL
+  MAYBE_VERILATOR_PICORV32_LDADD=@MDIR_PICORV32@/verilated.o        \
+				 @MDIR_PICORV32@/verilated_vcd_c.o  \
+				 @MDIR_PICORV32@/verilated_dpi.o
+endif
+endif
+
+MAYBE_VERILATOR_LDADD=$(MAYBE_VERILATOR_RI5CY_LDADD) \
+		      $(MAYBE_VERILATOR_PICORV32_LDADD)
+
 riscv64_gdbserver_SOURCES = $(ALL_SOURCES)
 riscv32_gdbserver_SOURCES = $(ALL_SOURCES)
 
@@ -58,22 +93,15 @@ ALL_SOURCES = AbstractConnection.cpp \
 
 ALL_LDADD = ../targets/libtargets.la                   \
             ../trace/libtrace.la                       \
-            @MDIR_RI5CY@/verilated.o                   \
-            @MDIR_RI5CY@/verilated_vcd_c.o             \
-            @MDIR_RI5CY@/verilated_dpi.o               \
-            @MDIR_PICORV32@/V@MODNAME_PICORV32@__ALL.a \
-            @MDIR_RI5CY@/V@MODNAME_RI5CY@__ALL.a       \
-            @MDIR_GDBSIM@/sim/riscv/libsim.a           \
-            @MDIR_GDBSIM@/bfd/libbfd.a                 \
-            @MDIR_GDBSIM@/opcodes/libopcodes.a         \
-            @MDIR_GDBSIM@/libiberty/libiberty.a        \
-            @MDIR_GDBSIM@/zlib/libz.a                  \
-            -ldl
+	    $(MAYBE_VERILATOR_LDADD)		       \
+	    $(MAYBE_GDBSIM_LDADD)		       \
+	    $(MAYBE_RI5CY_LDADD)		       \
+	    $(MAYBE_PICORV32_LDADD)
 
 ALL_CPPFLAGS = -I$(top_srcdir)/targets          \
                -I$(top_srcdir)/targets/common   \
-               -I$(top_srcdir)/targets/picorv32 \
-               -I$(top_srcdir)/targets/ri5cy    \
-               -I$(top_srcdir)/targets/gdbsim   \
                -I$(top_srcdir)/trace            \
-	       -I$(BINUTILS_INCDIR)
+	       -I$(BINUTILS_INCDIR)             \
+	       $(MAYBE_PICORV32_CPPFLAGS)       \
+	       $(MAYBE_RI5CY_CPPFLAGS)          \
+	       $(MAYBE_GDBSIM_CPPFLAGS)

@@ -1,3 +1,27 @@
+2018-02-26  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Regenerate.
+	* config.h.in: Regenerate.
+	* configure: Regenerate.
+	* configure.ac: Allow all the targets to be optional.  Add build
+	flags to support this.
+	* server/Makefile.am: Don't depend on any particular target being
+	present.
+	* server/Makefile.in: Regenerate.
+	* server/main.cpp: Only pull in target headers if the target is
+	configured for this build.
+	(createCpu): Only support instantiating targets configured for
+	this build.
+	* targets/Makefile.am: Don't depend on any particular target being
+	present.
+	* targets/Makefile.in: Regenerate.
+	* targets/common/Makefile.in: Regenerate.
+	* targets/gdbsim/Makefile.in: Regenerate.
+	* targets/picorv32/Makefile.in: Regenerate.
+	* targets/ri5cy/Makefile.in: Regenerate.
+	* trace/Makefile.in: Regenerate.
+
 2017-10-22  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* configure.ac: Turn -Wextra on by default.

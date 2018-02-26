@@ -3,6 +3,15 @@
 /* Build 64-bit gdbserver */
 #undef BUILD_64_BIT
 
+/* Build the GDB simulator model */
+#undef BUILD_GDBSIM_MODEL
+
+/* Build the PicoRV32 model */
+#undef BUILD_PICORV32_MODEL
+
+/* Build the Ri5cy model */
+#undef BUILD_RI5CY_MODEL
+
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 

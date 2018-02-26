@@ -123,8 +123,9 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libtargets_la_DEPENDENCIES = common/libcommon.la gdbsim/libgdbsim.la \
-	picorv32/libpicorv32.la ri5cy/libri5cy.la
+libtargets_la_DEPENDENCIES = common/libcommon.la \
+	$(MAYBE_GDBSIM_LIBADD) $(MAYBE_PICORV32_LIBADD) \
+	$(MAYBE_RI5CY_LIBADD)
 am_libtargets_la_OBJECTS = libtargets_la-ITarget.lo
 libtargets_la_OBJECTS = $(am_libtargets_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -229,7 +230,7 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = common gdbsim picorv32 ri5cy
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
@@ -287,6 +288,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GDBSIM_INCDIR = @GDBSIM_INCDIR@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -384,15 +386,25 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = common gdbsim picorv32 ri5cy
+@BUILD_GDBSIM_MODEL_TRUE@MAYBE_GDBSIM_SUBDIR = gdbsim
+@BUILD_GDBSIM_MODEL_TRUE@MAYBE_GDBSIM_LIBADD = gdbsim/libgdbsim.la
+@BUILD_PICORV32_MODEL_TRUE@MAYBE_PICORV32_SUBDIR = picorv32
+@BUILD_PICORV32_MODEL_TRUE@MAYBE_PICORV32_LIBADD = picorv32/libpicorv32.la
+@BUILD_RI5CY_MODEL_TRUE@MAYBE_RI5CY_SUBDIR = ri5cy
+@BUILD_RI5CY_MODEL_TRUE@MAYBE_RI5CY_LIBADD = ri5cy/libri5cy.la
+SUBDIRS = common                    \
+	  $(MAYBE_GDBSIM_SUBDIR)    \
+	  $(MAYBE_PICORV32_SUBDIR)  \
+	  $(MAYBE_RI5CY_SUBDIR)
+
 noinst_LTLIBRARIES = libtargets.la
 libtargets_la_SOURCES = ITarget.cpp \
                         ITarget.h
 
-libtargets_la_LIBADD = common/libcommon.la     \
-                       gdbsim/libgdbsim.la     \
-                       picorv32/libpicorv32.la \
-                       ri5cy/libri5cy.la
+libtargets_la_LIBADD = common/libcommon.la      \
+		       $(MAYBE_GDBSIM_LIBADD)   \
+		       $(MAYBE_PICORV32_LIBADD) \
+		       $(MAYBE_RI5CY_LIBADD)
 
 libtargets_la_CPPFLAGS = -I$(srcdir)/common     \
                          -I$(top_srcdir)/server \
