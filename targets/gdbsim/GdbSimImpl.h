@@ -110,6 +110,10 @@ class GdbSimImpl final
 
   GdbServer * mServer;
 
+  //! Have we reset before?
+
+  bool mHaveReset;
+
   ITarget::ResumeRes doOneStep (std::chrono::duration <double>);
   ITarget::ResumeRes doRunToBreak (std::chrono::duration <double>);
   bool stoppedAtSyscall (void);

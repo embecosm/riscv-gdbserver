@@ -42,12 +42,10 @@
 //! @param[in] flags  The trace flags
 
 GdbSimImpl::GdbSimImpl (const TraceFlags *flags)
-  : mFlags (flags)
+  : mFlags (flags),
+    mHaveReset (false)
 {
-  char * const sim_argv[] = { strdup ("gdbsim"), NULL };
-
-  gdbsim_desc = sim_open (SIM_OPEN_DEBUG, &gdb_callback,
-                          NULL, sim_argv);
+  reset (ITarget::ResetType::COLD);
 }	// GdbSimImpl::GdbSimImpl ()
 
 
@@ -130,9 +128,22 @@ GdbSimImpl::terminate ()
 ITarget::ResumeRes
 GdbSimImpl::reset (ITarget::ResetType type __attribute__ ((unused)))
 {
-  std::cerr << "In " << __PRETTY_FUNCTION__ << std::endl;
-  abort ();
-  return ITarget::ResumeRes::FAILURE;
+  char * const sim_argv[] = { strdup ("gdbsim"), NULL };
+
+  if (mHaveReset)
+    gdb_callback.shutdown (&gdb_callback);
+  mHaveReset = true;
+
+  gdb_callback = default_callback;
+  gdb_callback.init (&gdb_callback);
+
+  gdbsim_desc = sim_open (SIM_OPEN_DEBUG, &gdb_callback,
+                          NULL, sim_argv);
+
+  if (sim_create_inferior (gdbsim_desc, NULL, sim_argv, NULL) != SIM_RC_OK)
+    abort ();
+
+  return ITarget::ResumeRes::SUCCESS;
 }	// reset ()
 
 
@@ -187,7 +198,8 @@ GdbSimImpl::readRegister (const int reg, uint_reg_t &value)
   if (reg_size != sizeof (value))
     {
       if (reg_size == 0 || reg_size == static_cast <std::size_t> (-1))
-        std::cerr << "error: failed to read register " << reg << std::endl;
+        std::cerr << "error: failed to read register 0x"
+                  << std::hex << reg << std::endl;
       else
         std::cerr << "error: failed to read register " << reg << " due to "
                   << "incorrect size, expected " << sizeof (value)
@@ -383,31 +395,60 @@ GdbSimImpl::doOneStep (std::chrono::duration <double> timeout)
   sim_resume (gdbsim_desc, 1, 0 /* No signal.  */);
   sim_stop_reason (gdbsim_desc, &stop_reason, &signo);
 
-  /* This is the common case.  */
-  if (stop_reason == sim_stopped && signo == GDB_SIGNAL_TRAP)
+  switch (stop_reason)
     {
-      uint_reg_t stoppedAddress;
-      uint32_t insn;
-
-      readRegister (SIM_RISCV_PC_REGNUM, stoppedAddress);
-      read (stoppedAddress,
-            reinterpret_cast <uint8_t *> (&insn),
-            sizeof (insn));
-
-      if (insn == 0x00100073 /* EBREAK */)
+    case sim_stopped:
+      /* This is the common case.  */
+      if (signo == GDB_SIGNAL_TRAP)
         {
-          if (stoppedAtSyscall ())
-            return ITarget::ResumeRes::SYSCALL;
-          else
-            return ITarget::ResumeRes::INTERRUPTED;
+          uint_reg_t stoppedAddress;
+          uint32_t insn;
+
+          readRegister (SIM_RISCV_PC_REGNUM, stoppedAddress);
+          read (stoppedAddress,
+                reinterpret_cast <uint8_t *> (&insn),
+                sizeof (insn));
+
+          if (insn == 0x00100073 /* EBREAK */)
+            {
+              if (stoppedAtSyscall ())
+                return ITarget::ResumeRes::SYSCALL;
+              else
+                return ITarget::ResumeRes::INTERRUPTED;
+            }
+
+          return ITarget::ResumeRes::STEPPED;
+        }
+      else
+        {
+          std::cerr << "Unexpected signal " << std::dec << signo
+                    << " from simulator" << std::endl;
+          return ITarget::ResumeRes::INTERRUPTED;
         }
 
-      return ITarget::ResumeRes::STEPPED;
+      break;
+
+    case sim_signalled:
+      /* Simulator was terminated with a signal.  There's currently no way
+         to pass the signal number back out to the gdbserver code.  */
+      std::cerr << "Simulator terminated with signal "
+                << signo << std::endl;
+      break;
+
+    case sim_exited:
+      /* Simulator exited.  */
+      return ITarget::ResumeRes::SYSCALL;
+
+    default:
+    case sim_running:
+    case sim_polling:
+      /* These should not happen.  */
+      std::cerr << "Error, unexpected simulator stop, reason = "
+                << stop_reason << ", signal = " << signo << std::endl;
+      break;
     }
 
-  /* Not sure how to map this stop reason back to result at this time.  */
-  std::cerr << "stop reason = " << stop_reason
-            << " signo = " << signo << std::endl;
+  std::cerr << "Invalid simulator stop" << std::endl;
   abort ();
   return ITarget::ResumeRes::FAILURE;
 }

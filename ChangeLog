@@ -1,3 +1,16 @@
+2018-03-15  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* targets/gdbsim/GdbSimImpl.cpp (GdbSimImpl::GdbSimImpl):
+	Initialise new member variables.  Call reset to do work.
+	(GdbSimImpl::reset): Close previous simulator, and open a new
+	simulator.
+	(GdbSimImpl::readRegister): Update error message to put register
+	number in hex.
+	(GdbSimImpl::doOneStep): Better support for different reasons the
+	simulator might stop.
+	* targets/gdbsim/GdbSimImpl.h (GdbSimImpl::mHaveReset): Declare
+	new member variable.
+
 2017-12-21  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/SyscallReplyPacket.h: New file.
