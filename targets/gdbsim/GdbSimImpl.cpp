@@ -403,12 +403,24 @@ GdbSimImpl::doOneStep (std::chrono::duration <double> timeout)
         {
           uint_reg_t stoppedAddress;
           uint32_t insn;
+          uint16_t cinsn;
 
           readRegister (SIM_RISCV_PC_REGNUM, stoppedAddress);
+
+          read (stoppedAddress,
+                reinterpret_cast <uint8_t *> (&cinsn),
+                sizeof (cinsn));
+          if (cinsn == 0x9002 /* C.EBREAK */)
+            {
+              if (stoppedAtSyscall ())
+                return ITarget::ResumeRes::SYSCALL;
+              else
+                return ITarget::ResumeRes::INTERRUPTED;
+            }
+
           read (stoppedAddress,
                 reinterpret_cast <uint8_t *> (&insn),
                 sizeof (insn));
-
           if (insn == 0x00100073 /* EBREAK */)
             {
               if (stoppedAtSyscall ())
