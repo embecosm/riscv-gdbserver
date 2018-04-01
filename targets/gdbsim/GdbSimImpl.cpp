@@ -388,9 +388,25 @@ GdbSimImpl::timeStamp ()
 ITarget::ResumeRes
 GdbSimImpl::doOneStep (std::chrono::duration <double> timeout)
 {
+  uint32_t insn;
+  uint16_t cinsn;
+  uint_reg_t stepAddr;
   enum sim_stop stop_reason;
   int signo;
   (void) timeout;
+
+  /* If we are sat looking at a syscall (ECALL instruction) then nudge the
+     $pc past the ECALL, and then return that a syscall has been
+     performed.  */
+  readRegister (SIM_RISCV_PC_REGNUM, stepAddr);
+  read (stepAddr,
+        reinterpret_cast <uint8_t *> (&insn),
+        sizeof (insn));
+  if (insn == 0x00000073 /* ECALL */)
+    {
+      writeRegister (SIM_RISCV_PC_REGNUM, (stepAddr + 4));
+      return ITarget::ResumeRes::SYSCALL;
+    }
 
   sim_resume (gdbsim_desc, 1, 0 /* No signal.  */);
   sim_stop_reason (gdbsim_desc, &stop_reason, &signo);
@@ -401,34 +417,21 @@ GdbSimImpl::doOneStep (std::chrono::duration <double> timeout)
       /* This is the common case.  */
       if (signo == GDB_SIGNAL_TRAP)
         {
-          uint_reg_t stoppedAddress;
-          uint32_t insn;
-          uint16_t cinsn;
-
-          readRegister (SIM_RISCV_PC_REGNUM, stoppedAddress);
-
-          read (stoppedAddress,
+          /* If we stopped looking at either C.EBREAK or EBREAK then we
+             have hit a breakpoint.  Return an appropriate reply.  */
+          read (stepAddr,
                 reinterpret_cast <uint8_t *> (&cinsn),
                 sizeof (cinsn));
           if (cinsn == 0x9002 /* C.EBREAK */)
-            {
-              if (stoppedAtSyscall ())
-                return ITarget::ResumeRes::SYSCALL;
-              else
-                return ITarget::ResumeRes::INTERRUPTED;
-            }
+            return ITarget::ResumeRes::INTERRUPTED;
 
-          read (stoppedAddress,
+          read (stepAddr,
                 reinterpret_cast <uint8_t *> (&insn),
                 sizeof (insn));
           if (insn == 0x00100073 /* EBREAK */)
-            {
-              if (stoppedAtSyscall ())
-                return ITarget::ResumeRes::SYSCALL;
-              else
-                return ITarget::ResumeRes::INTERRUPTED;
-            }
+            return ITarget::ResumeRes::INTERRUPTED;
 
+          /* We must have just completed a step.  */
           return ITarget::ResumeRes::STEPPED;
         }
       else
@@ -492,23 +495,6 @@ GdbSimImpl::doRunToBreak (std::chrono::duration <double> timeout)
         return ITarget::ResumeRes::TIMEOUT;
     }
   while (true);
-}
-
-
-bool
-GdbSimImpl::stoppedAtSyscall ()
-{
-  uint_reg_t stoppedAddress;
-  uint32_t insn [3];
-
-  readRegister (SIM_RISCV_PC_REGNUM, stoppedAddress);
-  read (stoppedAddress - 4,
-        reinterpret_cast <uint8_t *> (&insn),
-        sizeof (insn));
-
-  return (insn [0] == 0x00000013    /* NOP    */
-          && insn [1] == 0x00100073 /* EBREAK */
-          && insn [2] == 0x00000013 /* NOP    */);
 }
 
 // Local Variables:

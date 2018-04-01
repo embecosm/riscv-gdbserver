@@ -1,5 +1,13 @@
 2018-04-01  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* targets/gdbsim/GdbSimImpl.cpp (GdbSimImpl::doOneStep): Use ECALL
+	for syscalls, and correctly spot C.EBREAK or EBREAK for breakpoints.
+	(GdbSimImpl::stoppedAtSyscall): Delete definition.
+	* targets/gdbsim/GdbSimImpl.h (GdbSimImpl::stoppedAtSyscall):
+	Delete declaration.
+
+2018-04-01  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspReadReg): Return an
 	error when accessing an invalid register.
 

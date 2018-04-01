@@ -116,7 +116,6 @@ class GdbSimImpl final
 
   ITarget::ResumeRes doOneStep (std::chrono::duration <double>);
   ITarget::ResumeRes doRunToBreak (std::chrono::duration <double>);
-  bool stoppedAtSyscall (void);
 };
 
 #endif	// GDBSIM_IMPL_H
