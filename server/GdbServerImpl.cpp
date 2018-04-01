@@ -797,11 +797,17 @@ GdbServerImpl::rspReadReg ()
   int byteSize;
 
   byteSize = cpu->readRegister (regNum, val);
-  Utils::val2Hex (val, pkt->data, byteSize, true /* little endian */);
 
+  if (byteSize < 0)
+    {
+      pkt->packStr ("E01");
+      rsp->putPkt (pkt);
+      return;
+    }
+
+  Utils::val2Hex (val, pkt->data, byteSize, true /* little endian */);
   pkt->setLen (strlen (pkt->data));
   rsp->putPkt (pkt);
-
 }	// rspReadReg ()
 
 
