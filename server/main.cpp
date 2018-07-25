@@ -29,7 +29,6 @@
 // RISC-V headers in general and for each target
 
 #include "ITarget.h"
-#include "Picorv32.h"
 #include "Ri5cy.h"
 
 // Class headers
@@ -168,9 +167,7 @@ main (int   argc,
 
   // The RISC-V model
 
-  if (0 == strcasecmp ("PicoRV32", coreName))
-    cpu = new Picorv32 (traceFlags);
-  else if (0 == strcasecmp ("RI5CY", coreName))
+  if (0 == strcasecmp ("RI5CY", coreName))
     cpu = new Ri5cy (traceFlags);
   else
     {

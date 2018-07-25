@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = common picorv32 ri5cy
+SUBDIRS = common ri5cy
 
 noinst_LTLIBRARIES = libtargets.la
 
@@ -27,7 +27,6 @@ libtargets_la_SOURCES = ITarget.cpp \
                         ITarget.h
 
 libtargets_la_LIBADD = common/libcommon.la     \
-                       picorv32/libpicorv32.la \
                        ri5cy/libri5cy.la
 
 libtargets_la_CPPFLAGS = -I$(srcdir)/common     \

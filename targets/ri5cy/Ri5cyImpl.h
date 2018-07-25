@@ -188,7 +188,7 @@ private:
 
   //! Disassembly trace file pointer
 
-  ofstream mDisasFile;
+  std::ofstream mDisasFile;
 
   // Helper methods
 

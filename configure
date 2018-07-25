@@ -642,8 +642,6 @@ BINUTILS_LIBDIR
 BINUTILS_INCDIR
 MODNAME_RI5CY
 MDIR_RI5CY
-MODNAME_PICORV32
-MDIR_PICORV32
 CXXCPP
 am__fastdepCXX_FALSE
 am__fastdepCXX_TRUE
@@ -778,8 +776,6 @@ with_gnu_ld
 with_sysroot
 enable_libtool_lock
 with_verilator_headers
-with_picorv32_modeldir
-with_picorv32_topmodule
 with_ri5cy_modeldir
 with_ri5cy_topmodule
 with_binutils_incdir
@@ -1442,10 +1438,6 @@ Optional Packages:
                           compiler's sysroot if not specified).
   --with-verilator-headers
                           location of standard verilator headers
-  --with-picorv32-modeldir
-                          directory containing the PicoRV32 model & headers
-  --with-picorv32-topmodule
-                          Name of the top module in the PicoRV32 Verilog
   --with-ri5cy-modeldir   directory containing the RI5CY model & headers
   --with-ri5cy-topmodule  Name of the top module in the RI5CY Verilog
   --with-binutils-incdir  include directory for binutils utilities
@@ -15869,7 +15861,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 # Add -Werror to the CXXFLAGS. For now this is not configurable.
-CXXFLAGS="$CXXFLAGS -Werror -std=gnu++11"
+CXXFLAGS="$CXXFLAGS -Werror -std=gnu++11 -faligned-new"
 
 # We need to know where the generic verilator headers are
 
@@ -15882,35 +15874,6 @@ fi
 
 
 CPPFLAGS="$CPPFLAGS -I$VINCDIR -I$VINCDIR/vltstd"
-
-# We need to know where the target library and headers are for each target,
-# and the name of the top module (from which we derive the module name)
-
-# PicoRV32
-
-# Check whether --with-picorv32-modeldir was given.
-if test "${with_picorv32_modeldir+set}" = set; then :
-  withval=$with_picorv32_modeldir; MDIR_PICORV32="$(cd $withval; pwd)"
-else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "PicoRV32 model directory not specified
-See \`config.log' for more details" "$LINENO" 5; }
-fi
-
-
-# Check whether --with-picorv32-topmodule was given.
-if test "${with_picorv32_topmodule+set}" = set; then :
-  withval=$with_picorv32_topmodule; MODNAME_PICORV32="$withval"
-else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "PicoRV32 top module not specified
-See \`config.log' for more details" "$LINENO" 5; }
-fi
-
-
-
 
 # RI5CY
 

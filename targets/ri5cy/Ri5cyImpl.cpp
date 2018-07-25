@@ -509,8 +509,8 @@ Ri5cyImpl::clockModel ()
 
       if (mLastPc != currentPc)
         {
-          stringstream iss;
-          ostringstream oss;
+          std::stringstream iss;
+          std::ostringstream oss;
           iss << "disas 0x" << std::hex << id_stage->instr;
           mServer->command (iss.str(), oss);
 
