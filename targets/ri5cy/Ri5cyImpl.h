@@ -24,6 +24,8 @@
 #define RI5CY_IMPL_H
 
 #include <cstdint>
+#include <iostream>
+#include <fstream>
 
 #include "ITarget.h"
 #include "Vtop.h"
@@ -178,6 +180,18 @@ private:
   //! VCD time. This will be in ns and we have a 50MHz device
 
   vluint64_t  mCpuTime;
+
+  //! Prev VCD time. This will be in ns and we have a 50MHz device
+
+  vluint64_t  mPrevCpuTime;
+
+  //! Prev code address
+
+  uint32_t  mPrevAddr;
+
+  //! Handle for address log
+
+  std::ofstream addrLog;
 
   // Helper methods
 

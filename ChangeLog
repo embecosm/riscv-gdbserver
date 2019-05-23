@@ -1,3 +1,14 @@
+2019-05-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* targets/ri5cy/Ri5cyImpl.cpp: Include iomanip header.
+	(Ri5cyImpl::Ri5cyImpl): Open a timing trace file and initialize
+	trace variables.
+	(Ri5cyImpl::~Ri5cyImpl): Close timing trace file.
+	(Ri5cyImpl::clockModel): Print out timing trace data.
+	* targets/ri5cy/Ri5cyImpl.h: Include iostream and fstream headers.
+	(Ri5cyImpl): Add state data for timing trace and handle for trace
+	file.
+
 2018-04-04  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallRequest):

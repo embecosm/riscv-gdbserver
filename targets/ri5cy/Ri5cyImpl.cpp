@@ -21,6 +21,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
+#include <iomanip>
 #include <cstdint>
 #include <cstdlib>
 #include <sstream>
@@ -67,6 +68,13 @@ Ri5cyImpl::Ri5cyImpl (const TraceFlags * flags) :
       mTfp->open ("gdbserver.vcd");
     }
 
+  // Open the logging file and set up values
+
+  addrLog.open ("addrlog.txt");
+
+  mPrevAddr = mCpu->top->riscv_core_i->if_stage_i->fetch_addr;
+  mPrevCpuTime = mCpuTime;
+
   // Reset and halt the model
 
   resetModel ();
@@ -84,6 +92,10 @@ Ri5cyImpl::~Ri5cyImpl ()
 
   if (mFlags->traceVcd ())
     mTfp->close ();
+
+  // Close the logging file
+
+  addrLog.close ();
 
   delete mCpu;
 
@@ -473,7 +485,18 @@ Ri5cyImpl::clockModel ()
   if (mFlags->traceVcd ())
     mTfp->dump (mCpuTime);
 
+  if (mCpu->top->riscv_core_i->if_stage_i->fetch_addr != mPrevAddr)
+    {
+      addrLog << "0x" << std::setfill ('0') << std::setw (8) << std::hex
+	      << mPrevAddr << std::dec << std::setw (0) << std::setfill (' ')
+	      << "\t" << mPrevCpuTime << "\t" << mCpuTime - mPrevCpuTime
+	      << endl;
+      mPrevAddr = mCpu->top->riscv_core_i->if_stage_i->fetch_addr;
+      mPrevCpuTime = mCpuTime;
+    }
+
   mCycleCnt++;
+
 }	// Ri5cyImpl::clockModel ()
 
 
