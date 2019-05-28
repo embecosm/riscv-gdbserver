@@ -1,3 +1,10 @@
+2019-05-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::stepInstr)
+	(Ri5cyImpl::runToBreak): If we hit a breakpoint set the PC back to
+	the address of the previous instruction, to match the behavior of
+	upstream GDB.
+
 2018-04-04  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* server/GdbServerImpl.cpp (GdbServerImpl::rspSyscallRequest):

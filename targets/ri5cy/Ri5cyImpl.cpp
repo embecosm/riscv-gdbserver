@@ -646,8 +646,11 @@ Ri5cyImpl::stepInstr (duration <double>  timeout)
       if (stoppedAtSyscall ())
         return ITarget::ResumeRes::SYSCALL;
       else
-        // Guess we hit a breakpoint while stepping.
-        return ITarget::ResumeRes::INTERRUPTED;
+	{
+	  // Guess we hit a breakpoint while stepping.
+	  writeRegister (REG_PC, readDebugReg (DBG_PPC));
+	  return ITarget::ResumeRes::INTERRUPTED;
+	}
     }
 
   return  ITarget::ResumeRes::STEPPED;
@@ -716,7 +719,11 @@ Ri5cyImpl::runToBreak (duration <double>  timeout)
   if (stoppedAtSyscall ())
     return ITarget::ResumeRes::SYSCALL;
   else
-    return ITarget::ResumeRes::INTERRUPTED;
+    {
+      // Guess we stopped at a breakpoint
+      writeRegister (REG_PC, readDebugReg (DBG_PPC));
+      return ITarget::ResumeRes::INTERRUPTED;
+    }
 }	// Ri5cyImpl::runToBreak ()
 
 
