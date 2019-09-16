@@ -1477,7 +1477,7 @@ GdbServerImpl::rspRemoveMatchpoint ()
 
   // Break out the instruction
   string ui32Fmt = SCNx32;
-  string fmt = "z%1d,%" + ui32Fmt + ",%1d";
+  string fmt = "z%ld,%" + ui32Fmt + ",%ld";
   if (3 != sscanf (pkt->data, fmt.c_str(), (int *)&type, &addr, &len))
     {
       cerr << "Warning: RSP matchpoint deletion request not "
@@ -1657,7 +1657,7 @@ GdbServerImpl::rspInsertMatchpoint ()
 
   // Break out the instruction
   string ui32Fmt = SCNx32;
-  string fmt = "Z%1d,%" + ui32Fmt + ",%1d";
+  string fmt = "Z%ld,%" + ui32Fmt + ",%ld";
   if (3 != sscanf (pkt->data, fmt.c_str(), (int *)&type, &addr, &len))
     {
       cerr << "Warning: RSP matchpoint insertion request not "
