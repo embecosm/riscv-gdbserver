@@ -1,3 +1,9 @@
+2019-09-16  Maxim Blinov  <maxim.blinov@embecosm.com>
+
+	* server/GdbServerImpl.cpp (GdbServerImpl::rspInsertMatchpoint)
+	(GdbServerImpl::rspRemoveMatchpoint): Change erroneous
+	literal 'one' numeral to literal 'l' character in format string.
+
 2019-05-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* targets/ri5cy/Ri5cyImpl.cpp (Ri5cyImpl::stepInstr)
